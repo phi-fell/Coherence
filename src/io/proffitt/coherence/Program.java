@@ -7,13 +7,17 @@ import io.proffitt.coherence.graphics.Window;
 
 public class Program {
 	public static void main(String[] args) {
-		if (glfwInit() != GL_TRUE) {
-			System.out.println("GLFW ERROR");
-			System.exit(1);
-		}
+		GLFWContext glfw = new GLFWContext();
 		Window w = new Window(800, 600, "coherence");
 		Game g = new Game(w);
 		g.start();
-		//glfwTerminate();
+		while (g.isRunning()) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		glfw.destroy();
 	}
 }

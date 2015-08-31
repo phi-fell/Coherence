@@ -4,6 +4,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
+import io.proffitt.coherence.error.ErrorHandler;
 
 import java.util.ArrayList;
 
@@ -39,10 +40,7 @@ public class Window {
 		glfwWindowHint(GLFW_RESIZABLE, resizable);
 		glfwWindowHint(GLFW_SAMPLES, samples);
 		id = glfwCreateWindow(width, height, title, NULL, NULL);
-		if (id == NULL) {
-			System.out.println("ERROR in window creation");
-			return;
-		}
+		ErrorHandler.get().handle(id != NULL);
 		synchronized (windows) {
 			windows.add(this);
 		}
