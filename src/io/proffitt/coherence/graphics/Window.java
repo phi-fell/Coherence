@@ -8,6 +8,10 @@ import io.proffitt.coherence.error.ErrorHandler;
 
 import java.util.ArrayList;
 
+import org.lwjgl.glfw.GLFWCursorPosCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.opengl.GLContext;
 
 public class Window {
@@ -21,6 +25,10 @@ public class Window {
 	int							glProfile;
 	int							resizable;
 	int							samples;
+	GLFWKeyCallback				keyCall;
+	GLFWScrollCallback			scrollCall;
+	GLFWCursorPosCallback		cursorCall;
+	GLFWMouseButtonCallback		mouseCall;
 	public Window(int w, int h, String t) {
 		width = w;
 		height = h;
@@ -31,6 +39,16 @@ public class Window {
 		glProfile = GLFW_OPENGL_CORE_PROFILE;
 		resizable = GL_FALSE;
 		samples = 0;
+	}
+	public void setCallbacks(GLFWKeyCallback keyC, GLFWScrollCallback scrollC, GLFWCursorPosCallback cursorC, GLFWMouseButtonCallback mouseC) {
+		keyCall = keyC;
+		scrollCall = scrollC;
+		cursorCall = cursorC;
+		mouseCall = mouseC;
+		glfwSetKeyCallback(id, keyCall);
+		glfwSetScrollCallback(id, scrollCall);
+		glfwSetCursorPosCallback(id, cursorCall);
+		glfwSetMouseButtonCallback(id, mouseCall);
 	}
 	public void create() {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glMaj);
@@ -48,7 +66,7 @@ public class Window {
 		GLContext.createFromCurrent();
 		glfwSwapInterval(1);
 	}
-	public boolean isKeyDown(int key){
+	public boolean isKeyDown(int key) {
 		return glfwGetKey(id, key) == GLFW_PRESS;
 	}
 	public void makeCurrent() {
@@ -61,6 +79,7 @@ public class Window {
 		glfwSwapBuffers(id);
 	}
 	public void destroy() {
+		keyCall.release();
 		glfwDestroyWindow(id);
 	}
 	public long getID() {

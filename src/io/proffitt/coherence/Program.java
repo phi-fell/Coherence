@@ -1,8 +1,6 @@
 package io.proffitt.coherence;
 
-import static org.lwjgl.glfw.GLFW.glfwInit;
-import static org.lwjgl.glfw.GLFW.glfwTerminate;
-import static org.lwjgl.opengl.GL11.GL_TRUE;
+import io.proffitt.coherence.graphics.GLFWContext;
 import io.proffitt.coherence.graphics.Window;
 
 public class Program {
