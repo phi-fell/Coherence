@@ -8,9 +8,9 @@ import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.resource.ResourceHandler;
 
 public class Game implements Runnable {
-	Thread	t;
-	boolean	running;
-	Window	w;
+	Thread t;
+	boolean running;
+	Window w;
 	public Game(Window wind) {
 		running = false;
 		w = wind;
@@ -39,8 +39,9 @@ public class Game implements Runnable {
 	@Override
 	public void run() {
 		w.create();
-		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
-		float[] v = new float[] { +0.0f, +0.8f, 1, -0.8f, -0.8f, 1, +0.8f, -0.8f, 1 };
+		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos),
+				GLFWMouseButtonCallback(this::handleMouseClick));
+		float[] v = new float[] { +0.0f, +0.8f, 1, 1, 0, 0, -0.8f, -0.8f, 1, 0, 1, 0, +0.8f, -0.8f, 1, 0, 0, 1 };
 		Model m = new Model(v);
 		while (running) {
 			w.poll();
