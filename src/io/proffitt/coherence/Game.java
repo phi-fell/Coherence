@@ -1,7 +1,11 @@
 package io.proffitt.coherence;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Window;
+import io.proffitt.coherence.resource.ResourceHandler;
 
 public class Game implements Runnable {
 	Thread	t;
@@ -36,11 +40,16 @@ public class Game implements Runnable {
 	public void run() {
 		w.create();
 		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
-		int x = 0;
+		float[] v = new float[] { +0.0f, +0.8f, 1, -0.8f, -0.8f, 1, +0.8f, -0.8f, 1 };
+		Model m = new Model(v);
 		while (running) {
 			w.poll();
+			glClear(GL_COLOR_BUFFER_BIT);
+			ResourceHandler.get().getShader("default").bind();
+			m.render();
 			w.swap();
 		}
+		m.destroy();
 		running = false;
 	}
 }
