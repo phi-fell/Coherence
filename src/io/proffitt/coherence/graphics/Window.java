@@ -34,7 +34,7 @@ public class Window {
 		height = h;
 		title = t;
 		glMaj = 4;
-		glMin = 2;
+		glMin = 3;
 		glForward = GL_TRUE;
 		glProfile = GLFW_OPENGL_CORE_PROFILE;
 		resizable = GL_FALSE;

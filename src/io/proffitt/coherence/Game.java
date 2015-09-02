@@ -66,9 +66,9 @@ public class Game implements Runnable {
 			w.poll();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("default").bind();
-			glUniformMatrix4fv(3, false, null);//model
-			glUniformMatrix4fv(4, false, null);//view
-			glUniformMatrix4fv(5, false, null);//projection
+			//glUniformMatrix4fv(3, false, null);//model
+			//glUniformMatrix4fv(4, false, null);//view
+			//glUniformMatrix4fv(5, false, null);//projection
 			m.render();
 			w.swap();
 		}

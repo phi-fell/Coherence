@@ -2,6 +2,16 @@ package io.proffitt.coherence.math;
 
 public class Matrix4f {
 	private float[][]	m	= new float[4][4];
+	public boolean equals(Matrix4f rhs) {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				if (m[i][j] != rhs.m[i][j]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 	public Matrix4f() {
 		this(1);
 	}
@@ -40,7 +50,7 @@ public class Matrix4f {
 		for (int i = 0; i < 4; i++) {
 			ret += "[ ";
 			for (int j = 0; j < 4; j++) {
-				ret = ret + m[i][j] + " ";
+				ret = ret + m[j][i] + " ";
 			}
 			ret = ret + "]\n";
 		}
