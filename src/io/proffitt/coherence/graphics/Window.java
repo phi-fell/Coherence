@@ -38,7 +38,7 @@ public class Window {
 		glForward = GL_TRUE;
 		glProfile = GLFW_OPENGL_CORE_PROFILE;
 		resizable = GL_FALSE;
-		samples = 0;
+		samples = 8;
 	}
 	public void setCallbacks(GLFWKeyCallback keyC, GLFWScrollCallback scrollC, GLFWCursorPosCallback cursorC, GLFWMouseButtonCallback mouseC) {
 		keyCall = keyC;

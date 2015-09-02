@@ -1,8 +1,21 @@
 package io.proffitt.coherence;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFWCursorPosCallback;
+import static org.lwjgl.glfw.GLFW.GLFWKeyCallback;
+import static org.lwjgl.glfw.GLFW.GLFWMouseButtonCallback;
+import static org.lwjgl.glfw.GLFW.GLFWScrollCallback;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_GREATER;
 import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearDepth;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL13.*;
+
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.resource.ResourceHandler;
@@ -41,11 +54,14 @@ public class Game implements Runnable {
 		w.create();
 		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos),
 				GLFWMouseButtonCallback(this::handleMouseClick));
-		float[] v = new float[] { +0.0f, +0.8f, 1, 1, 0, 0, -0.8f, -0.8f, 1, 0, 1, 0, +0.8f, -0.8f, 1, 0, 0, 1 };
-		Model m = new Model(v);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_GREATER);
+		glClearDepth(0);
+		glEnable(GL_MULTISAMPLE);
+		Model m = ResourceHandler.get().getModel("smoothmonkey");
 		while (running) {
 			w.poll();
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("default").bind();
 			m.render();
 			w.swap();
