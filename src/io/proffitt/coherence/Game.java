@@ -15,6 +15,9 @@ import static org.lwjgl.opengl.GL11.glClearDepth;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL21.*;
+import static org.lwjgl.system.MathUtil.*;
 
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Window;
@@ -63,6 +66,9 @@ public class Game implements Runnable {
 			w.poll();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("default").bind();
+			glUniformMatrix4fv(3, false, null);//model
+			glUniformMatrix4fv(4, false, null);//view
+			glUniformMatrix4fv(5, false, null);//projection
 			m.render();
 			w.swap();
 		}

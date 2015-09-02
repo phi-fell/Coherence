@@ -5,6 +5,10 @@ import io.proffitt.coherence.graphics.Window;
 
 public class Program {
 	public static void main(String[] args) {
+		int i = 0;
+		if (i == 0) {
+			return;
+		}
 		GLFWContext glfw = new GLFWContext();
 		Window w = new Window(800, 600, "coherence");
 		Game g = new Game(w);
