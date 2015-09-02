@@ -35,6 +35,17 @@ public class Matrix4f {
 		}
 		return ret;
 	}
+	public String toString() {
+		String ret = "";
+		for (int i = 0; i < 4; i++) {
+			ret += "[ ";
+			for (int j = 0; j < 4; j++) {
+				ret = ret + m[i][j] + " ";
+			}
+			ret = ret + "]\n";
+		}
+		return ret;
+	}
 	public static Matrix4f getTranslation(float x, float y, float z) {
 		Matrix4f mat = new Matrix4f(1);
 		mat.m[3][0] = x;

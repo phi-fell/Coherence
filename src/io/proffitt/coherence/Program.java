@@ -2,9 +2,13 @@ package io.proffitt.coherence;
 
 import io.proffitt.coherence.graphics.GLFWContext;
 import io.proffitt.coherence.graphics.Window;
+import io.proffitt.coherence.math.Matrix4f;
 
 public class Program {
 	public static void main(String[] args) {
+		Matrix4f hi = new Matrix4f();
+		System.out.println(hi);
+		
 		int i = 0;
 		if (i == 0) {
 			return;
