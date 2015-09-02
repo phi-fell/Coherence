@@ -34,11 +34,11 @@ public class Window {
 		height = h;
 		title = t;
 		glMaj = 4;
-		glMin = 2;
+		glMin = 1;
 		glForward = GL_TRUE;
 		glProfile = GLFW_OPENGL_CORE_PROFILE;
 		resizable = GL_FALSE;
-		samples = 8;
+		samples = 16;
 	}
 	public void setCallbacks(GLFWKeyCallback keyC, GLFWScrollCallback scrollC, GLFWCursorPosCallback cursorC, GLFWMouseButtonCallback mouseC) {
 		keyCall = keyC;
