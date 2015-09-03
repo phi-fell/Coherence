@@ -21,6 +21,7 @@ import static org.lwjgl.system.MathUtil.*;
 
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Window;
+import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.resource.ResourceHandler;
 
 public class Game implements Runnable {
@@ -62,13 +63,15 @@ public class Game implements Runnable {
 		glClearDepth(0);
 		glEnable(GL_MULTISAMPLE);
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
+		long firstTime = System.nanoTime();
 		while (running) {
 			w.poll();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("default").bind();
-			//glUniformMatrix4fv(3, false, null);//model
-			//glUniformMatrix4fv(4, false, null);//view
-			//glUniformMatrix4fv(5, false, null);//projection
+			glUniformMatrix4fv(3, false, Matrix4f.getRotationY((System.nanoTime() - firstTime) / 10000000000f).toFloatBuffer());// model
+			glUniformMatrix4fv(4, false, Matrix4f.getTranslation(0, 0, -1).toFloatBuffer());// view
+			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(1.6f, 4f/3f, 0.1f, 3f).toFloatBuffer());// projection
+			//glUniformMatrix4fv(5, false, Matrix4f.getOrthographic(4, 3).toFloatBuffer());// projection
 			m.render();
 			w.swap();
 		}

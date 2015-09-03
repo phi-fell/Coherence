@@ -1,5 +1,9 @@
 package io.proffitt.coherence.math;
 
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
+
 public class Matrix4f {
 	private float[][] m = new float[4][4];
 	public boolean equals(Matrix4f rhs) {
@@ -56,6 +60,20 @@ public class Matrix4f {
 		}
 		return ret;
 	}
+	public float[] toFloatArray() {
+		float[] ret = new float[16];
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				ret[(i * 4) + j] = m[i][j];
+			}
+		}
+		return ret;
+	}
+	public FloatBuffer toFloatBuffer() {
+		FloatBuffer ret = BufferUtils.createFloatBuffer(16);
+		ret.put(this.toFloatArray()).flip();
+		return ret;
+	}
 	public static Matrix4f getTranslation(float x, float y, float z) {
 		Matrix4f mat = new Matrix4f(1);
 		mat.m[3][0] = x;
@@ -101,13 +119,13 @@ public class Matrix4f {
 		return mat;
 	}
 	public static Matrix4f getPerspective(float fov, float aspect, float near, float far) {
-		//NOTE: fov is in radians!
+		// NOTE: fov is in radians!
 		Matrix4f mat = new Matrix4f(0);
-		mat.m[0][0] = 1 / (float)Math.tan(fov / 2);
-		mat.m[1][1] = aspect / (float)Math.tan(fov / 2);
+		mat.m[0][0] = 1 / (float) Math.tan(fov / 2);
+		mat.m[1][1] = aspect / (float) Math.tan(fov / 2);
 		mat.m[2][2] = (far + near) / (near - far);
-		mat.m[2][3] = (2 * far * near) / (near - far);
-		mat.m[3][2] = -1;
+		mat.m[3][2] = (2 * far * near) / (near - far);
+		mat.m[2][3] = -1;
 		return mat;
 	}
 }
