@@ -5,7 +5,7 @@ import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 
 public class Matrix4f {
-	private float[][] m = new float[4][4];
+	private float[][]	m	= new float[4][4];
 	public boolean equals(Matrix4f rhs) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -119,12 +119,11 @@ public class Matrix4f {
 		return mat;
 	}
 	public static Matrix4f getPerspective(float fov, float aspect, float near, float far) {
-		// NOTE: fov is in radians!
 		Matrix4f mat = new Matrix4f(0);
-		mat.m[0][0] = 1 / (float) Math.tan(fov / 2);
-		mat.m[1][1] = aspect / (float) Math.tan(fov / 2);
-		mat.m[2][2] = (far + near) / (near - far);
-		mat.m[3][2] = (2 * far * near) / (near - far);
+		mat.m[0][0] = (float) (1.0 / (Math.tan(Math.PI * fov / 360) * aspect));
+		mat.m[1][1] = (float) (1.0 / Math.tan(Math.PI * fov / 360));
+		mat.m[2][2] = (float) ((far + near) / (near - far));
+		mat.m[3][2] = (float) (2 * far * near / (near - far));
 		mat.m[2][3] = -1;
 		return mat;
 	}

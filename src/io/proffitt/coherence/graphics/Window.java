@@ -40,6 +40,12 @@ public class Window {
 		resizable = GL_FALSE;
 		samples = 16;
 	}
+	public int getWidth() {
+		return width;
+	}
+	public int getHeight() {
+		return height;
+	}
 	public void setCallbacks(GLFWKeyCallback keyC, GLFWScrollCallback scrollC, GLFWCursorPosCallback cursorC, GLFWMouseButtonCallback mouseC) {
 		keyCall = keyC;
 		scrollCall = scrollC;

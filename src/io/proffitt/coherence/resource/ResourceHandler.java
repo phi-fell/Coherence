@@ -1,23 +1,22 @@
 package io.proffitt.coherence.resource;
 
+import io.proffitt.coherence.graphics.Model;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import io.proffitt.coherence.graphics.Model;
-
 public class ResourceHandler {
-	private static ResourceHandler rh;
+	private static ResourceHandler	rh;
 	public static ResourceHandler get() {
 		if (rh == null) {
 			rh = new ResourceHandler();
 		}
 		return rh;
 	}
-	private HashMap<String, Shader> shaders;
-	private HashMap<String, Model> models;
+	private HashMap<String, Shader>	shaders;
+	private HashMap<String, Model>	models;
 	private ResourceHandler() {
 		shaders = new HashMap<String, Shader>();
 		models = new HashMap<String, Model>();
@@ -78,8 +77,8 @@ public class ResourceHandler {
 				String[] components = lines[i].split(" ");
 				for (int k = 0; k < 3; k++) {
 					String[] c = components[k + 1].split("//");
-					int vpos = (Integer.parseInt(c[0])-1) * 3;
-					int npos = (Integer.parseInt(c[1])-1) * 3;
+					int vpos = (Integer.parseInt(c[0]) - 1) * 3;
+					int npos = (Integer.parseInt(c[1]) - 1) * 3;
 					for (int j = 0; j < 3; j++) {
 						verts[facepos + j] = rawverts[vpos + j];
 					}

@@ -8,9 +8,11 @@ layout (location = 4) uniform mat4 view;
 layout (location = 5) uniform mat4 projection;
 
 out vec3 pass_normal;
+out vec3 pass_pos;
 
 void main()
 {
-    pass_normal = (projection * view * model * vec4(normal, 0)).xyz;
+    pass_normal = normalize((view * model * vec4(normal, 0)).xyz);
+    pass_pos = (view * model * vec4(pos, 1.0)).xyz;
     gl_Position = projection * view * model * vec4(pos, 1.0);
 }

@@ -1,33 +1,18 @@
 package io.proffitt.coherence;
 
-import static org.lwjgl.glfw.GLFW.GLFWCursorPosCallback;
-import static org.lwjgl.glfw.GLFW.GLFWKeyCallback;
-import static org.lwjgl.glfw.GLFW.GLFWMouseButtonCallback;
-import static org.lwjgl.glfw.GLFW.GLFWScrollCallback;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_GREATER;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearDepth;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL21.*;
-import static org.lwjgl.system.MathUtil.*;
-
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.resource.ResourceHandler;
 
 public class Game implements Runnable {
-	Thread t;
-	boolean running;
-	Window w;
+	Thread	t;
+	boolean	running;
+	Window	w;
 	public Game(Window wind) {
 		running = false;
 		w = wind;
@@ -56,22 +41,22 @@ public class Game implements Runnable {
 	@Override
 	public void run() {
 		w.create();
-		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos),
-				GLFWMouseButtonCallback(this::handleMouseClick));
+		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_GREATER);
-		glClearDepth(0);
+		glDepthFunc(GL_LEQUAL);
+		glClearDepth(1);
 		glEnable(GL_MULTISAMPLE);
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
 		long firstTime = System.nanoTime();
+		int fov = 65;
 		while (running) {
 			w.poll();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("default").bind();
 			glUniformMatrix4fv(3, false, Matrix4f.getRotationY((System.nanoTime() - firstTime) / 10000000000f).toFloatBuffer());// model
-			glUniformMatrix4fv(4, false, Matrix4f.getTranslation(0, 0, -1).toFloatBuffer());// view
-			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(1.6f, 4f/3f, 0.1f, 3f).toFloatBuffer());// projection
-			//glUniformMatrix4fv(5, false, Matrix4f.getOrthographic(4, 3).toFloatBuffer());// projection
+			glUniformMatrix4fv(4, false, Matrix4f.getTranslation(0, 0, -3f).toFloatBuffer());// view
+			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
+			m.render();
 			m.render();
 			w.swap();
 		}
