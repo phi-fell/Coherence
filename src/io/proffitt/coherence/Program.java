@@ -6,7 +6,7 @@ import io.proffitt.coherence.graphics.Window;
 public class Program {
 	public static void main(String[] args) {
 		GLFWContext glfw = new GLFWContext();
-		Window w = new Window(1600, 900, "coherence");
+		Window w = new Window(1400, 800, "coherence");
 		Game g = new Game(w);
 		g.start();
 		while (g.isRunning()) {
