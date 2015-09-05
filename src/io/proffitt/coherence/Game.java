@@ -30,13 +30,15 @@ public class Game implements Runnable {
 				} else {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				}
+			} else if (key == GLFW_KEY_ESCAPE) {
+				Window.getWindow(window).destroy();
+				System.exit(0);
 			}
 		} else if (action == GLFW_RELEASE) {
 		}
 	}
 	double	mx	= 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
-		System.out.println(mx + ", " + my);
 		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
 			cam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
 			Window wind = Window.getWindow(window);
@@ -68,7 +70,7 @@ public class Game implements Runnable {
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
 		long lastTime = System.nanoTime();
 		int fov = 65;
-		cam.setPos(0, 0, -10);
+		cam.setPos(0, 0, -4);
 		cam.setRot(0, 0, 0);
 		float modelRot = 0;
 		while (running) {
@@ -76,13 +78,37 @@ public class Game implements Runnable {
 			double delta = (nT - lastTime) / 1000000000f;
 			lastTime = nT;
 			w.poll();
+			//Start of gameloop
+			//handleinput
+			int zMod = 0;
+			int xMod = 0;
+			float speed = 3;
+			if (w.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+				speed = 8;
+			}
+			if (w.isKeyDown(GLFW_KEY_W)) {
+				zMod++;
+			}
+			if (w.isKeyDown(GLFW_KEY_S)) {
+				zMod--;
+			}
+			if (w.isKeyDown(GLFW_KEY_A)) {
+				xMod++;
+			}
+			if (w.isKeyDown(GLFW_KEY_D)) {
+				xMod--;
+			}
+			cam.move(zMod * speed * (float)delta, xMod * speed * (float)delta);
+			//update
+			modelRot += (float) (delta / 10);
+			//render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("default").bind();
-			modelRot += (float) (delta / 10);
 			glUniformMatrix4fv(3, false, Matrix4f.getRotationY(modelRot).toFloatBuffer());// model
 			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
 			m.render();
+			//End of gameloop
 			w.swap();
 		}
 		m.destroy();
