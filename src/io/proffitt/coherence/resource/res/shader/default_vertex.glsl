@@ -14,7 +14,7 @@ out mat4 pass_view;
 void main()
 {
     pass_normal = normalize((view * model * vec4(normal, 0)).xyz);
-    pass_pos = (model * vec4(pos, 1.0)).xyz;
+    pass_pos = (view * model * vec4(pos, 1.0)).xyz;
     pass_view = view;
     gl_Position = projection * view * model * vec4(pos, 1.0);
 }

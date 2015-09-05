@@ -68,6 +68,8 @@ public class Game implements Runnable {
 		glClearDepth(1);
 		glEnable(GL_MULTISAMPLE);
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
+		float[] floorVerts = {-100,-5,100,0,1,0,100,-5,100,0,1,0,100,-5,-100,0,1,0,100,-5,-100,0,1,0,-100,-5,-100,0,1,0,-100,-5,100,0,1,0};
+		Model floor = new Model(floorVerts);
 		long lastTime = System.nanoTime();
 		int fov = 65;
 		cam.setPos(0, 0, -4);
@@ -108,6 +110,7 @@ public class Game implements Runnable {
 			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
 			m.render();
+			floor.render();
 			//End of gameloop
 			w.swap();
 		}

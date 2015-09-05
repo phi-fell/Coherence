@@ -19,9 +19,10 @@ uniform bool[20] lightPresent;
 
 void main()
 {
-	vec3 lightPos = vec3(-3,0,-3);
-	vec3 lightVector = normalize((pass_view * vec4(lightPos,1)).xyz * -1);
-	vec3 viewVector = normalize((pass_view * vec4(pass_pos,1)).xyz * -1);
+	vec3 lightPos = vec3(0,-10,0);
+	vec3 lightViewPos = (pass_view * vec4(lightPos,1)).xyz;
+	vec3 lightVector = normalize(pass_pos - lightViewPos);
+	vec3 viewVector = normalize(-1 * pass_pos);
     vec3 ambient = vec3(0.1);
     vec3 diffuse = vec3(dot(pass_normal, lightVector) * 0.7);
     vec3 halfAngle = normalize(lightVector + viewVector);
