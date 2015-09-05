@@ -4,6 +4,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.math.Matrix4f;
@@ -13,6 +14,7 @@ public class Game implements Runnable {
 	Thread	t;
 	boolean	running;
 	Window	w;
+	Camera	cam	= new Camera();
 	public Game(Window wind) {
 		running = false;
 		w = wind;
@@ -22,12 +24,29 @@ public class Game implements Runnable {
 	}
 	public void handleKeyPress(long window, int key, int scancode, int action, int mods) {
 		if (action == GLFW_PRESS) {
-			System.out.println("key: " + (char) key + " pressed");
+			if (key == GLFW_KEY_F5) {
+				if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				} else {
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				}
+			}
 		} else if (action == GLFW_RELEASE) {
-			System.out.println("key: " + (char) key + " released");
 		}
 	}
+	double	mx	= 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
+		System.out.println(mx + ", " + my);
+		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
+			cam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
+			Window wind = Window.getWindow(window);
+			glfwSetCursorPos(window, wind.getWidth() / 2f, wind.getHeight() / 2f);
+			mx = wind.getWidth() / 2f;
+			my = wind.getHeight() / 2f;
+		} else {
+			mx = xpos;
+			my = ypos;
+		}
 	}
 	public void handleMouseClick(long window, int button, int action, int mods) {
 	}
@@ -47,16 +66,22 @@ public class Game implements Runnable {
 		glClearDepth(1);
 		glEnable(GL_MULTISAMPLE);
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
-		long firstTime = System.nanoTime();
+		long lastTime = System.nanoTime();
 		int fov = 65;
+		cam.setPos(0, 0, -10);
+		cam.setRot(0, 0, 0);
+		float modelRot = 0;
 		while (running) {
+			long nT = System.nanoTime();
+			double delta = (nT - lastTime) / 1000000000f;
+			lastTime = nT;
 			w.poll();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("default").bind();
-			glUniformMatrix4fv(3, false, Matrix4f.getRotationY((System.nanoTime() - firstTime) / 10000000000f).toFloatBuffer());// model
-			glUniformMatrix4fv(4, false, Matrix4f.getTranslation(0, 0, -3f).toFloatBuffer());// view
+			modelRot += (float) (delta / 10);
+			glUniformMatrix4fv(3, false, Matrix4f.getRotationY(modelRot).toFloatBuffer());// model
+			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
-			m.render();
 			m.render();
 			w.swap();
 		}
