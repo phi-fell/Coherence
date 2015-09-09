@@ -14,7 +14,7 @@ out mat4 pass_view;
 
 void main()
 {
-	pass_lightPos = (view * vec4(0,-2,0,1)).xyz;
+	pass_lightPos = (view * vec4(3,3,3,1)).xyz;
     pass_normal = normalize((view * model * vec4(normal, 0)).xyz);
     pass_pos = (view * model * vec4(pos, 1.0)).xyz;
     pass_view = view;
