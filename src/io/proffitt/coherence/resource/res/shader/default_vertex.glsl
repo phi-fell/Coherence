@@ -9,10 +9,12 @@ layout (location = 5) uniform mat4 projection;
 
 out vec3 pass_normal;
 out vec3 pass_pos;
+out vec3 pass_lightPos;
 out mat4 pass_view;
 
 void main()
 {
+	pass_lightPos = (view * vec4(0,-10,0,1)).xyz;
     pass_normal = normalize((view * model * vec4(normal, 0)).xyz);
     pass_pos = (view * model * vec4(pos, 1.0)).xyz;
     pass_view = view;
