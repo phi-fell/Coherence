@@ -9,12 +9,13 @@ import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.resource.ResourceHandler;
+import io.proffitt.coherence.world.Cell;
 
 public class Game implements Runnable {
-	Thread	t;
-	boolean	running;
-	Window	w;
-	Camera	cam	= new Camera();
+	Thread t;
+	boolean running;
+	Window w;
+	Camera cam = new Camera();
 	public Game(Window wind) {
 		running = false;
 		w = wind;
@@ -37,7 +38,7 @@ public class Game implements Runnable {
 		} else if (action == GLFW_RELEASE) {
 		}
 	}
-	double	mx	= 0, my = 0;
+	double mx = 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
 		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
 			cam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
@@ -62,14 +63,22 @@ public class Game implements Runnable {
 	@Override
 	public void run() {
 		w.create();
-		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
+		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos),
+				GLFWMouseButtonCallback(this::handleMouseClick));
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glClearDepth(1);
 		glEnable(GL_MULTISAMPLE);
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
-		float[] floorVerts = {-100,-5,100,0,1,0,100,-5,100,0,1,0,100,-5,-100,0,1,0,100,-5,-100,0,1,0,-100,-5,-100,0,1,0,-100,-5,100,0,1,0};
-		Model floor = new Model(floorVerts);
+		// float[] floorVerts =
+		// {-100,-5,100,0,1,0,100,-5,100,0,1,0,100,-5,-100,0,1,0,100,-5,-100,0,1,0,-100,-5,-100,0,1,0,-100,-5,100,0,1,0};
+		Cell cell = new Cell();
+		float[] v = cell.getVerts();
+		for (int i = 0; i < v.length - 1; i++) {
+			System.out.print(v[i] + ",");
+		}
+		System.out.println(v[v.length - 1]);
+		Model floor = new Model(cell.getVerts());
 		long lastTime = System.nanoTime();
 		int fov = 65;
 		cam.setPos(0, 0, -4);
@@ -80,8 +89,8 @@ public class Game implements Runnable {
 			double delta = (nT - lastTime) / 1000000000f;
 			lastTime = nT;
 			w.poll();
-			//Start of gameloop
-			//handleinput
+			// Start of gameloop
+			// handleinput
 			int zMod = 0;
 			int xMod = 0;
 			float speed = 3;
@@ -100,10 +109,10 @@ public class Game implements Runnable {
 			if (w.isKeyDown(GLFW_KEY_D)) {
 				xMod--;
 			}
-			cam.move(zMod * speed * (float)delta, xMod * speed * (float)delta);
-			//update
+			cam.move(zMod * speed * (float) delta, xMod * speed * (float) delta);
+			// update
 			modelRot += (float) (delta / 10);
-			//render
+			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("default").bind();
 			glUniformMatrix4fv(3, false, Matrix4f.getRotationY(modelRot).toFloatBuffer());// model
@@ -111,7 +120,7 @@ public class Game implements Runnable {
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
 			m.render();
 			floor.render();
-			//End of gameloop
+			// End of gameloop
 			w.swap();
 		}
 		m.destroy();

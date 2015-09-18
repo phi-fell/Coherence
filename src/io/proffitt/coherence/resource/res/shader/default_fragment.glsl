@@ -8,7 +8,7 @@ in mat4 pass_view;
 out vec4 fragColor;
 
 struct light{
-	vec3 direction;
+	vec3 pos;
 	vec3 color;
 	float diffuseCoefficient;
 };
@@ -16,7 +16,7 @@ struct light{
 uniform vec3 ambient;
 uniform float ambientCoefficient;
 uniform light[20] lights;
-uniform bool[20] lightPresent;
+uniform int numLights;
 
 void main()
 {
