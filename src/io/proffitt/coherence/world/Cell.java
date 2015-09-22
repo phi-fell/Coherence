@@ -3,18 +3,26 @@ package io.proffitt.coherence.world;
 import io.proffitt.coherence.math.Vector4f;
 
 public class Cell {
-	float[][] height;
-	public static final int SIZE = 64;
+	float[][]				height;
+	public static final int	SIZE	= 64;
 	public Cell() {
 		height = new float[SIZE][SIZE];
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
-				height[i][j] = (float)((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
+				height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
 			}
 		}
 	}
 	public float[] getVerts() {
 		float[] verts = new float[(SIZE - 1) * (SIZE - 1) * 36];
+		Vector4f[][] pos = new Vector4f[SIZE][SIZE];
+		Vector4f[][] norm = new Vector4f[SIZE][SIZE];
+		for (int i = 0; i < SIZE; i++) {
+			for (int j = 0; j < SIZE; j++) {
+				pos[i][j] = new Vector4f(i - (SIZE / 2), height[i][j], j - (SIZE / 2), 1);
+				
+			}
+		}
 		for (int i = 0; i < SIZE - 1; i++) {
 			for (int j = 0; j < SIZE - 1; j++) {
 				// vertices

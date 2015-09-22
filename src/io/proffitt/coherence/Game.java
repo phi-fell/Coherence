@@ -70,13 +70,8 @@ public class Game implements Runnable {
 		glClearDepth(1);
 		glEnable(GL_MULTISAMPLE);
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
-		// float[] floorVerts =
-		// {-100,-5,100,0,1,0,100,-5,100,0,1,0,100,-5,-100,0,1,0,100,-5,-100,0,1,0,-100,-5,-100,0,1,0,-100,-5,100,0,1,0};
 		Cell cell = new Cell();
 		float[] v = cell.getVerts();
-		for (int i = 0; i < v.length - 1; i++) {
-			System.out.print(v[i] + ",");
-		}
 		System.out.println(v[v.length - 1]);
 		Model floor = new Model(cell.getVerts());
 		long lastTime = System.nanoTime();

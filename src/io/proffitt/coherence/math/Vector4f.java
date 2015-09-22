@@ -1,7 +1,7 @@
 package io.proffitt.coherence.math;
 
 public class Vector4f {
-	public float x, y, z, w; // 3d vector in homogeneous coordinates
+	public float	x, y, z, w; // 3d vector in homogeneous coordinates
 	public Vector4f() {
 		x = 0;
 		y = 0;
@@ -13,6 +13,22 @@ public class Vector4f {
 		y = b;
 		z = c;
 		w = d;
+	}
+	public float getLenSq() {
+		return (x * x) + (y * y) + (z * z);
+	}
+	public float getLength(){
+		return (float)Math.sqrt(getLenSq());
+	}
+	public void normalize(){
+		float len = getLength();
+		if (len == 0){
+			return;
+		}
+		x/=len;
+		y/=len;
+		z/=len;
+		w/=len;
 	}
 	public void divideByW() {
 		if (w == 0) {
