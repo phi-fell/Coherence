@@ -14,7 +14,7 @@ public class Camera {
 		z = 0;
 	}
 	public Matrix4f getViewMatrix() {
-		return Matrix4f.getRotationZ(-aZ).multiply(Matrix4f.getRotationX(-aX).multiply(Matrix4f.getRotationY(-aY).multiply(Matrix4f.getTranslation(x, y, z))));
+		return Matrix4f.getRotationZ(-aZ).multiply(Matrix4f.getRotationX(-aX).multiply(Matrix4f.getRotationY(-aY).multiply(Matrix4f.getTranslation(-x, -y, -z))));
 	}
 	public void setPos(float nx, float ny, float nz) {
 		x = nx;

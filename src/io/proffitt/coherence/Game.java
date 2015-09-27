@@ -71,12 +71,10 @@ public class Game implements Runnable {
 		glEnable(GL_MULTISAMPLE);
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
 		Cell cell = new Cell();
-		float[] v = cell.getVerts();
-		System.out.println(v[v.length - 1]);
 		Model floor = new Model(cell.getVerts());
 		long lastTime = System.nanoTime();
 		int fov = 65;
-		cam.setPos(0, 0, -4);
+		cam.setPos(0, 0, 4);
 		cam.setRot(0, 0, 0);
 		float modelRot = 0;
 		while (running) {
@@ -93,16 +91,16 @@ public class Game implements Runnable {
 				speed = 8;
 			}
 			if (w.isKeyDown(GLFW_KEY_W)) {
-				zMod++;
-			}
-			if (w.isKeyDown(GLFW_KEY_S)) {
 				zMod--;
 			}
+			if (w.isKeyDown(GLFW_KEY_S)) {
+				zMod++;
+			}
 			if (w.isKeyDown(GLFW_KEY_A)) {
-				xMod++;
+				xMod--;
 			}
 			if (w.isKeyDown(GLFW_KEY_D)) {
-				xMod--;
+				xMod++;
 			}
 			cam.move(zMod * speed * (float) delta, xMod * speed * (float) delta);
 			// update
