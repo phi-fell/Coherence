@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
-import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.GL;
 
 public class Window {
 	static ArrayList<Window>	windows	= new ArrayList<Window>();
@@ -69,7 +69,7 @@ public class Window {
 			windows.add(this);
 		}
 		makeCurrent();
-		GLContext.createFromCurrent();
+		GL.createCapabilities();
 		glfwSwapInterval(1);
 	}
 	public boolean isKeyDown(int key) {

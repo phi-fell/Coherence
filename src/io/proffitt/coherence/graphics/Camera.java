@@ -3,8 +3,8 @@ package io.proffitt.coherence.graphics;
 import io.proffitt.coherence.math.Matrix4f;
 
 public class Camera {
-	private float	x, y, z;	//position
-	private float	aX, aY, aZ; //euler angles
+	private float x, y, z; // position
+	private float aX, aY, aZ; // euler angles
 	public Camera() {
 		aX = 0;
 		aY = 0;
@@ -30,13 +30,17 @@ public class Camera {
 		aX = nAX;
 		aY = nAY;
 		aZ = nAZ;
+		if (aX < Math.PI / -2) {
+			aX = (float) Math.PI / -2;
+		} else if (aX > Math.PI / 2) {
+			aX = (float) Math.PI / 2;
+		}
+		aY = aY % (float)(Math.PI * 2);
 	}
 	public void rotate(float mAX, float mAY, float mAZ) {
-		aX += mAX;
-		aY += mAY;
-		aZ += mAZ;
+		setRot(aX + mAX, aY + mAY, aZ + mAZ);
 	}
 	public void move(float forward, float right) {
-		this.translate((float)((forward * Math.sin(aY)) + (right * Math.cos(-aY))), 0, (float)((forward * Math.cos(aY)) + (right * Math.sin(-aY))));
+		this.translate((float) ((forward * Math.sin(aY)) + (right * Math.cos(-aY))), 0, (float) ((forward * Math.cos(aY)) + (right * Math.sin(-aY))));
 	}
 }

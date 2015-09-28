@@ -28,6 +28,6 @@ void main()
     ambient = min(max(ambient, 0),1);
     diffuse = min(max(diffuse, 0),1);
     specular = min(max(specular, 0),1);
-    float gamma = 0.1;
+    float gamma = 1;
     fragColor = vec4(pow(ambient + diffuse + specular, vec3(1/gamma)),1);
 }
