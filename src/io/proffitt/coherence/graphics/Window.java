@@ -5,6 +5,8 @@ import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import io.proffitt.coherence.error.ErrorHandler;
+import io.proffitt.coherence.settings.Configuration;
+import io.proffitt.coherence.settings.SettingsListener;
 
 import java.util.ArrayList;
 
@@ -14,7 +16,8 @@ import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.opengl.GL;
 
-public class Window {
+public class Window implements SettingsListener {
+	Configuration config;
 	static ArrayList<Window>	windows	= new ArrayList<Window>();
 	long						id;
 	int							width, height;
@@ -24,12 +27,12 @@ public class Window {
 	int							glForward;
 	int							glProfile;
 	int							resizable;
-	int							samples;
 	GLFWKeyCallback				keyCall;
 	GLFWScrollCallback			scrollCall;
 	GLFWCursorPosCallback		cursorCall;
 	GLFWMouseButtonCallback		mouseCall;
-	public Window(int w, int h, String t) {
+	public Window(Configuration c, int w, int h, String t) {
+		config = c;
 		width = w;
 		height = h;
 		title = t;
@@ -38,7 +41,15 @@ public class Window {
 		glForward = GL_TRUE;
 		glProfile = GLFW_OPENGL_CORE_PROFILE;
 		resizable = GL_FALSE;
-		samples = 16;
+	}
+	@Override
+	public void onSettingChanged(int setting, int newValue) {
+		switch (setting) {
+		case Configuration.VSYNC: glfwSwapInterval(newValue);
+			break;
+		default:
+			break;
+		}
 	}
 	public int getWidth() {
 		return width;
@@ -62,7 +73,7 @@ public class Window {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, glForward);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, glProfile);
 		glfwWindowHint(GLFW_RESIZABLE, resizable);
-		glfwWindowHint(GLFW_SAMPLES, samples);
+		glfwWindowHint(GLFW_SAMPLES, config.get(Configuration.MSAA));
 		id = glfwCreateWindow(width, height, title, NULL, NULL);
 		ErrorHandler.get().handle(id != NULL);
 		synchronized (windows) {
@@ -70,7 +81,8 @@ public class Window {
 		}
 		makeCurrent();
 		GL.createCapabilities();
-		glfwSwapInterval(1);
+		glfwSwapInterval(config.get(Configuration.VSYNC));
+		config.register(this);
 	}
 	public boolean isKeyDown(int key) {
 		return glfwGetKey(id, key) == GLFW_PRESS;

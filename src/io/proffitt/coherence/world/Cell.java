@@ -1,10 +1,14 @@
 package io.proffitt.coherence.world;
 
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import io.proffitt.coherence.graphics.Model;
+import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
 
 public class Cell {
-	float[][]				height;
 	public static final int	SIZE	= 64;
+	float[][]				height;
+	Model model;
 	public Cell() {
 		height = new float[SIZE][SIZE];
 		for (int i = 0; i < SIZE; i++) {
@@ -12,8 +16,13 @@ public class Cell {
 				height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
 			}
 		}
+		model = new Model(getVerts());
 	}
-	public float[] getVerts() {
+	public void draw(){
+		glUniformMatrix4fv(3, false, (new Matrix4f()).toFloatBuffer());// model
+		model.render();
+	}
+	private float[] getVerts() {
 		float[] verts = new float[(SIZE - 1) * (SIZE - 1) * 36];
 		Vector4f[][] pos = new Vector4f[SIZE][SIZE];
 		Vector4f[][] norm = new Vector4f[SIZE][SIZE];
