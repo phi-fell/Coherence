@@ -4,11 +4,21 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import io.proffitt.coherence.graphics.Camera;
+import io.proffitt.coherence.graphics.Font;
 import io.proffitt.coherence.graphics.Model;
+import io.proffitt.coherence.graphics.Text;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.math.Matrix4f;
+import io.proffitt.coherence.math.Vector4f;
 import io.proffitt.coherence.resource.ResourceHandler;
+import io.proffitt.coherence.resource.Texture;
 import io.proffitt.coherence.world.Cell;
 
 public class Game implements Runnable {
@@ -69,6 +79,9 @@ public class Game implements Runnable {
 		glDepthFunc(GL_LEQUAL);
 		glClearDepth(1);
 		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_TEXTURE_2D);
+		glEnable (GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
 		Cell cell = new Cell();
 		Model floor = new Model(cell.getVerts());
@@ -77,6 +90,8 @@ public class Game implements Runnable {
 		cam.setPos(0, 0, 4);
 		cam.setRot(0, 0, 0);
 		float modelRot = 0;
+		Font arial = new Font("arial", 10);
+		Text helloText = arial.getText("Hello World!\nHow're ya doin?\nI'm doing pretty well, myself.\n\tthis is tabbed in\nthis isn't.\n\t\tthis is double tabbed!!!");
 		while (running) {
 			long nT = System.nanoTime();
 			double delta = (nT - lastTime) / 1000000000f;
@@ -113,6 +128,9 @@ public class Game implements Runnable {
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
 			m.render();
 			floor.render();
+			//render text
+			ResourceHandler.get().getShader("text").bind();
+			helloText.draw(w, new Vector4f(2,0,0,0));
 			// End of gameloop
 			w.swap();
 		}

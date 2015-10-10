@@ -115,7 +115,9 @@ public class Matrix4f {
 	public static Matrix4f getOrthographic(float width, float height) {
 		Matrix4f mat = new Matrix4f(1);
 		mat.m[0][0] = 2 / width;
-		mat.m[1][1] = 2 / height;
+		mat.m[1][1] = -2 / height;
+		mat.m[3][0] = -1f;
+		mat.m[3][1] = 1f;
 		return mat;
 	}
 	public static Matrix4f getPerspective(float fov, float aspect, float near, float far) {
