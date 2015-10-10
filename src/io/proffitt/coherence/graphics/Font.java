@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import io.proffitt.coherence.resource.Texture;
 
 public class Font {
-	java.awt.Font awtFont;
+	java.awt.Font	awtFont;
 	public Font(String name, int size) {
 		awtFont = new java.awt.Font(name, java.awt.Font.PLAIN, size);
 	}
@@ -20,14 +20,18 @@ public class Font {
 		Graphics2D g = empty.createGraphics();
 		g.setFont(awtFont);
 		FontMetrics fm = g.getFontMetrics();
-		int w = fm.stringWidth(s);
+		int w = 0;
+		for (int i = 0; i < lines.length; i++) {
+			int temp = fm.stringWidth(lines[i]);
+			w = w < temp ? temp : w;
+		}
 		int h = fm.getHeight();
 		BufferedImage ret = new BufferedImage(w, h * lines.length, BufferedImage.TYPE_INT_ARGB);
 		g = ret.createGraphics();
 		g.setFont(awtFont);
 		g.setPaint(Color.white);
 		fm = g.getFontMetrics();
-		for (int i = 0; i < lines.length; i++){
+		for (int i = 0; i < lines.length; i++) {
 			LineMetrics lm = fm.getLineMetrics(lines[i], g);
 			g.drawString(lines[i], 0, (i * lm.getHeight()) + lm.getAscent());
 		}

@@ -90,7 +90,7 @@ public class Game implements Runnable {
 		cam.setPos(0, 0, 4);
 		cam.setRot(0, 0, 0);
 		float modelRot = 0;
-		Font arial = new Font("arial", 10);
+		Font arial = new Font("Courier New", 12);
 		Text helloText = arial.getText("Hello World!\nHow're ya doin?\nI'm doing pretty well, myself.\n\tthis is tabbed in\nthis isn't.\n\t\tthis is double tabbed!!!");
 		while (running) {
 			long nT = System.nanoTime();
@@ -130,7 +130,7 @@ public class Game implements Runnable {
 			floor.render();
 			//render text
 			ResourceHandler.get().getShader("text").bind();
-			helloText.draw(w, new Vector4f(2,0,0,0));
+			helloText.draw(w, new Vector4f(0,0,0,0));
 			// End of gameloop
 			w.swap();
 		}
