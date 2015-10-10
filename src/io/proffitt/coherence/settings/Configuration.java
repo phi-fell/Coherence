@@ -13,7 +13,7 @@ public class Configuration {
 	public Configuration() {
 		settings = new int[NUM_SETTINGS];
 		//defaults
-		settings[VSYNC] = 0;
+		settings[VSYNC] = 1;
 		settings[MSAA] = 16;
 		//end defaults
 		listeners = new ArrayList<SettingsListener>();

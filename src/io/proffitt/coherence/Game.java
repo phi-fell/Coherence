@@ -22,6 +22,7 @@ import io.proffitt.coherence.resource.Texture;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.world.Cell;
+import io.proffitt.coherence.world.Level;
 
 public class Game implements Runnable, SettingsListener {
 	Thread			t;
@@ -99,7 +100,7 @@ public class Game implements Runnable, SettingsListener {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		Model m = ResourceHandler.get().getModel("smoothmonkey");
-		Cell cell = new Cell();
+		Level l = new Level(30, 30);
 		int fov = 65;
 		cam.setPos(0, 0, 4);
 		cam.setRot(0, 0, 0);
@@ -112,6 +113,11 @@ public class Game implements Runnable, SettingsListener {
 		int FPS = 0;
 		while (running) {
 			long nT = System.nanoTime();
+			double delta = (nT - lastTime) / 1000000000f;
+			while (1.0 / delta > 400) {//avoid overheating at high fps
+				nT = System.nanoTime();
+				delta = (nT - lastTime) / 1000000000f;
+			}
 			if (nT - sinceFPS >= 1000000000) {
 				fpsText = defaultFont.getText("FPS: " + FPS);
 				FPS = 0;
@@ -119,16 +125,15 @@ public class Game implements Runnable, SettingsListener {
 			} else {
 				FPS++;
 			}
-			double delta = (nT - lastTime) / 1000000000f;
 			lastTime = nT;
 			w.poll();
 			// Start of gameloop
 			// handleinput
 			int zMod = 0;
 			int xMod = 0;
-			float speed = 3;
+			float speed = 5;
 			if (w.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-				speed = 8;
+				speed = 30;
 			}
 			if (glfwGetInputMode(w.getID(), GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
 				if (w.isKeyDown(GLFW_KEY_W)) {
@@ -156,7 +161,7 @@ public class Game implements Runnable, SettingsListener {
 			glUniformMatrix4fv(3, false, Matrix4f.getRotationY(modelRot).toFloatBuffer());// model
 			m.render();
 			//done with monkey
-			cell.draw();
+			l.draw();
 			//render text
 			ResourceHandler.get().getShader("text").bind();
 			fpsText.draw(w, new Vector4f(0, 0, 0, 0));
