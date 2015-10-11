@@ -25,4 +25,8 @@ public class Text {
 		tex.bind();
 		model.render();
 	}
+	public void destroy(){
+		tex.destroy();
+		tex = null;
+	}
 }

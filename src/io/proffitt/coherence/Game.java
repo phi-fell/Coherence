@@ -4,24 +4,18 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
+import io.proffitt.coherence.error.ErrorHandler;
 import io.proffitt.coherence.graphics.Camera;
-import io.proffitt.coherence.graphics.Font;
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Text;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
+import io.proffitt.coherence.resource.Font;
 import io.proffitt.coherence.resource.ResourceHandler;
-import io.proffitt.coherence.resource.Texture;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
-import io.proffitt.coherence.world.Cell;
+import io.proffitt.coherence.world.Entity;
 import io.proffitt.coherence.world.Level;
 
 public class Game implements Runnable, SettingsListener {
@@ -29,7 +23,8 @@ public class Game implements Runnable, SettingsListener {
 	boolean			running;
 	Configuration	config;
 	Window			w;
-	Camera			cam	= new Camera();
+	Camera			cam				= new Camera();
+	boolean			debugConsole	= false;
 	public Game(Configuration c, Window wind) {
 		config = c;
 		c.register(this);
@@ -51,8 +46,9 @@ public class Game implements Runnable, SettingsListener {
 	}
 	public void handleKeyPress(long window, int key, int scancode, int action, int mods) {
 		if (action == GLFW_PRESS) {
-			if (key == GLFW_KEY_F5) {
-				if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
+			if (key == GLFW_KEY_GRAVE_ACCENT) {
+				debugConsole = !debugConsole;
+				if (debugConsole) {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				} else {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -92,22 +88,28 @@ public class Game implements Runnable, SettingsListener {
 	public void run() {
 		w.create();
 		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
+		glfwSetInputMode(w.getID(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetCursorPos(w.getID(), w.getWidth() / 2f, w.getHeight() / 2f);
+		mx = w.getWidth() / 2f;
+		my = w.getHeight() / 2f;
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glClearDepth(1);
 		glEnable(GL_MULTISAMPLE);
-		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		Model m = ResourceHandler.get().getModel("smoothmonkey");
-		Level l = new Level(30, 30);
+		Entity monkey = new Entity(ResourceHandler.get().getModel("smoothmonkey"));
+		Level level = new Level(30, 30);
 		int fov = 65;
 		cam.setPos(0, 0, 4);
 		cam.setRot(0, 0, 0);
-		float modelRot = 0;
-		Font defaultFont = new Font("Courier New", 12);
-		Text helloText = defaultFont.getText("Hello World!\nHow're ya doin?\nI'm doing pretty well, myself.\n\tthis is tabbed in\nthis isn't.\n\t\tthis is double tabbed!!!");
-		Text fpsText = defaultFont.getText("FPS: -1");
+		Text fpsText = ResourceHandler.get().getFont("Courier New,12").getText("FPS: -1");
+		int er = GL_NO_ERROR;
+		while((er = glGetError()) != GL_NO_ERROR)
+		{
+			System.out.println("OpenGL Error in initialization: " + Integer.toHexString(er));
+		}
+		//time stuff, no more init after this
 		long lastTime = System.nanoTime();
 		long sinceFPS = lastTime;
 		int FPS = 0;
@@ -119,7 +121,7 @@ public class Game implements Runnable, SettingsListener {
 				delta = (nT - lastTime) / 1000000000f;
 			}
 			if (nT - sinceFPS >= 1000000000) {
-				fpsText = defaultFont.getText("FPS: " + FPS);
+				fpsText = ResourceHandler.get().getFont("Courier New,12").getText("FPS: " + FPS);
 				FPS = 0;
 				sinceFPS = nT;
 			} else {
@@ -135,7 +137,7 @@ public class Game implements Runnable, SettingsListener {
 			if (w.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
 				speed = 30;
 			}
-			if (glfwGetInputMode(w.getID(), GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
+			if (!debugConsole) {
 				if (w.isKeyDown(GLFW_KEY_W)) {
 					zMod--;
 				}
@@ -151,24 +153,29 @@ public class Game implements Runnable, SettingsListener {
 			}
 			cam.move(zMod * speed * (float) delta, xMod * speed * (float) delta);
 			// update
-			modelRot += (float) (delta / 10);
+			monkey.getTransfrom().getRotation().y += (float) (delta / 10);
 			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("default").bind();
 			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
-			//render monkey:
-			glUniformMatrix4fv(3, false, Matrix4f.getRotationY(modelRot).toFloatBuffer());// model
-			m.render();
-			//done with monkey
-			l.draw();
+			monkey.draw(); //render monkey
+			level.draw(); // draw level
 			//render text
 			ResourceHandler.get().getShader("text").bind();
 			fpsText.draw(w, new Vector4f(0, 0, 0, 0));
+			//render debug console
+			//TODO: render debug console
 			// End of gameloop
 			w.swap();
+			int err = GL_NO_ERROR;
+			while((err = glGetError()) != GL_NO_ERROR)
+			{
+				System.out.println("OpenGL Error in render loop: 0x" + Integer.toHexString(err));
+			}
 		}
-		m.destroy();
+		monkey.destroy();
+		ResourceHandler.get().cleanup();
 		running = false;
 	}
 }

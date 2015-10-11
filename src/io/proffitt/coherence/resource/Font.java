@@ -1,4 +1,4 @@
-package io.proffitt.coherence.graphics;
+package io.proffitt.coherence.resource;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.font.LineMetrics;
 import java.awt.image.BufferedImage;
 
-import io.proffitt.coherence.resource.Texture;
+import io.proffitt.coherence.graphics.Text;
 
 public class Font {
 	java.awt.Font	awtFont;
@@ -27,6 +27,7 @@ public class Font {
 		}
 		int h = fm.getHeight();
 		BufferedImage ret = new BufferedImage(w, h * lines.length, BufferedImage.TYPE_INT_ARGB);
+		g.dispose();
 		g = ret.createGraphics();
 		g.setFont(awtFont);
 		g.setPaint(Color.white);

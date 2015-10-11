@@ -15,11 +15,39 @@ public class ResourceHandler {
 		}
 		return rh;
 	}
+	private HashMap<String, Font>	fonts;
 	private HashMap<String, Shader>	shaders;
 	private HashMap<String, Model>	models;
 	private ResourceHandler() {
+		fonts = new HashMap<String, Font>();
 		shaders = new HashMap<String, Shader>();
 		models = new HashMap<String, Model>();
+	}
+	/**
+	 * Removes and cleans up all cached resources.
+	 * ResourceHandler may still be used after this, but accessing any
+	 * resource will require it to be reloaded from disk (or generated) and into memory (and/or onto the GPU).
+	 */
+	public void cleanup() {
+		for (String s : fonts.keySet()) {
+			fonts.remove(s);//fonts don't need cleanup
+		}
+		for (String s : shaders.keySet()) {
+			shaders.remove(s).destroy();
+		}
+		for (String s : models.keySet()) {
+			models.remove(s).destroy();
+		}
+	}
+	public Font getFont(String name) {
+		if (!fonts.containsKey(name)) {
+			fonts.put(name, loadFont(name));
+		}
+		return fonts.get(name);
+	}
+	private Font loadFont(String name) {
+		String fontData[] = name.split(",");
+		return new Font(fontData[0], Integer.parseInt(fontData[1]));
 	}
 	public Shader getShader(String name) {
 		if (!shaders.containsKey(name)) {

@@ -37,6 +37,9 @@ public class Model {
 		glDeleteVertexArrays(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glDeleteBuffers(VBO);
+		VAO = 0;
+		VBO = 0;
+		vertnum = 0;
 	}
 	public void render() {
 		glBindVertexArray(VAO);

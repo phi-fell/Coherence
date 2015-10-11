@@ -43,4 +43,10 @@ public class Texture {
 	public void bind(){
         glBindTexture(GL_TEXTURE_2D, id);
 	}
+	public void destroy(){
+		bind();
+		glDeleteTextures(id);
+		id = 0;
+		bind();
+	}
 }
