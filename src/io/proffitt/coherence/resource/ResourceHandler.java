@@ -2,10 +2,14 @@ package io.proffitt.coherence.resource;
 
 import io.proffitt.coherence.graphics.Model;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
+
+import javax.imageio.ImageIO;
 
 public class ResourceHandler {
 	private static ResourceHandler	rh;
@@ -15,10 +19,12 @@ public class ResourceHandler {
 		}
 		return rh;
 	}
-	private HashMap<String, Font>	fonts;
-	private HashMap<String, Shader>	shaders;
-	private HashMap<String, Model>	models;
+	private HashMap<String, Texture>	textures;
+	private HashMap<String, Font>		fonts;
+	private HashMap<String, Shader>		shaders;
+	private HashMap<String, Model>		models;
 	private ResourceHandler() {
+		textures = new HashMap<String, Texture>();
 		fonts = new HashMap<String, Font>();
 		shaders = new HashMap<String, Shader>();
 		models = new HashMap<String, Model>();
@@ -29,6 +35,9 @@ public class ResourceHandler {
 	 * resource will require it to be reloaded from disk (or generated) and into memory (and/or onto the GPU).
 	 */
 	public void cleanup() {
+		for (String s : textures.keySet()) {
+			textures.remove(s).destroy();
+		}
 		for (String s : fonts.keySet()) {
 			fonts.remove(s);//fonts don't need cleanup
 		}
@@ -38,6 +47,22 @@ public class ResourceHandler {
 		for (String s : models.keySet()) {
 			models.remove(s).destroy();
 		}
+	}
+	public Texture getTexture(String name) {
+		if (!textures.containsKey(name)) {
+			textures.put(name, loadTexture(name));
+		}
+		return textures.get(name);
+	}
+	private Texture loadTexture(String name) {
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File(this.getClass().getResource("res/tex/" + name + ".png").getFile()));
+		} catch (IOException e) {
+			System.out.println("Could not load texture \"" + name + "\"");
+			e.printStackTrace();
+		}
+		return new Texture(img);
 	}
 	public Font getFont(String name) {
 		if (!fonts.containsKey(name)) {

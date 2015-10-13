@@ -99,7 +99,7 @@ public class Game implements Runnable, SettingsListener {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		Entity monkey = new Entity(ResourceHandler.get().getModel("smoothmonkey"));
-		Level level = new Level(1, 1);
+		Level level = new Level(10, 10);
 		int fov = 65;
 		cam.setPos(0, 0, 4);
 		cam.setRot(0, 0, 0);
@@ -162,6 +162,10 @@ public class Game implements Runnable, SettingsListener {
 			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
 			monkey.draw(); //render monkey
+			ResourceHandler.get().getShader("terrain").bind();
+			ResourceHandler.get().getTexture("grass").bind();
+			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
+			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
 			level.draw(); // draw level
 			//render text
 			ResourceHandler.get().getShader("text").bind();

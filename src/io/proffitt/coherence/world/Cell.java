@@ -14,8 +14,9 @@ public class Cell {
 		height = new float[SIZE][SIZE];
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
-				height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
-				height[i][j] += (Math.random() - 0.5f) * 0.7;
+				//height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
+				height[i][j] = -1.5f;
+				height[i][j] += (Math.random() - 0.5f) * 0.2;
 			}
 		}
 		model = null;
