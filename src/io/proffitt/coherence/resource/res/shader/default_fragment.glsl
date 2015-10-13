@@ -24,7 +24,7 @@ void main()
     vec3 diffuse = vec3(dot(pass_normal, lightVector));
     vec3 halfAngle = normalize(lightVector + viewVector);
     float specularity = max(0,dot(halfAngle,pass_normal));
-    vec3 specular = vec3(pow(specularity,32) * 0.5);
+    vec3 specular = vec3(pow(specularity,32));
     ambient = min(max(ambient, 0),1);
     diffuse = min(max(diffuse, 0),1);
     specular = min(max(specular, 0),1);
