@@ -4,11 +4,14 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
+
 import io.proffitt.coherence.error.ErrorHandler;
-import io.proffitt.coherence.graphics.Camera;
-import io.proffitt.coherence.graphics.Model;
-import io.proffitt.coherence.graphics.Text;
-import io.proffitt.coherence.graphics.Window;
+import io.proffitt.coherence.graphics.*;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
 import io.proffitt.coherence.resource.Font;
@@ -17,6 +20,16 @@ import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.world.Entity;
 import io.proffitt.coherence.world.Level;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.*;
+import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL31.*;
+import static org.lwjgl.opengl.GL32.*;
+import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL41.*;
+import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL20.*;
 
 public class Game implements Runnable, SettingsListener {
 	Thread			t;
@@ -104,6 +117,9 @@ public class Game implements Runnable, SettingsListener {
 		cam.setPos(0, 0, 4);
 		cam.setRot(0, 0, 0);
 		Text fpsText = ResourceHandler.get().getFont("Courier New,12").getText("FPS: -1");
+		FrameBuffer HDRFBO = new FrameBuffer(w.getWidth(), w.getHeight());
+		float[] fbverts = { -1, -1, 0, 0, 0, 0, 1, -1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, -1, -1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, -1, 1, 0, 0, 1, 0 };
+		Model FBModel = new Model(fbverts);
 		int er = GL_NO_ERROR;
 		while ((er = glGetError()) != GL_NO_ERROR) {
 			System.out.println("OpenGL Error in initialization: " + Integer.toHexString(er));
@@ -112,6 +128,7 @@ public class Game implements Runnable, SettingsListener {
 		long lastTime = System.nanoTime();
 		long sinceFPS = lastTime;
 		int FPS = 0;
+		float HDRmax = 1;
 		while (running) {
 			long nT = System.nanoTime();
 			double delta = (nT - lastTime) / 1000000000f;
@@ -158,7 +175,9 @@ public class Game implements Runnable, SettingsListener {
 			monkey.getTransfrom().getRotation().y += (float) (delta / 10);
 			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			ResourceHandler.get().getShader("default").bind();
+			HDRFBO.bind();
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			ResourceHandler.get().getShader("HDRdefault").bind();
 			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
 			monkey.draw(); //render monkey
@@ -167,6 +186,20 @@ public class Game implements Runnable, SettingsListener {
 			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
 			level.draw(); // draw level
+			//Render HDRFBO
+			ResourceHandler.get().getShader("HDR").bind();
+			FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 4);
+			glReadPixels(0, 0, HDRFBO.getWidth(), HDRFBO.getHeight(), GL_RGBA, GL_HALF_FLOAT, pbuffer);
+			float max = pbuffer.get();
+			while (pbuffer.hasRemaining()){
+				max = Math.max(max, pbuffer.get());
+			}
+			HDRFBO.unbind();
+			HDRmax = (HDRmax * 0.99f) + (max * 0.01f);
+			glUniform1f(7, HDRmax);
+			HDRFBO.getTexture().bind();
+			FBModel.render();
+			HDRFBO.getTexture().unbind();
 			//render text
 			ResourceHandler.get().getShader("text").bind();
 			fpsText.draw(w, new Vector4f(0, 0, 0, 0));
