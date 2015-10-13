@@ -99,14 +99,13 @@ public class Game implements Runnable, SettingsListener {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		Entity monkey = new Entity(ResourceHandler.get().getModel("smoothmonkey"));
-		Level level = new Level(30, 30);
+		Level level = new Level(1, 1);
 		int fov = 65;
 		cam.setPos(0, 0, 4);
 		cam.setRot(0, 0, 0);
 		Text fpsText = ResourceHandler.get().getFont("Courier New,12").getText("FPS: -1");
 		int er = GL_NO_ERROR;
-		while((er = glGetError()) != GL_NO_ERROR)
-		{
+		while ((er = glGetError()) != GL_NO_ERROR) {
 			System.out.println("OpenGL Error in initialization: " + Integer.toHexString(er));
 		}
 		//time stuff, no more init after this
@@ -136,6 +135,9 @@ public class Game implements Runnable, SettingsListener {
 			float speed = 5;
 			if (w.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
 				speed = 30;
+			}
+			if (w.isKeyDown(GLFW_KEY_SPACE)) {
+				speed = 300;
 			}
 			if (!debugConsole) {
 				if (w.isKeyDown(GLFW_KEY_W)) {
@@ -169,8 +171,7 @@ public class Game implements Runnable, SettingsListener {
 			// End of gameloop
 			w.swap();
 			int err = GL_NO_ERROR;
-			while((err = glGetError()) != GL_NO_ERROR)
-			{
+			while ((err = glGetError()) != GL_NO_ERROR) {
 				System.out.println("OpenGL Error in render loop: 0x" + Integer.toHexString(err));
 			}
 		}
