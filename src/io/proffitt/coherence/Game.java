@@ -30,6 +30,7 @@ import static org.lwjgl.opengl.GL33.*;
 import static org.lwjgl.opengl.GL41.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL21.*;
 
 public class Game implements Runnable, SettingsListener {
 	Thread			t;
@@ -124,11 +125,12 @@ public class Game implements Runnable, SettingsListener {
 		while ((er = glGetError()) != GL_NO_ERROR) {
 			System.out.println("OpenGL Error in initialization: " + Integer.toHexString(er));
 		}
+		float HDRmax = 1;
+		boolean autoHDR = false;
 		//time stuff, no more init after this
 		long lastTime = System.nanoTime();
 		long sinceFPS = lastTime;
 		int FPS = 0;
-		float HDRmax = 1;
 		while (running) {
 			long nT = System.nanoTime();
 			double delta = (nT - lastTime) / 1000000000f;
@@ -137,6 +139,7 @@ public class Game implements Runnable, SettingsListener {
 				delta = (nT - lastTime) / 1000000000f;
 			}
 			if (nT - sinceFPS >= 1000000000) {
+				fpsText.destroy();
 				fpsText = ResourceHandler.get().getFont("Courier New,12").getText("FPS: " + FPS);
 				FPS = 0;
 				sinceFPS = nT;
@@ -169,6 +172,17 @@ public class Game implements Runnable, SettingsListener {
 				if (w.isKeyDown(GLFW_KEY_D)) {
 					xMod++;
 				}
+				if (w.isKeyDown(GLFW_KEY_H)) {
+					autoHDR = true;
+				}
+				if (w.isKeyDown(GLFW_KEY_R)) {
+					autoHDR = false;
+					HDRmax += 0.01;
+				}
+				if (w.isKeyDown(GLFW_KEY_F)) {
+					autoHDR = false;
+					HDRmax -= 0.01;
+				}
 			}
 			cam.move(zMod * speed * (float) delta, xMod * speed * (float) delta);
 			// update
@@ -188,14 +202,24 @@ public class Game implements Runnable, SettingsListener {
 			level.draw(); // draw level
 			//Render HDRFBO
 			ResourceHandler.get().getShader("HDR").bind();
-			FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 4);
-			glReadPixels(0, 0, HDRFBO.getWidth(), HDRFBO.getHeight(), GL_RGBA, GL_HALF_FLOAT, pbuffer);
-			float max = pbuffer.get();
-			while (pbuffer.hasRemaining()){
-				max = Math.max(max, pbuffer.get());
+			if (autoHDR) {
+				FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 3);
+				glReadPixels(0, 0, HDRFBO.getWidth(), HDRFBO.getHeight(), GL_RGB, GL_FLOAT, pbuffer);
+				double avg = 0;
+				float max = 0;
+				while (pbuffer.hasRemaining()) {
+					float brightness = pbuffer.get() + pbuffer.get() + pbuffer.get();
+					avg += Math.log1p(brightness);
+					max = Math.max(max, brightness);
+				}
+				avg /= HDRFBO.getWidth() * HDRFBO.getHeight();
+				//avg = Math.exp(avg)-0.5;
+				avg = Math.expm1(avg);
+				float ABSOLUTE_MINIMUM_HDR = 0.3f;
+				float newHDRmax = (float)Math.max(Math.max(avg * 5, max / 5), ABSOLUTE_MINIMUM_HDR);
+				HDRmax = (HDRmax * 0.98f) + (newHDRmax * 0.02f);
 			}
 			HDRFBO.unbind();
-			HDRmax = (HDRmax * 0.99f) + (max * 0.01f);
 			glUniform1f(7, HDRmax);
 			HDRFBO.getTexture().bind();
 			FBModel.render();

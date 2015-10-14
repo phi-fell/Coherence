@@ -4,7 +4,8 @@ in vec2 pass_UV;
 
 out vec4 fragColor;
 
-layout (location = 7)uniform float HDRmax;
+layout (location = 7) uniform float HDRmax;
+
 uniform sampler2D tex;
 
 void main()
