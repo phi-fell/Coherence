@@ -200,11 +200,14 @@ public class Game implements Runnable, SettingsListener {
 			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
 			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
 			level.draw(); // draw level
-			//Render HDRFBO
-			ResourceHandler.get().getShader("HDR").bind();
+			HDRFBO.unbind();
+			//calculate HDRmax
 			if (autoHDR) {
 				FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 3);
+				//HDRFBO.blit();
+				HDRFBO.ssbind();
 				glReadPixels(0, 0, HDRFBO.getWidth(), HDRFBO.getHeight(), GL_RGB, GL_FLOAT, pbuffer);
+				HDRFBO.unbind();
 				double avg = 0;
 				float max = 0;
 				while (pbuffer.hasRemaining()) {
@@ -216,10 +219,12 @@ public class Game implements Runnable, SettingsListener {
 				//avg = Math.exp(avg)-0.5;
 				avg = Math.expm1(avg);
 				float ABSOLUTE_MINIMUM_HDR = 0.3f;
-				float newHDRmax = (float)Math.max(Math.max(avg * 5, max / 5), ABSOLUTE_MINIMUM_HDR);
+				float ABSOLUTE_MAXIMUM_HDR = 10f;
+				float newHDRmax = (float)Math.min(Math.max(Math.max(avg * 5, max / 5), ABSOLUTE_MINIMUM_HDR), ABSOLUTE_MAXIMUM_HDR);
 				HDRmax = (HDRmax * 0.98f) + (newHDRmax * 0.02f);
 			}
-			HDRFBO.unbind();
+			//Render HDRFBO
+			ResourceHandler.get().getShader("HDR").bind();
 			glUniform1f(7, HDRmax);
 			HDRFBO.blit();
 			HDRFBO.getTexture().bind();

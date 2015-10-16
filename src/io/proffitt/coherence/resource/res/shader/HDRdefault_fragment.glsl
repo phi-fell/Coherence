@@ -24,9 +24,12 @@ void main()
     vec3 diffuse = vec3(dot(pass_normal, lightVector));
     vec3 halfAngle = normalize(lightVector + viewVector);
     float specularity = max(0,dot(halfAngle,pass_normal));
+    if (specularity > 1) {
+    	specularity = 0;
+    }
     vec3 specular = vec3(pow(specularity,32));
     ambient = min(max(ambient, 0),1);
-    diffuse = min(max(diffuse, 0),1);
+    diffuse = min(max(diffuse, 0),1);//TODO: make this mathematically impossible
     float gamma = 1;
     fragColor = vec4(pow(ambient + diffuse + specular, vec3(1/gamma)),1);
 }
