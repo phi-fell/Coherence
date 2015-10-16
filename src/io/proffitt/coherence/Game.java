@@ -221,6 +221,7 @@ public class Game implements Runnable, SettingsListener {
 			}
 			HDRFBO.unbind();
 			glUniform1f(7, HDRmax);
+			HDRFBO.blit();
 			HDRFBO.getTexture().bind();
 			FBModel.render();
 			HDRFBO.getTexture().unbind();
