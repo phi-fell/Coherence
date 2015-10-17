@@ -12,6 +12,7 @@ import org.lwjgl.BufferUtils;
 
 import io.proffitt.coherence.error.ErrorHandler;
 import io.proffitt.coherence.graphics.*;
+import io.proffitt.coherence.math.AABB;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
 import io.proffitt.coherence.resource.Font;
@@ -119,6 +120,7 @@ public class Game implements Runnable, SettingsListener {
 		cam.setRot(0, 0, 0);
 		Text fpsText = ResourceHandler.get().getFont("Courier New,12").getText("FPS: -1");
 		FrameBuffer HDRFBO = new FrameBuffer(w.getWidth(), w.getHeight());
+		FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 3);
 		float[] fbverts = { -1, -1, 0, 0, 0, 0, 1, -1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, -1, -1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, -1, 1, 0, 0, 1, 0 };
 		Model FBModel = new Model(fbverts);
 		int er = GL_NO_ERROR;
@@ -127,6 +129,7 @@ public class Game implements Runnable, SettingsListener {
 		}
 		float HDRmax = 1;
 		boolean autoHDR = false;
+		HDRCalculator HDRcalc = new HDRCalculator();
 		//time stuff, no more init after this
 		long lastTime = System.nanoTime();
 		long sinceFPS = lastTime;
@@ -203,25 +206,13 @@ public class Game implements Runnable, SettingsListener {
 			HDRFBO.unbind();
 			//calculate HDRmax
 			if (autoHDR) {
-				FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 3);
 				//HDRFBO.blit();
 				HDRFBO.ssbind();
+				pbuffer.clear();
 				glReadPixels(0, 0, HDRFBO.getWidth(), HDRFBO.getHeight(), GL_RGB, GL_FLOAT, pbuffer);
 				HDRFBO.unbind();
-				double avg = 0;
-				float max = 0;
-				while (pbuffer.hasRemaining()) {
-					float brightness = pbuffer.get() + pbuffer.get() + pbuffer.get();
-					avg += Math.log1p(brightness);
-					max = Math.max(max, brightness);
-				}
-				avg /= HDRFBO.getWidth() * HDRFBO.getHeight();
-				//avg = Math.exp(avg)-0.5;
-				avg = Math.expm1(avg);
-				float ABSOLUTE_MINIMUM_HDR = 0.3f;
-				float ABSOLUTE_MAXIMUM_HDR = 10f;
-				float newHDRmax = (float)Math.min(Math.max(Math.max(avg * 5, max / 5), ABSOLUTE_MINIMUM_HDR), ABSOLUTE_MAXIMUM_HDR);
-				HDRmax = (HDRmax * 0.98f) + (newHDRmax * 0.02f);
+				HDRcalc.calculate(pbuffer, HDRFBO.getWidth(), HDRFBO.getHeight());
+				HDRmax = (HDRmax * 0.98f) + (HDRcalc.getValue() * 0.02f);
 			}
 			//Render HDRFBO
 			ResourceHandler.get().getShader("HDR").bind();

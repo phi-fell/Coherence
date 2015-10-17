@@ -19,7 +19,9 @@ public class Model {
 	int	VAO;
 	int	VBO;
 	int	vertnum;
-	public Model(float[] verts) {
+	public float[] verts;
+	public Model(float[] v) {
+		verts = v;
 		vertnum = verts.length / 6;
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts).flip();
