@@ -222,8 +222,8 @@ public class Game implements Runnable, SettingsListener {
 			FBModel.render();
 			HDRFBO.getTexture().unbind();
 			//render text
-			ResourceHandler.get().getShader("text").bind();
-			fpsText.draw(w, new Vector4f(0, 0, 0, 0));
+			ResourceHandler.get().getShader("2dOrtho").bind();
+			fpsText.getBackingImage().draw(w, new Vector4f(0, 0, 0, 0));
 			//render debug console
 			//TODO: render debug console
 			// End of gameloop

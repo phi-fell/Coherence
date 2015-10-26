@@ -20,10 +20,13 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.BufferUtils;
 
+import io.proffitt.coherence.graphics.Image;
+
 public class Texture {
-	int					id;
-	public final int	width;
-	public final int	height;
+	int id;
+	public final int width;
+	public final int height;
+	Image img = null;
 	public Texture(int w, int h) {
 		width = w;
 		height = h;
@@ -34,6 +37,12 @@ public class Texture {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, (java.nio.ByteBuffer) null);
+	}
+	public Image getAsImage() {
+		if (img == null) {
+			img = new Image(this);
+		}
+		return img;
 	}
 	public Texture(BufferedImage image) {
 		width = image.getWidth();
@@ -69,6 +78,14 @@ public class Texture {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	public void destroy() {
+		if (img != null) {
+			Image temp = img;
+			img = null;
+			temp.destroy();
+			if (id == 0){
+				return;
+			}
+		}
 		bind();
 		glDeleteTextures(id);
 		id = 0;
