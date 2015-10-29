@@ -21,5 +21,15 @@ public abstract class MenuComponent {
 	public void addComponent(MenuComponent mc){
 		components.add(mc);
 	}
-	public abstract void draw();
+	/**
+	 * @param xmod X position of parent component
+	 * @param ymod Y position of parent component
+	 */
+	public abstract void draw(int xmod, int ymod);
+	/**
+	 * @param xrel X position within this component
+	 * @param yrel Y position within this component
+	 * @return true if click was handled by this component, false otherwise.
+	 */
+	public abstract boolean handleClick(int xrel, int yrel);
 }
