@@ -1,5 +1,9 @@
 package io.proffitt.coherence;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+
 import io.proffitt.coherence.graphics.GLFWContext;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.settings.Configuration;

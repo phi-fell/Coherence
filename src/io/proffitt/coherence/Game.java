@@ -38,7 +38,8 @@ public class Game implements Runnable, SettingsListener {
 	boolean			running;
 	Configuration	config;
 	Window			w;
-	Camera			cam				= new Camera();
+	Camera			perspectiveCam	= new Camera();
+	Camera			orthoCam		= new Camera();
 	boolean			debugConsole	= false;
 	public Game(Configuration c, Window wind) {
 		config = c;
@@ -80,7 +81,7 @@ public class Game implements Runnable, SettingsListener {
 	double	mx	= 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
 		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
-			cam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
+			perspectiveCam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
 			Window wind = Window.getWindow(window);
 			glfwSetCursorPos(window, wind.getWidth() / 2f, wind.getHeight() / 2f);
 			mx = wind.getWidth() / 2f;
@@ -116,8 +117,9 @@ public class Game implements Runnable, SettingsListener {
 		Entity monkey = new Entity(ResourceHandler.get().getModel("smoothmonkey"));
 		Level level = new Level(10, 10);
 		int fov = 65;
-		cam.setPos(0, 0, 4);
-		cam.setRot(0, 0, 0);
+		perspectiveCam.setPos(0, 0, 4);
+		perspectiveCam.setProjection(Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f));
+		orthoCam.setProjection(Matrix4f.getOrthographic(w.getWidth(), w.getHeight()));
 		Text fpsText = ResourceHandler.get().getFont("Courier New,12").getText("FPS: -1");
 		FrameBuffer HDRFBO = new FrameBuffer(w.getWidth(), w.getHeight());
 		FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 3);
@@ -187,7 +189,7 @@ public class Game implements Runnable, SettingsListener {
 					HDRmax -= 0.01;
 				}
 			}
-			cam.move(zMod * speed * (float) delta, xMod * speed * (float) delta);
+			perspectiveCam.move(zMod * speed * (float) delta, xMod * speed * (float) delta);
 			// update
 			monkey.getTransfrom().getRotation().y += (float) (delta / 10);
 			// render
@@ -195,13 +197,11 @@ public class Game implements Runnable, SettingsListener {
 			HDRFBO.bind();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("HDRdefault").bind();
-			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
-			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
+			perspectiveCam.bind();
 			monkey.draw(); //render monkey
 			ResourceHandler.get().getShader("terrain").bind();
 			ResourceHandler.get().getTexture("grass").bind();
-			glUniformMatrix4fv(4, false, cam.getViewMatrix().toFloatBuffer());// view
-			glUniformMatrix4fv(5, false, Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f).toFloatBuffer());// projection
+			perspectiveCam.bind();
 			level.draw(); // draw level
 			HDRFBO.unbind();
 			//calculate HDRmax
@@ -223,7 +223,9 @@ public class Game implements Runnable, SettingsListener {
 			HDRFBO.getTexture().unbind();
 			//render text
 			ResourceHandler.get().getShader("2dOrtho").bind();
-			fpsText.getBackingImage().draw(w, new Vector4f(0, 0, 0, 0));
+			orthoCam.bind();
+			fpsText.getBackingImage().draw(0, 0);
+			ResourceHandler.get().getTexture("grass").getAsImage().draw(50, 50);
 			//render debug console
 			//TODO: render debug console
 			// End of gameloop

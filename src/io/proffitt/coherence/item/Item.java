@@ -1,6 +1,7 @@
 package io.proffitt.coherence.item;
 
 public class Item {
-	Image icon;
-	
+	ItemSchematic schema;
+	double mass;
+	String name;
 }

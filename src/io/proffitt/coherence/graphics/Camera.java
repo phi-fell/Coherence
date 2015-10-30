@@ -1,10 +1,12 @@
 package io.proffitt.coherence.graphics;
 
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.math.Matrix4f;
 
 public class Camera {
 	private float x, y, z; // position
 	private float aX, aY, aZ; // euler angles
+	private Matrix4f projMat;
 	public Camera() {
 		aX = 0;
 		aY = 0;
@@ -12,6 +14,14 @@ public class Camera {
 		x = 0;
 		y = 0;
 		z = 0;
+		projMat = new Matrix4f();
+	}
+	public void setProjection(Matrix4f projection){
+		projMat = projection;
+	}
+	public void bind(){
+		glUniformMatrix4fv(4, false, getViewMatrix().toFloatBuffer());// view
+		glUniformMatrix4fv(5, false, projMat.toFloatBuffer());// projection
 	}
 	public Matrix4f getViewMatrix() {
 		return Matrix4f.getRotationZ(-aZ).multiply(Matrix4f.getRotationX(-aX).multiply(Matrix4f.getRotationY(-aY).multiply(Matrix4f.getTranslation(-x, -y, -z))));

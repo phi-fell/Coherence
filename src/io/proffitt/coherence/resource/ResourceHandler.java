@@ -1,6 +1,7 @@
 package io.proffitt.coherence.resource;
 
 import io.proffitt.coherence.graphics.Model;
+import io.proffitt.coherence.gui.MenuComponent;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -19,6 +20,7 @@ public class ResourceHandler {
 		}
 		return rh;
 	}
+	private HashMap<String, MenuComponent>	menus;
 	private HashMap<String, Texture>	textures;
 	private HashMap<String, Font>		fonts;
 	private HashMap<String, Shader>		shaders;
@@ -35,6 +37,9 @@ public class ResourceHandler {
 	 * resource will require it to be reloaded from disk (or generated) and into memory (and/or onto the GPU).
 	 */
 	public void cleanup() {
+		for (String s : menus.keySet()) {
+			menus.remove(s);//menus don't need cleanup
+		}
 		for (String s : textures.keySet()) {
 			textures.remove(s).destroy();
 		}
@@ -48,6 +53,16 @@ public class ResourceHandler {
 			models.remove(s).destroy();
 		}
 	}
+	public MenuComponent getMenu(String name) {
+		if (!menus.containsKey(name)) {
+			menus.put(name, loadMenu(name));
+		}
+		return menus.get(name);
+	}
+	private MenuComponent loadMenu(String name) {
+		//TODO: load menu (CML? (coherence ML?)
+		return null;
+	}
 	public Texture getTexture(String name) {
 		if (!textures.containsKey(name)) {
 			textures.put(name, loadTexture(name));
@@ -57,7 +72,7 @@ public class ResourceHandler {
 	private Texture loadTexture(String name) {
 		BufferedImage img = null;
 		try {
-			img = ImageIO.read(new File(this.getClass().getResource("res/tex/" + name + ".png").getFile()));
+			img = ImageIO.read(new File("res/tex/" + name + ".png"));
 		} catch (IOException e) {
 			System.out.println("Could not load texture \"" + name + "\"");
 			e.printStackTrace();
@@ -148,7 +163,7 @@ public class ResourceHandler {
 	private String loadResourceAsString(String path) {
 		Scanner scanner = null;
 		try {
-			scanner = new Scanner(new File(this.getClass().getResource(path).getFile()));
+			scanner = new Scanner(new File(path));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
