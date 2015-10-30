@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import io.proffitt.coherence.error.ErrorHandler;
+import io.proffitt.coherence.gui.MenuParent;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
 
@@ -16,7 +17,7 @@ import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.opengl.GL;
 
-public class Window implements SettingsListener {
+public class Window implements SettingsListener, MenuParent {
 	Configuration config;
 	static ArrayList<Window>	windows	= new ArrayList<Window>();
 	long						id;
@@ -115,5 +116,13 @@ public class Window implements SettingsListener {
 			}
 		}
 		return ret;
+	}
+	@Override
+	public int getX() {
+		return 0; // Window is absolute parent, so X is 0
+	}
+	@Override
+	public int getY() {
+		return 0; // Window is absolute parent, so Y is 0
 	}
 }

@@ -1,6 +1,7 @@
 package io.proffitt.coherence.resource;
 
 import io.proffitt.coherence.graphics.Model;
+import io.proffitt.coherence.gui.Menu;
 import io.proffitt.coherence.gui.MenuComponent;
 
 import java.awt.image.BufferedImage;
@@ -13,38 +14,39 @@ import java.util.Scanner;
 import javax.imageio.ImageIO;
 
 public class ResourceHandler {
-	private static ResourceHandler	rh;
+	private static ResourceHandler rh;
 	public static ResourceHandler get() {
 		if (rh == null) {
 			rh = new ResourceHandler();
 		}
 		return rh;
 	}
-	private HashMap<String, MenuComponent>	menus;
-	private HashMap<String, Texture>	textures;
-	private HashMap<String, Font>		fonts;
-	private HashMap<String, Shader>		shaders;
-	private HashMap<String, Model>		models;
+	private HashMap<String, MenuComponent> menus;
+	private HashMap<String, Texture> textures;
+	private HashMap<String, Font> fonts;
+	private HashMap<String, Shader> shaders;
+	private HashMap<String, Model> models;
 	private ResourceHandler() {
+		menus = new HashMap<String, MenuComponent>();
 		textures = new HashMap<String, Texture>();
 		fonts = new HashMap<String, Font>();
 		shaders = new HashMap<String, Shader>();
 		models = new HashMap<String, Model>();
 	}
 	/**
-	 * Removes and cleans up all cached resources.
-	 * ResourceHandler may still be used after this, but accessing any
-	 * resource will require it to be reloaded from disk (or generated) and into memory (and/or onto the GPU).
+	 * Removes and cleans up all cached resources. ResourceHandler may still be
+	 * used after this, but accessing any resource will require it to be
+	 * reloaded from disk (or generated) and into memory (and/or onto the GPU).
 	 */
 	public void cleanup() {
 		for (String s : menus.keySet()) {
-			menus.remove(s);//menus don't need cleanup
+			menus.remove(s);// menus don't need cleanup
 		}
 		for (String s : textures.keySet()) {
 			textures.remove(s).destroy();
 		}
 		for (String s : fonts.keySet()) {
-			fonts.remove(s);//fonts don't need cleanup
+			fonts.remove(s);// fonts don't need cleanup
 		}
 		for (String s : shaders.keySet()) {
 			shaders.remove(s).destroy();
@@ -60,8 +62,7 @@ public class ResourceHandler {
 		return menus.get(name);
 	}
 	private MenuComponent loadMenu(String name) {
-		//TODO: load menu (CML? (coherence ML?)
-		return null;
+		return Menu.createFromCML(loadResourceAsCML("res/gui/" + name + ".mnu").getTag("root"));
 	}
 	public Texture getTexture(String name) {
 		if (!textures.containsKey(name)) {
@@ -159,6 +160,11 @@ public class ResourceHandler {
 		}
 		Model m = new Model(verts);
 		return m;
+	}
+	private CMLTag loadResourceAsCML(String path) {
+		CMLTag ret = new CMLTag("",loadResourceAsString(path).replace("\t", " "));
+		System.out.println(ret.toString());
+		return ret;
 	}
 	private String loadResourceAsString(String path) {
 		Scanner scanner = null;

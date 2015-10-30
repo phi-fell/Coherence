@@ -2,15 +2,17 @@ package io.proffitt.coherence.graphics;
 
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
+import io.proffitt.coherence.gui.MenuComponent;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
 import io.proffitt.coherence.resource.Texture;
 
-public class Image {
+public class Image extends MenuComponent {
 	Texture					tex;
 	static final float[]	imgVerts	= { 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 };
 	static final Model		model		= new Model(imgVerts);
 	public Image(Texture t) {
+		super(null, 0, 0, t.width, t.height);
 		tex = t;
 	}
 	/**

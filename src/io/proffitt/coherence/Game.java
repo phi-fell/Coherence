@@ -12,6 +12,8 @@ import org.lwjgl.BufferUtils;
 
 import io.proffitt.coherence.error.ErrorHandler;
 import io.proffitt.coherence.graphics.*;
+import io.proffitt.coherence.gui.FPSText;
+import io.proffitt.coherence.gui.MenuComponent;
 import io.proffitt.coherence.math.AABB;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
@@ -34,13 +36,13 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL21.*;
 
 public class Game implements Runnable, SettingsListener {
-	Thread			t;
-	boolean			running;
-	Configuration	config;
-	Window			w;
-	Camera			perspectiveCam	= new Camera();
-	Camera			orthoCam		= new Camera();
-	boolean			debugConsole	= false;
+	Thread t;
+	boolean running;
+	Configuration config;
+	Window w;
+	Camera perspectiveCam = new Camera();
+	Camera orthoCam = new Camera();
+	boolean debugConsole = false;
 	public Game(Configuration c, Window wind) {
 		config = c;
 		c.register(this);
@@ -50,11 +52,11 @@ public class Game implements Runnable, SettingsListener {
 	@Override
 	public void onSettingChanged(int setting, int newValue) {
 		switch (setting) {
-		case Configuration.MSAA:
-			System.out.println("Changing MSAA requires a restart to take effect!");
-			break;
-		default:
-			break;
+			case Configuration.MSAA:
+				System.out.println("Changing MSAA requires a restart to take effect!");
+				break;
+			default:
+				break;
 		}
 	}
 	public boolean isRunning() {
@@ -78,7 +80,7 @@ public class Game implements Runnable, SettingsListener {
 		} else if (action == GLFW_RELEASE) {
 		}
 	}
-	double	mx	= 0, my = 0;
+	double mx = 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
 		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
 			perspectiveCam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
@@ -103,7 +105,8 @@ public class Game implements Runnable, SettingsListener {
 	@Override
 	public void run() {
 		w.create();
-		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
+		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos),
+				GLFWMouseButtonCallback(this::handleMouseClick));
 		glfwSetInputMode(w.getID(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPos(w.getID(), w.getWidth() / 2f, w.getHeight() / 2f);
 		mx = w.getWidth() / 2f;
@@ -120,7 +123,9 @@ public class Game implements Runnable, SettingsListener {
 		perspectiveCam.setPos(0, 0, 4);
 		perspectiveCam.setProjection(Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f));
 		orthoCam.setProjection(Matrix4f.getOrthographic(w.getWidth(), w.getHeight()));
-		Text fpsText = ResourceHandler.get().getFont("Courier New,12").getText("FPS: -1");
+		FPSText.generateSingleton(w, ResourceHandler.get().getFont("Courier New,12").getText("FPS: -1"));
+		MenuComponent HUD = ResourceHandler.get().getMenu("hud");
+		HUD.setParent(w);
 		FrameBuffer HDRFBO = new FrameBuffer(w.getWidth(), w.getHeight());
 		FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 3);
 		float[] fbverts = { -1, -1, 0, 0, 0, 0, 1, -1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, -1, -1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, -1, 1, 0, 0, 1, 0 };
@@ -132,20 +137,19 @@ public class Game implements Runnable, SettingsListener {
 		float HDRmax = 1;
 		boolean autoHDR = false;
 		HDRCalculator HDRcalc = new HDRCalculator();
-		//time stuff, no more init after this
+		// time stuff, no more init after this
 		long lastTime = System.nanoTime();
 		long sinceFPS = lastTime;
 		int FPS = 0;
 		while (running) {
 			long nT = System.nanoTime();
 			double delta = (nT - lastTime) / 1000000000f;
-			while (1.0 / delta > 400) {//avoid overheating at high fps
+			while (1.0 / delta > 400) {// avoid overheating at high fps
 				nT = System.nanoTime();
 				delta = (nT - lastTime) / 1000000000f;
 			}
 			if (nT - sinceFPS >= 1000000000) {
-				fpsText.destroy();
-				fpsText = ResourceHandler.get().getFont("Courier New,12").getText("FPS: " + FPS);
+				FPSText.generateSingleton(w, ResourceHandler.get().getFont("Courier New,12").getText("FPS: " + FPS));
 				FPS = 0;
 				sinceFPS = nT;
 			} else {
@@ -198,15 +202,15 @@ public class Game implements Runnable, SettingsListener {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("HDRdefault").bind();
 			perspectiveCam.bind();
-			monkey.draw(); //render monkey
+			monkey.draw(); // render monkey
 			ResourceHandler.get().getShader("terrain").bind();
 			ResourceHandler.get().getTexture("grass").bind();
 			perspectiveCam.bind();
 			level.draw(); // draw level
 			HDRFBO.unbind();
-			//calculate HDRmax
+			// calculate HDRmax
 			if (autoHDR) {
-				//HDRFBO.blit();
+				// HDRFBO.blit();
 				HDRFBO.ssbind();
 				pbuffer.clear();
 				glReadPixels(0, 0, HDRFBO.getWidth(), HDRFBO.getHeight(), GL_RGB, GL_FLOAT, pbuffer);
@@ -214,20 +218,19 @@ public class Game implements Runnable, SettingsListener {
 				HDRcalc.calculate(pbuffer, HDRFBO.getWidth(), HDRFBO.getHeight());
 				HDRmax = (HDRmax * 0.98f) + (HDRcalc.getValue() * 0.02f);
 			}
-			//Render HDRFBO
+			// Render HDRFBO
 			ResourceHandler.get().getShader("HDR").bind();
 			glUniform1f(7, HDRmax);
 			HDRFBO.blit();
 			HDRFBO.getTexture().bind();
 			FBModel.render();
 			HDRFBO.getTexture().unbind();
-			//render text
+			// render text
 			ResourceHandler.get().getShader("2dOrtho").bind();
 			orthoCam.bind();
-			fpsText.getBackingImage().draw(0, 0);
-			ResourceHandler.get().getTexture("grass").getAsImage().draw(50, 50);
-			//render debug console
-			//TODO: render debug console
+			ResourceHandler.get().getMenu("hud").draw(0, 0);
+			// render debug console
+			// TODO: render debug console
 			// End of gameloop
 			w.swap();
 			int err = GL_NO_ERROR;

@@ -1,6 +1,11 @@
-fpstext:
-	x: 0
-	y: 0
-image: grass
-	x: 200
-	y: 20
+root: menu
+	width: PARENT_WIDTH
+	height: PARENT_HEIGHT
+	components:
+		1: fpstext
+			x: 0
+			y: 0
+		2: image
+			src: grass
+			x: 200
+			y: 20
