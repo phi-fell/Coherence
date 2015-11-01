@@ -6,8 +6,10 @@ import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import io.proffitt.coherence.error.ErrorHandler;
 import io.proffitt.coherence.gui.MenuParent;
+import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
+import io.proffitt.coherence.settings.Value;
 
 import java.util.ArrayList;
 
@@ -17,8 +19,7 @@ import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.opengl.GL;
 
-public class Window implements SettingsListener, MenuParent {
-	Configuration config;
+public class Window implements SettingsListener {
 	static ArrayList<Window>	windows	= new ArrayList<Window>();
 	long						id;
 	int							width, height;
@@ -32,8 +33,7 @@ public class Window implements SettingsListener, MenuParent {
 	GLFWScrollCallback			scrollCall;
 	GLFWCursorPosCallback		cursorCall;
 	GLFWMouseButtonCallback		mouseCall;
-	public Window(Configuration c, int w, int h, String t) {
-		config = c;
+	public Window(int w, int h, String t) {
 		width = w;
 		height = h;
 		title = t;
@@ -44,12 +44,9 @@ public class Window implements SettingsListener, MenuParent {
 		resizable = GL_FALSE;
 	}
 	@Override
-	public void onSettingChanged(int setting, int newValue) {
-		switch (setting) {
-		case Configuration.VSYNC: glfwSwapInterval(newValue);
-			break;
-		default:
-			break;
+	public void onSettingChanged(String setting, Value newValue) {
+		if (setting.equals("VSYNC")) {
+			glfwSwapInterval(newValue.getBool() ? 1 : 0);
 		}
 	}
 	public int getWidth() {
@@ -74,7 +71,7 @@ public class Window implements SettingsListener, MenuParent {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, glForward);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, glProfile);
 		glfwWindowHint(GLFW_RESIZABLE, resizable);
-		glfwWindowHint(GLFW_SAMPLES, config.get(Configuration.MSAA));
+		glfwWindowHint(GLFW_SAMPLES, ResourceHandler.get().getConfig("settings").get("MSAA").getInt());
 		id = glfwCreateWindow(width, height, title, NULL, NULL);
 		ErrorHandler.get().handle(id != NULL);
 		synchronized (windows) {
@@ -82,8 +79,8 @@ public class Window implements SettingsListener, MenuParent {
 		}
 		makeCurrent();
 		GL.createCapabilities();
-		glfwSwapInterval(config.get(Configuration.VSYNC));
-		config.register(this);
+		glfwSwapInterval(ResourceHandler.get().getConfig("settings").get("VSYNC").getBool() ? 1 : 0);
+		ResourceHandler.get().getConfig("settings").register(this);
 	}
 	public boolean isKeyDown(int key) {
 		return glfwGetKey(id, key) == GLFW_PRESS;
@@ -116,13 +113,5 @@ public class Window implements SettingsListener, MenuParent {
 			}
 		}
 		return ret;
-	}
-	@Override
-	public int getX() {
-		return 0; // Window is absolute parent, so X is 0
-	}
-	@Override
-	public int getY() {
-		return 0; // Window is absolute parent, so Y is 0
 	}
 }

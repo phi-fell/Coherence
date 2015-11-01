@@ -1,11 +1,51 @@
 root: menu
 	width: PARENT_WIDTH
 	height: PARENT_HEIGHT
+	// asdf
+	
+	
+	// roflmao
+	
+	
 	components:
-		1: fpstext
+	
+	//
+	// 1234
+	
+	
+	// qwertyuiop
+		1: text
+			contents: FPS
 			x: 0
 			y: 0
+		rofl: text
+			x: 600
+			y: 400
+			contents: >|-\n-| 
+				Testing?
+					Testing!
+						1...
+						
+						
+						
+						2...
+						3!
+				Done.
 		2: image
 			src: grass
 			x: 200
 			y: 20
+		3: menu
+			width: PARENT_WIDTH
+			height: PARENT_HEIGHT
+			x: 200
+			y: 300
+			components:
+				1: image
+					src:grass
+					x : 10
+					y: 10
+				2: text
+					contents: FPS
+					x: 0
+					y: 150

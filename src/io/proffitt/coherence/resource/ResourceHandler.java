@@ -3,6 +3,7 @@ package io.proffitt.coherence.resource;
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.gui.Menu;
 import io.proffitt.coherence.gui.MenuComponent;
+import io.proffitt.coherence.settings.Configuration;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -21,12 +22,14 @@ public class ResourceHandler {
 		}
 		return rh;
 	}
+	private HashMap<String, Configuration> configs;
 	private HashMap<String, MenuComponent> menus;
 	private HashMap<String, Texture> textures;
 	private HashMap<String, Font> fonts;
 	private HashMap<String, Shader> shaders;
 	private HashMap<String, Model> models;
 	private ResourceHandler() {
+		configs = new HashMap<String, Configuration>();
 		menus = new HashMap<String, MenuComponent>();
 		textures = new HashMap<String, Texture>();
 		fonts = new HashMap<String, Font>();
@@ -39,6 +42,9 @@ public class ResourceHandler {
 	 * reloaded from disk (or generated) and into memory (and/or onto the GPU).
 	 */
 	public void cleanup() {
+		for  (String s : configs.keySet()){
+			configs.remove(s);// configs don't need cleanup
+		}
 		for (String s : menus.keySet()) {
 			menus.remove(s);// menus don't need cleanup
 		}
@@ -54,6 +60,17 @@ public class ResourceHandler {
 		for (String s : models.keySet()) {
 			models.remove(s).destroy();
 		}
+	}
+	public Configuration getConfig(String name) {
+		if (!configs.containsKey(name)) {
+			configs.put(name, loadConfig(name));
+		}
+		return configs.get(name);
+	}
+	private Configuration loadConfig(String name) {
+		Configuration ret = new Configuration();
+		ret.loadFromCML(this.loadResourceAsCML("res/config/"+name+".cml"));
+		return ret;
 	}
 	public MenuComponent getMenu(String name) {
 		if (!menus.containsKey(name)) {
@@ -162,8 +179,7 @@ public class ResourceHandler {
 		return m;
 	}
 	private CMLTag loadResourceAsCML(String path) {
-		CMLTag ret = new CMLTag("",loadResourceAsString(path).replace("\t", " "));
-		System.out.println(ret.toString());
+		CMLTag ret = new CMLTag("",loadResourceAsString(path).replace("\t", "    "));
 		return ret;
 	}
 	private String loadResourceAsString(String path) {

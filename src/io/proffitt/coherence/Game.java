@@ -7,13 +7,14 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.HashMap;
 
 import org.lwjgl.BufferUtils;
 
 import io.proffitt.coherence.error.ErrorHandler;
 import io.proffitt.coherence.graphics.*;
-import io.proffitt.coherence.gui.FPSText;
 import io.proffitt.coherence.gui.MenuComponent;
+import io.proffitt.coherence.gui.MenuParent;
 import io.proffitt.coherence.math.AABB;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
@@ -21,6 +22,7 @@ import io.proffitt.coherence.resource.Font;
 import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
+import io.proffitt.coherence.settings.Value;
 import io.proffitt.coherence.world.Entity;
 import io.proffitt.coherence.world.Level;
 import static org.lwjgl.opengl.GL11.*;
@@ -35,28 +37,24 @@ import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL21.*;
 
-public class Game implements Runnable, SettingsListener {
-	Thread t;
-	boolean running;
-	Configuration config;
-	Window w;
-	Camera perspectiveCam = new Camera();
-	Camera orthoCam = new Camera();
-	boolean debugConsole = false;
-	public Game(Configuration c, Window wind) {
-		config = c;
-		c.register(this);
+public class Game implements Runnable, SettingsListener, MenuParent {
+	Thread			t;
+	boolean			running;
+	Configuration	globals;
+	Window			w;
+	Camera			perspectiveCam	= new Camera();
+	Camera			orthoCam		= new Camera();
+	boolean			debugConsole	= false;
+	public Game(Window wind) {
+		globals = new Configuration();
+		ResourceHandler.get().getConfig("settings").register(this);
 		running = false;
 		w = wind;
 	}
 	@Override
-	public void onSettingChanged(int setting, int newValue) {
-		switch (setting) {
-			case Configuration.MSAA:
-				System.out.println("Changing MSAA requires a restart to take effect!");
-				break;
-			default:
-				break;
+	public void onSettingChanged(String setting, Value newValue) {
+		if (setting.equals("MSAA")) {
+			System.out.println("Changing MSAA requires a restart to take effect!");
 		}
 	}
 	public boolean isRunning() {
@@ -75,12 +73,13 @@ public class Game implements Runnable, SettingsListener {
 				Window.getWindow(window).destroy();
 				System.exit(0);
 			} else if (key == GLFW_KEY_V) {
-				config.set(Configuration.VSYNC, 1 - config.get(Configuration.VSYNC));
+				Value vsync = ResourceHandler.get().getConfig("settings").nullGet("VSYNC");
+				vsync.setBool(!vsync.getBool());
 			}
 		} else if (action == GLFW_RELEASE) {
 		}
 	}
-	double mx = 0, my = 0;
+	double	mx	= 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
 		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
 			perspectiveCam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
@@ -105,8 +104,7 @@ public class Game implements Runnable, SettingsListener {
 	@Override
 	public void run() {
 		w.create();
-		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos),
-				GLFWMouseButtonCallback(this::handleMouseClick));
+		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
 		glfwSetInputMode(w.getID(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPos(w.getID(), w.getWidth() / 2f, w.getHeight() / 2f);
 		mx = w.getWidth() / 2f;
@@ -119,13 +117,10 @@ public class Game implements Runnable, SettingsListener {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		Entity monkey = new Entity(ResourceHandler.get().getModel("smoothmonkey"));
 		Level level = new Level(10, 10);
-		int fov = 65;
-		perspectiveCam.setPos(0, 0, 4);
-		perspectiveCam.setProjection(Matrix4f.getPerspective(fov, w.getWidth() / ((float) w.getHeight()), 0.01f, 1000f));
-		orthoCam.setProjection(Matrix4f.getOrthographic(w.getWidth(), w.getHeight()));
-		FPSText.generateSingleton(w, ResourceHandler.get().getFont("Courier New,12").getText("FPS: -1"));
+		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setFOV(65).setNearPlane(0.01f).setFarPlane(1000f);
+		orthoCam.setOrtho().setWidth(w.getWidth()).setHeight(w.getHeight());
 		MenuComponent HUD = ResourceHandler.get().getMenu("hud");
-		HUD.setParent(w);
+		HUD.setParent(this);
 		FrameBuffer HDRFBO = new FrameBuffer(w.getWidth(), w.getHeight());
 		FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 3);
 		float[] fbverts = { -1, -1, 0, 0, 0, 0, 1, -1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, -1, -1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, -1, 1, 0, 0, 1, 0 };
@@ -149,7 +144,7 @@ public class Game implements Runnable, SettingsListener {
 				delta = (nT - lastTime) / 1000000000f;
 			}
 			if (nT - sinceFPS >= 1000000000) {
-				FPSText.generateSingleton(w, ResourceHandler.get().getFont("Courier New,12").getText("FPS: " + FPS));
+				globals.nullGet("FPS").setInt(FPS);
 				FPS = 0;
 				sinceFPS = nT;
 			} else {
@@ -192,6 +187,12 @@ public class Game implements Runnable, SettingsListener {
 					autoHDR = false;
 					HDRmax -= 0.01;
 				}
+				if (w.isKeyDown(GLFW_KEY_O)) {
+					perspectiveCam.setFOV(perspectiveCam.getFOV() - 1f);
+				}
+				if (w.isKeyDown(GLFW_KEY_L)) {
+					perspectiveCam.setFOV(perspectiveCam.getFOV() + 1f);
+				}
 			}
 			perspectiveCam.move(zMod * speed * (float) delta, xMod * speed * (float) delta);
 			// update
@@ -228,7 +229,7 @@ public class Game implements Runnable, SettingsListener {
 			// render text
 			ResourceHandler.get().getShader("2dOrtho").bind();
 			orthoCam.bind();
-			ResourceHandler.get().getMenu("hud").draw(0, 0);
+			HUD.draw();
 			// render debug console
 			// TODO: render debug console
 			// End of gameloop
@@ -241,5 +242,25 @@ public class Game implements Runnable, SettingsListener {
 		monkey.destroy();
 		ResourceHandler.get().cleanup();
 		running = false;
+	}
+	@Override
+	public int getWidth() {
+		return w.getWidth();
+	}
+	@Override
+	public int getHeight() {
+		return w.getHeight();
+	}
+	@Override
+	public int getX() {
+		return 0;
+	}
+	@Override
+	public int getY() {
+		return 0;
+	}
+	@Override
+	public Value getValue(String k) {
+		return globals.get(k);
 	}
 }

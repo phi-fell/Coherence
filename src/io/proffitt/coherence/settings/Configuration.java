@@ -1,33 +1,59 @@
 package io.proffitt.coherence.settings;
 
-import java.util.ArrayList;
+import io.proffitt.coherence.resource.CMLTag;
 
-public class Configuration {
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Configuration implements ValueOwner {
 	private ArrayList<SettingsListener>	listeners;
-	private int[]						settings;
-	public static final int				NUM_SETTINGS	= 2;	//KEEP UPDATED!!!
-	//settings
-	public static final int				VSYNC			= 0;
-	public static final int				MSAA			= 1;	//requires restart
-	//end settings
+	private HashMap<String, Value>		settings;
+	private HashMap<String, Value>		cached;
 	public Configuration() {
-		settings = new int[NUM_SETTINGS];
-		//defaults
-		settings[VSYNC] = 1;
-		settings[MSAA] = 16;
-		//end defaults
 		listeners = new ArrayList<SettingsListener>();
+		settings = new HashMap<String, Value>();
+		//defaults
+		settings.put("vsync", new Value(true));
+		settings.put("msaa", new Value(16));
+		//end defaults
+	}
+	public void loadFromCML(CMLTag ct) {
+		for (String k : ct.getTagIDs()) {
+			Value next = ct.getTag(k).getValue();
+			next.setOwner(this, k);
+			settings.put(k, next);
+		}
 	}
 	public void register(SettingsListener newSL) {
 		listeners.add(newSL);
 	}
-	public void set(int setting, int newVal) {
-		settings[setting] = newVal;
+	public void set(String k, Value newVal) {
+		setNoNotify(k, newVal);
+		notifyListeners(k, newVal);
+	}
+	//requires that listeners be notified soon after!
+	private void setNoNotify(String k, Value newVal) {
+		settings.put(k, newVal);
+	}
+	private void notifyListeners(String k, Value nv) {
 		for (SettingsListener sl : listeners) {
-			sl.onSettingChanged(setting, newVal);
+			sl.onSettingChanged(k, nv);
 		}
 	}
-	public int get(int setting) {
-		return settings[setting];
+	public Value get(String k) {
+		Value ret = settings.get(k);
+		return ret;
+	}
+	public Value nullGet(String k) {
+		Value ret = get(k);
+		if (ret == null) {
+			ret = new Value("NULL");
+			setNoNotify(k, ret);
+		}
+		return ret;
+	}
+	@Override
+	public void alert(String id) {
+		notifyListeners(id, get(id));
 	}
 }

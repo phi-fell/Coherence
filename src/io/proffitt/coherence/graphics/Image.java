@@ -7,13 +7,15 @@ import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
 import io.proffitt.coherence.resource.Texture;
 
-public class Image extends MenuComponent {
+public class Image {
 	Texture					tex;
 	static final float[]	imgVerts	= { 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 };
 	static final Model		model		= new Model(imgVerts);
 	public Image(Texture t) {
-		super(null, 0, 0, t.width, t.height);
 		tex = t;
+	}
+	public Texture getBackingTexture(){
+		return tex;
 	}
 	/**
 	 * fewer param version of {@link Text#draw(Vector4f, float, float)

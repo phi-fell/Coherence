@@ -1,14 +1,17 @@
 package io.proffitt.coherence.gui;
 
+import io.proffitt.coherence.settings.Value;
+
 import java.util.ArrayList;
 
-public abstract class MenuComponent {
-	int x, y, w, h;
-	boolean relativeWidth = false;
-	boolean relativeHeight = false;
-	ArrayList<MenuComponent> components;
-	MenuParent parent;
+public abstract class MenuComponent implements MenuParent {
+	int							x, y, w, h;
+	boolean						relativeWidth	= false;
+	boolean						relativeHeight	= false;
+	ArrayList<MenuComponent>	components;
+	MenuParent					parent;
 	public MenuComponent(MenuParent p, int X, int Y, int width, int height) {
+		components = new ArrayList<MenuComponent>();
 		parent = p;
 		w = width;
 		h = height;
@@ -17,6 +20,15 @@ public abstract class MenuComponent {
 	}
 	public void setParent(MenuParent p) {
 		parent = p;
+	}
+	public Value getValue(String k){
+		return parent.getValue(k);
+	}
+	public int getX() {
+		return x + (parent == null ? 0 : parent.getX());
+	}
+	public int getY() {
+		return y + (parent == null ? 0 : parent.getY());
 	}
 	public int getWidth() {
 		return w + (relativeWidth ? parent.getWidth() : 0);
@@ -33,8 +45,11 @@ public abstract class MenuComponent {
 	 * @param ymod
 	 *            Y position of parent component
 	 */
-	public void draw(int xmod, int ymod) {
+	public void draw() {
 		// This method should be overriden by ANY visual component
+		for (MenuComponent mc : components) {
+			mc.draw();
+		}
 	}
 	/**
 	 * @param xrel
