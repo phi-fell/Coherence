@@ -1,12 +1,12 @@
 package io.proffitt.coherence.resource;
 
+import io.proffitt.coherence.graphics.Text;
+
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.font.LineMetrics;
 import java.awt.image.BufferedImage;
-
-import io.proffitt.coherence.graphics.Text;
 
 public class Font {
 	java.awt.Font	awtFont;

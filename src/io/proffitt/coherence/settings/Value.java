@@ -1,20 +1,18 @@
 package io.proffitt.coherence.settings;
 
-import jdk.nashorn.internal.codegen.RuntimeCallSite;
-
 public class Value {
 	public static final int	TYPE_LONG	= 0;
 	public static final int	TYPE_DOUBLE	= 1;
 	public static final int	TYPE_STRING	= 2;
 	public static final int	TYPE_BOOL	= 3;
-	private ValueOwner OWNER = null;
-	private String ID = null;
+	private ValueOwner		OWNER		= null;
+	private String			ID			= null;
 	long					lVal;
 	double					dVal;
 	String					sVal;
 	boolean					bVal;
 	int						type;
-	public Value(Value v){
+	public Value(Value v) {
 		type = v.type;
 		lVal = v.lVal;
 		dVal = v.dVal;
@@ -33,8 +31,8 @@ public class Value {
 	public Value(boolean v) {
 		setBool(v);
 	}
-	void setOwner(ValueOwner vo, String id){
-		if (OWNER != null || ID != null){
+	void setOwner(ValueOwner vo, String id) {
+		if (OWNER != null || ID != null) {
 			throw new RuntimeException("Value is already owned!");
 		} else {
 			OWNER = vo;
@@ -50,7 +48,7 @@ public class Value {
 		}
 		return o.toString().equals(this.getString());
 	}
-	public int getType(){
+	public int getType() {
 		return type;
 	}
 	public void parse() {
@@ -78,35 +76,35 @@ public class Value {
 				}
 			}
 		}
-		if (OWNER != null){
+		if (OWNER != null) {
 			OWNER.alert(ID);
 		}
 	}
 	public void setLong(long v) {
 		type = TYPE_LONG;
 		lVal = v;
-		if (OWNER != null){
+		if (OWNER != null) {
 			OWNER.alert(ID);
 		}
 	}
 	public void setDouble(double v) {
 		type = 1;
 		dVal = v;
-		if (OWNER != null){
+		if (OWNER != null) {
 			OWNER.alert(ID);
 		}
 	}
 	public void setString(String v) {
 		type = 2;
 		sVal = v;
-		if (OWNER != null){
+		if (OWNER != null) {
 			OWNER.alert(ID);
 		}
 	}
 	public void setBool(boolean v) {
 		type = 3;
 		bVal = v;
-		if (OWNER != null){
+		if (OWNER != null) {
 			OWNER.alert(ID);
 		}
 	}

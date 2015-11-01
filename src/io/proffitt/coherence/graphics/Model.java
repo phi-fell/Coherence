@@ -16,10 +16,10 @@ import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 
 public class Model {
-	int	VAO;
-	int	VBO;
-	int	vertnum;
-	public float[] verts;
+	int				VAO;
+	int				VBO;
+	int				vertnum;
+	public float[]	verts;
 	public Model(float[] v) {
 		verts = v;
 		vertnum = verts.length / 6;

@@ -7,7 +7,7 @@ public class Transform {
 	public Transform() {
 		pos = new Vector4f();
 		rot = new Vector4f();
-		scale = new Vector4f(1,1,1,1);
+		scale = new Vector4f(1, 1, 1, 1);
 	}
 	public Vector4f getPosition() {
 		return pos;

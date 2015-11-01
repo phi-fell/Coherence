@@ -37,8 +37,8 @@ public class HDRCalculator implements Runnable {
 		double avg = 0;
 		float max = 0;
 		pbuffer.clear();
-		for (int i = 0; i < pbuffer.capacity(); i+=3){
-			float brightness = pbuffer.get(i) + pbuffer.get(i+1) + pbuffer.get(i+2);
+		for (int i = 0; i < pbuffer.capacity(); i += 3) {
+			float brightness = pbuffer.get(i) + pbuffer.get(i + 1) + pbuffer.get(i + 2);
 			avg += Math.log1p(brightness);
 			max = Math.max(max, brightness);
 		}

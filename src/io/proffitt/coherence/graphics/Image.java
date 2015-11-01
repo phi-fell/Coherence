@@ -1,8 +1,6 @@
 package io.proffitt.coherence.graphics;
 
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-
-import io.proffitt.coherence.gui.MenuComponent;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
 import io.proffitt.coherence.resource.Texture;
@@ -14,7 +12,7 @@ public class Image {
 	public Image(Texture t) {
 		tex = t;
 	}
-	public Texture getBackingTexture(){
+	public Texture getBackingTexture() {
 		return tex;
 	}
 	/**

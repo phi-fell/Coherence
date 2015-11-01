@@ -4,10 +4,10 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.math.Matrix4f;
 
 public class Camera {
-	private float		x, y, z;	// position
-	private float		aX, aY, aZ; // euler angles
-	private boolean		ortho, projGenerated, viewGenerated;
-	private float		width, height, fov, near, far;
+	private float	x, y, z;	// position
+	private float	aX, aY, aZ; // euler angles
+	private boolean	ortho, projGenerated, viewGenerated;
+	private float	width, height, fov, near, far;
 	private Matrix4f	projMat, viewMat;
 	public Camera() {
 		aX = 0;
@@ -25,50 +25,50 @@ public class Camera {
 		projMat = new Matrix4f();
 		projGenerated = true;
 	}
-	public Camera setWidth(float w){
+	public Camera setWidth(float w) {
 		projGenerated = false;
 		width = w;
 		return this;
 	}
-	public Camera setHeight(float h){
+	public Camera setHeight(float h) {
 		projGenerated = false;
 		height = h;
 		return this;
 	}
-	public Camera setPerspective(){
+	public Camera setPerspective() {
 		projGenerated = false;
 		ortho = false;
 		return this;
 	}
-	public Camera setOrtho(){
+	public Camera setOrtho() {
 		projGenerated = false;
 		ortho = true;
 		return this;
 	}
-	public Camera setFOV(float f){
+	public Camera setFOV(float f) {
 		projGenerated = false;
 		fov = f;
 		return this;
 	}
-	public Camera setNearPlane(float n){
+	public Camera setNearPlane(float n) {
 		projGenerated = false;
 		near = n;
 		return this;
 	}
-	public Camera setFarPlane(float f){
+	public Camera setFarPlane(float f) {
 		projGenerated = false;
 		far = f;
 		return this;
 	}
-	private void generateProjection(){
-		if (ortho){
+	private void generateProjection() {
+		if (ortho) {
 			projMat = Matrix4f.getOrthographic(width, height);
-		}else{
+		} else {
 			projMat = Matrix4f.getPerspective(fov, width / height, near, far);
 		}
 		projGenerated = true;
 	}
-	private void generateView(){
+	private void generateView() {
 		viewMat = Matrix4f.getRotationZ(-aZ).multiply(Matrix4f.getRotationX(-aX).multiply(Matrix4f.getRotationY(-aY).multiply(Matrix4f.getTranslation(-x, -y, -z))));
 		viewGenerated = true;
 	}
@@ -77,13 +77,13 @@ public class Camera {
 		glUniformMatrix4fv(5, false, getProjectionMatrix().toFloatBuffer());// projection
 	}
 	public Matrix4f getViewMatrix() {
-		if (!viewGenerated){
+		if (!viewGenerated) {
 			generateView();
 		}
 		return viewMat;
 	}
-	public Matrix4f getProjectionMatrix(){
-		if (!projGenerated){
+	public Matrix4f getProjectionMatrix() {
+		if (!projGenerated) {
 			generateProjection();
 		}
 		return projMat;

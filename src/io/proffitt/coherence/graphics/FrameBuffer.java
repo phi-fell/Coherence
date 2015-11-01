@@ -1,29 +1,24 @@
 package io.proffitt.coherence.graphics;
 
-import io.proffitt.coherence.resource.Texture;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
+import static org.lwjgl.opengl.GL14.GL_DEPTH_COMPONENT24;
+import static org.lwjgl.opengl.GL20.glDrawBuffers;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL31.*;
-import static org.lwjgl.opengl.GL32.*;
-import static org.lwjgl.opengl.GL33.*;
-import static org.lwjgl.opengl.GL41.*;
-
-import org.lwjgl.opengl.ARBDebugOutput;
-
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL20.*;
+import io.proffitt.coherence.resource.Texture;
 
 import org.lwjgl.opengl.ARBFramebufferObject;
 
 public class FrameBuffer {
-	int msFrameID;
-	int ssFrameID;
-	int colorID;
-	int depthID;
-	int width, height;
-	Texture tex;
+	int		msFrameID;
+	int		ssFrameID;
+	int		colorID;
+	int		depthID;
+	int		width, height;
+	Texture	tex;
 	public FrameBuffer(int w, int h) {
 		width = w;
 		height = h;

@@ -15,19 +15,19 @@ import java.util.Scanner;
 import javax.imageio.ImageIO;
 
 public class ResourceHandler {
-	private static ResourceHandler rh;
+	private static ResourceHandler	rh;
 	public static ResourceHandler get() {
 		if (rh == null) {
 			rh = new ResourceHandler();
 		}
 		return rh;
 	}
-	private HashMap<String, Configuration> configs;
-	private HashMap<String, MenuComponent> menus;
-	private HashMap<String, Texture> textures;
-	private HashMap<String, Font> fonts;
-	private HashMap<String, Shader> shaders;
-	private HashMap<String, Model> models;
+	private HashMap<String, Configuration>	configs;
+	private HashMap<String, MenuComponent>	menus;
+	private HashMap<String, Texture>		textures;
+	private HashMap<String, Font>			fonts;
+	private HashMap<String, Shader>			shaders;
+	private HashMap<String, Model>			models;
 	private ResourceHandler() {
 		configs = new HashMap<String, Configuration>();
 		menus = new HashMap<String, MenuComponent>();
@@ -42,7 +42,7 @@ public class ResourceHandler {
 	 * reloaded from disk (or generated) and into memory (and/or onto the GPU).
 	 */
 	public void cleanup() {
-		for  (String s : configs.keySet()){
+		for (String s : configs.keySet()) {
 			configs.remove(s);// configs don't need cleanup
 		}
 		for (String s : menus.keySet()) {
@@ -69,7 +69,7 @@ public class ResourceHandler {
 	}
 	private Configuration loadConfig(String name) {
 		Configuration ret = new Configuration();
-		ret.loadFromCML(this.loadResourceAsCML("res/config/"+name+".cml"));
+		ret.loadFromCML(this.loadResourceAsCML("res/config/" + name + ".cml"));
 		return ret;
 	}
 	public MenuComponent getMenu(String name) {
@@ -179,7 +179,7 @@ public class ResourceHandler {
 		return m;
 	}
 	private CMLTag loadResourceAsCML(String path) {
-		CMLTag ret = new CMLTag("",loadResourceAsString(path).replace("\t", "    "));
+		CMLTag ret = new CMLTag("", loadResourceAsString(path).replace("\t", "    "));
 		return ret;
 	}
 	private String loadResourceAsString(String path) {

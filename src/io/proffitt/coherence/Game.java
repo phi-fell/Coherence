@@ -3,39 +3,20 @@ package io.proffitt.coherence;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.HashMap;
-
-import org.lwjgl.BufferUtils;
-
-import io.proffitt.coherence.error.ErrorHandler;
+import static org.lwjgl.opengl.GL20.glUniform1f;
 import io.proffitt.coherence.graphics.*;
 import io.proffitt.coherence.gui.MenuComponent;
 import io.proffitt.coherence.gui.MenuParent;
-import io.proffitt.coherence.math.AABB;
-import io.proffitt.coherence.math.Matrix4f;
-import io.proffitt.coherence.math.Vector4f;
-import io.proffitt.coherence.resource.Font;
 import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.settings.Value;
 import io.proffitt.coherence.world.Entity;
 import io.proffitt.coherence.world.Level;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL14.*;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL31.*;
-import static org.lwjgl.opengl.GL32.*;
-import static org.lwjgl.opengl.GL33.*;
-import static org.lwjgl.opengl.GL41.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL21.*;
+
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
 
 public class Game implements Runnable, SettingsListener, MenuParent {
 	Thread			t;

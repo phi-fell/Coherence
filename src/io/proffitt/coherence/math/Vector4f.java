@@ -17,18 +17,18 @@ public class Vector4f {
 	public float getLenSq() {
 		return (x * x) + (y * y) + (z * z);
 	}
-	public float getLength(){
-		return (float)Math.sqrt(getLenSq());
+	public float getLength() {
+		return (float) Math.sqrt(getLenSq());
 	}
-	public void normalize(){
+	public void normalize() {
 		float len = getLength();
-		if (len == 0){
+		if (len == 0) {
 			return;
 		}
-		x/=len;
-		y/=len;
-		z/=len;
-		w/=len;
+		x /= len;
+		y /= len;
+		z /= len;
+		w /= len;
 	}
 	public void divideByW() {
 		if (w == 0) {

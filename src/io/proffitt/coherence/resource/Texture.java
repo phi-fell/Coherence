@@ -1,32 +1,19 @@
 package io.proffitt.coherence.resource;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.GL_RGBA16F;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL14.*;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL31.*;
-import static org.lwjgl.opengl.GL32.*;
-import static org.lwjgl.opengl.GL33.*;
-import static org.lwjgl.opengl.GL41.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL21.*;
+import static org.lwjgl.opengl.GL30.GL_RGBA32F;
+import io.proffitt.coherence.graphics.Image;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.BufferUtils;
 
-import io.proffitt.coherence.graphics.Image;
-
 public class Texture {
-	int id;
-	public final int width;
-	public final int height;
-	Image img = null;
+	int					id;
+	public final int	width;
+	public final int	height;
+	Image				img	= null;
 	public Texture(int w, int h) {
 		width = w;
 		height = h;
@@ -82,7 +69,7 @@ public class Texture {
 			Image temp = img;
 			img = null;
 			temp.destroy();
-			if (id == 0){
+			if (id == 0) {
 				return;
 			}
 		}

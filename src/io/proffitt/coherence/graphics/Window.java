@@ -5,9 +5,7 @@ import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import io.proffitt.coherence.error.ErrorHandler;
-import io.proffitt.coherence.gui.MenuParent;
 import io.proffitt.coherence.resource.ResourceHandler;
-import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.settings.Value;
 

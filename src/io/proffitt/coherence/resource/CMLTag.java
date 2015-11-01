@@ -2,7 +2,6 @@ package io.proffitt.coherence.resource;
 
 import io.proffitt.coherence.settings.Value;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CMLTag {

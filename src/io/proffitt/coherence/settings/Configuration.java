@@ -8,7 +8,6 @@ import java.util.HashMap;
 public class Configuration implements ValueOwner {
 	private ArrayList<SettingsListener>	listeners;
 	private HashMap<String, Value>		settings;
-	private HashMap<String, Value>		cached;
 	public Configuration() {
 		listeners = new ArrayList<SettingsListener>();
 		settings = new HashMap<String, Value>();

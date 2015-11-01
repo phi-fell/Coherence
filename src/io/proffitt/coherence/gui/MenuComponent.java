@@ -21,7 +21,7 @@ public abstract class MenuComponent implements MenuParent {
 	public void setParent(MenuParent p) {
 		parent = p;
 	}
-	public Value getValue(String k){
+	public Value getValue(String k) {
 		return parent.getValue(k);
 	}
 	public int getX() {
