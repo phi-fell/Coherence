@@ -4,10 +4,10 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.math.Matrix4f;
 
 public class Camera {
-	private float	x, y, z;	// position
-	private float	aX, aY, aZ; // euler angles
-	private boolean	ortho, projGenerated, viewGenerated;
-	private float	width, height, fov, near, far;
+	private float		x, y, z;							// position
+	private float		aX, aY, aZ;							// euler angles
+	private boolean		ortho, projGenerated, viewGenerated;
+	private float		width, height, fov, near, far;
 	private Matrix4f	projMat, viewMat;
 	public Camera() {
 		aX = 0;
@@ -94,6 +94,15 @@ public class Camera {
 		y = ny;
 		z = nz;
 		return this;
+	}
+	public float getX() {
+		return x;
+	}
+	public float getY() {
+		return y;
+	}
+	public float getZ() {
+		return z;
 	}
 	public Camera translate(float mx, float my, float mz) {
 		viewGenerated = false;

@@ -60,7 +60,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		} else if (action == GLFW_RELEASE) {
 		}
 	}
-	double	mx	= 0, my = 0;
+	double mx = 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
 		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
 			perspectiveCam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
@@ -173,6 +173,12 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 				}
 				if (w.isKeyDown(GLFW_KEY_L)) {
 					perspectiveCam.setFOV(perspectiveCam.getFOV() + 1f);
+				}
+				if (w.isKeyDown(GLFW_KEY_M)) {
+					level.setHeight(perspectiveCam.getX(), perspectiveCam.getZ(), level.getHeight(perspectiveCam.getX(), perspectiveCam.getZ()) + 0.1f);
+				}
+				if (w.isKeyDown(GLFW_KEY_N)) {
+					level.setHeight(perspectiveCam.getX(), perspectiveCam.getZ(), level.getHeight(perspectiveCam.getX(), perspectiveCam.getZ()) - 0.1f);
 				}
 			}
 			perspectiveCam.move(zMod * speed * (float) delta, xMod * speed * (float) delta);

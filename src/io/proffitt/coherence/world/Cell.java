@@ -1,6 +1,9 @@
 package io.proffitt.coherence.world;
 
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+
+import java.util.ArrayList;
+
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
@@ -9,22 +12,49 @@ public class Cell {
 	public final int	SIZE;
 	float[][]			height;
 	Model				model;
+	Cell[][]			adj;
+	ArrayList<Entity>	entities;
 	public Cell(int size) {
 		SIZE = size;
 		height = new float[SIZE][SIZE];
+		entities = new ArrayList<Entity>();
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
-				//height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
+				// height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE /
+				// 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE *
+				// SIZE) / 16.0) - 8);
 				height[i][j] = -1.5f;
 				height[i][j] += (Math.random() - 0.5f) * 0.2;
 			}
 		}
 		model = null;
 	}
-	public void generateModel(Cell[][] adj) {
+	public void addEntity(Entity e) {
+		entities.add(e);
+	}
+	public void setAdjacent(Cell[][] a) {
+		adj = a;
+	}
+	public void setHeight(int x, int z, float h) {
+		height[x][z] = h;
+		if (model != null) {
+			model.destroy();
+		}
+		model = null;
+	}
+	public float getHeight(int x, int z) {
+		return height[x][z];
+	}
+	public void generateModel() {
+		if (model != null) {
+			model.destroy();
+		}
 		model = new Model(getVerts(adj));
 	}
 	public void draw(float x, float y, float z) {
+		if (model == null) {
+			generateModel();
+		}
 		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x, y, z).toFloatBuffer());// model
 		model.render();
 	}
@@ -57,7 +87,7 @@ public class Cell {
 		return adj[cx][cy].height[x][y];
 	}
 	private Vector4f pos(int x, int y, Cell[][] adj) {
-		return new Vector4f(x - (SIZE / 2), getStitchingHeight(x, y, adj), y - (SIZE / 2), 1);
+		return new Vector4f(x, getStitchingHeight(x, y, adj), y, 1);
 	}
 	private float[] getVerts(Cell[][] adj) {
 		float[] verts = new float[(SIZE) * (SIZE) * 36];

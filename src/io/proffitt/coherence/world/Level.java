@@ -21,7 +21,7 @@ public class Level {
 						adj[i][j] = ((a + (i - 1) >= 0 && a + (i - 1) < w) && (b + (j - 1) >= 0 && b + (j - 1) < h)) ? cells[a + (i - 1)][b + (j - 1)] : null;
 					}
 				}
-				cells[a][b].generateModel(adj);
+				cells[a][b].setAdjacent(adj);
 			}
 		}
 	}
@@ -31,5 +31,15 @@ public class Level {
 				cells[a][b].draw(a * CELL_SIZE, 0, b * CELL_SIZE);
 			}
 		}
+	}
+	public float getHeight(float xf, float zf) {
+		int x = (int) (xf + 0.5f);
+		int z = (int) (zf + 0.5f);
+		return cells[x / CELL_SIZE][z / CELL_SIZE].getHeight(x % CELL_SIZE, z % CELL_SIZE);
+	}
+	public void setHeight(float xf, float zf, float h) {
+		int x = (int) (xf + 0.5f);
+		int z = (int) (zf + 0.5f);
+		cells[x / CELL_SIZE][z / CELL_SIZE].setHeight(x % CELL_SIZE, z % CELL_SIZE, h);
 	}
 }
