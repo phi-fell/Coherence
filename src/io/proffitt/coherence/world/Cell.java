@@ -12,7 +12,6 @@ public class Cell {
 	public final int	SIZE;
 	float[][]			height;
 	Model				model;
-	Cell[][]			adj;
 	ArrayList<Entity>	entities;
 	public Cell(int size) {
 		SIZE = size;
@@ -32,9 +31,6 @@ public class Cell {
 	public void addEntity(Entity e) {
 		entities.add(e);
 	}
-	public void setAdjacent(Cell[][] a) {
-		adj = a;
-	}
 	public void setHeight(int x, int z, float h) {
 		height[x][z] = h;
 		if (model != null) {
@@ -45,7 +41,10 @@ public class Cell {
 	public float getHeight(int x, int z) {
 		return height[x][z];
 	}
-	public void generateModel() {
+	public boolean modelValid() {
+		return model != null;
+	}
+	public void generateModel(Cell[][] adj) {
 		if (model != null) {
 			model.destroy();
 		}
@@ -53,7 +52,7 @@ public class Cell {
 	}
 	public void draw(float x, float y, float z) {
 		if (model == null) {
-			generateModel();
+			throw new RuntimeException("draw() failed, Cell Model is obsolete.");
 		}
 		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x, y, z).toFloatBuffer());// model
 		model.render();

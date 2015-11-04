@@ -21,13 +21,22 @@ public class Level {
 						adj[i][j] = ((a + (i - 1) >= 0 && a + (i - 1) < w) && (b + (j - 1) >= 0 && b + (j - 1) < h)) ? cells[a + (i - 1)][b + (j - 1)] : null;
 					}
 				}
-				cells[a][b].setAdjacent(adj);
+				cells[a][b].generateModel(adj);
 			}
 		}
 	}
 	public void draw() {
 		for (int a = 0; a < w; a++) {
 			for (int b = 0; b < h; b++) {
+				if (!cells[a][b].modelValid()) {
+					Cell[][] adj = new Cell[3][3];
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 3; j++) {
+							adj[i][j] = ((a + (i - 1) >= 0 && a + (i - 1) < w) && (b + (j - 1) >= 0 && b + (j - 1) < h)) ? cells[a + (i - 1)][b + (j - 1)] : null;
+						}
+					}
+					cells[a][b].generateModel(adj);
+				}
 				cells[a][b].draw(a * CELL_SIZE, 0, b * CELL_SIZE);
 			}
 		}
