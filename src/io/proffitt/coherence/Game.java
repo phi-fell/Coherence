@@ -110,8 +110,8 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		while ((er = glGetError()) != GL_NO_ERROR) {
 			System.out.println("OpenGL Error in initialization: " + Integer.toHexString(er));
 		}
-		float HDRmax = 1;
-		boolean autoHDR = false;
+		globals.nullGet("calcHDR").setBool(false);
+		globals.nullGet("HDRMax").setDouble(1);
 		HDRCalculator HDRcalc = new HDRCalculator();
 		// time stuff, no more init after this
 		long lastTime = System.nanoTime();
@@ -158,15 +158,15 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 					xMod++;
 				}
 				if (w.isKeyDown(GLFW_KEY_H)) {
-					autoHDR = true;
+					globals.get("calcHDR").setBool(true);
 				}
 				if (w.isKeyDown(GLFW_KEY_R)) {
-					autoHDR = false;
-					HDRmax += 0.01;
+					globals.get("calcHDR").setBool(false);
+					globals.get("HDRMax").setDouble(globals.get("HDRMax").getDouble() + 0.01);
 				}
 				if (w.isKeyDown(GLFW_KEY_F)) {
-					autoHDR = false;
-					HDRmax -= 0.01;
+					globals.get("calcHDR").setBool(false);
+					globals.get("HDRMax").setDouble(globals.get("HDRMax").getDouble() - 0.01);
 				}
 				if (w.isKeyDown(GLFW_KEY_O)) {
 					perspectiveCam.setFOV(perspectiveCam.getFOV() - 1f);
@@ -197,18 +197,18 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			level.draw(); // draw level
 			HDRFBO.unbind();
 			// calculate HDRmax
-			if (autoHDR) {
+			if (globals.get("calcHDR").getBool()) {
 				// HDRFBO.blit();
 				HDRFBO.ssbind();
 				pbuffer.clear();
 				glReadPixels(0, 0, HDRFBO.getWidth(), HDRFBO.getHeight(), GL_RGB, GL_FLOAT, pbuffer);
 				HDRFBO.unbind();
 				HDRcalc.calculate(pbuffer, HDRFBO.getWidth(), HDRFBO.getHeight());
-				HDRmax = (HDRmax * 0.98f) + (HDRcalc.getValue() * 0.02f);
+				globals.get("HDRMax").setDouble((globals.get("HDRMax").getDouble() * 0.98f) + (HDRcalc.getValue() * 0.02f));
 			}
 			// Render HDRFBO
 			ResourceHandler.get().getShader("HDR").bind();
-			glUniform1f(7, HDRmax);
+			glUniform1f(7, globals.get("HDRMax").getFloat());
 			HDRFBO.blit();
 			HDRFBO.getTexture().bind();
 			FBModel.render();
