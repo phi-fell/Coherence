@@ -41,7 +41,7 @@ public class Menu extends MenuComponent {
 		} else if (type.equalsIgnoreCase("image")) {
 			ret = new ImageComponent(ResourceHandler.get().getTexture(data.getTag("src").getValue().getString()).getAsImage(), x, y);
 		} else if (type.equalsIgnoreCase("text")) {
-			ret = new TextComponent(ResourceHandler.get().getFont(data.getTag("font") == null ? "Courier New,12" : data.getTag("font").getValue().getString()), (data.getTag("contents") == null || data.getTag("contents").getValue().getString().length() == 0) ? "TEXT_ERROR" : data.getTag("contents").getValue().getString().replace(" ", "|"), x, y);
+			ret = new TextComponent(ResourceHandler.get().getFont(data.getTag("font") == null ? "Courier New,12" : data.getTag("font").getValue().getString()), (data.getTag("contents") == null || data.getTag("contents").getValue().getString().length() == 0) ? "TEXT_ERROR" : data.getTag("contents").getValue().getString(), x, y);
 		} else {
 			// ERROR
 		}

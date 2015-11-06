@@ -43,7 +43,7 @@ public class Expression {
 		vC = null;
 		switch (op) {
 		case OP_SET:
-			vA = vB;
+			vA.set(vB);
 			vC = vA;
 			break;
 		case OP_ADD:

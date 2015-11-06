@@ -84,6 +84,8 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 				if (globals.get("console").getBool()) {
 					if (key == GLFW_KEY_ENTER) {
 						console.registerTextInput('\n');
+					} else if (key == GLFW_KEY_BACKSPACE){
+						console.registerTextInput('\b');
 					}
 				} else {
 					if (key == GLFW_KEY_V) {

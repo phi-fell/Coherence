@@ -28,6 +28,8 @@ public class Console {
 		if (c == '\n') {
 			pushString(input);
 			input = "";
+		} else if (c == '\b') {
+			input = input.substring(0, input.length() > 0 ? input.length() - 1 : 0);
 		} else {
 			input += c;
 		}
@@ -36,7 +38,7 @@ public class Console {
 	public void pushString(String s) {
 		Command c = new Command(s);
 		addMessage(s);
-		if (!c.execute(ResourceHandler.get().getConfig("globals"))){
+		if (!c.execute(ResourceHandler.get().getConfig("globals"))) {
 			addMessage("Invalid Command!");
 		}
 	}

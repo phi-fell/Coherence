@@ -80,6 +80,25 @@ public class Value {
 			OWNER.alert(ID);
 		}
 	}
+	public void set(Value rhs) {
+		this.type = rhs.type;
+		switch (type) {
+		case 0:
+			lVal = rhs.lVal;
+			break;
+		case 1:
+			dVal = rhs.dVal;
+			break;
+		case 2:
+			sVal = rhs.sVal;
+			break;
+		case 3:
+			bVal = rhs.bVal;
+			break;
+		default:
+			break;
+		}
+	}
 	public void setLong(long v) {
 		type = TYPE_LONG;
 		lVal = v;
