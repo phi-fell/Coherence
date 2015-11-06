@@ -177,4 +177,61 @@ public class Value {
 	public float getFloat() {
 		return (float) getDouble();
 	}
+	//operators
+	public void Add(Value rhs) {
+		if (type == TYPE_STRING || rhs.type == TYPE_STRING) {
+			setString(getString() + rhs.getString());
+		} else if (type == TYPE_DOUBLE || rhs.type == TYPE_DOUBLE) {
+			setDouble(getDouble() + rhs.getDouble());
+		} else if (type == TYPE_LONG || rhs.type == TYPE_LONG) {
+			setLong(getLong() + rhs.getLong());
+		} else if (type == TYPE_BOOL && rhs.type == TYPE_BOOL) {
+			setBool(getBool() || rhs.getBool());
+		} else {
+			//IMPOSSIBLE!
+			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+		}
+	}
+	public void Subtract(Value rhs) {
+		if (type == TYPE_STRING || rhs.type == TYPE_STRING) {
+			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+		} else if (type == TYPE_DOUBLE || rhs.type == TYPE_DOUBLE) {
+			setDouble(getDouble() - rhs.getDouble());
+		} else if (type == TYPE_LONG || rhs.type == TYPE_LONG) {
+			setLong(getLong() - rhs.getLong());
+		} else if (type == TYPE_BOOL && rhs.type == TYPE_BOOL) {
+			setBool(getBool() && rhs.getBool());
+		} else {
+			//IMPOSSIBLE!
+			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+		}
+	}
+	public void Multiply(Value rhs) {
+		if (type == TYPE_STRING || rhs.type == TYPE_STRING) {
+			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+		} else if (type == TYPE_DOUBLE || rhs.type == TYPE_DOUBLE) {
+			setDouble(getDouble() * rhs.getDouble());
+		} else if (type == TYPE_LONG || rhs.type == TYPE_LONG) {
+			setLong(getLong() * rhs.getLong());
+		} else if (type == TYPE_BOOL && rhs.type == TYPE_BOOL) {
+			setBool(getBool() && rhs.getBool());
+		} else {
+			//IMPOSSIBLE!
+			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+		}
+	}
+	public void Divide(Value rhs) {
+		if (type == TYPE_STRING || rhs.type == TYPE_STRING) {
+			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+		} else if (type == TYPE_DOUBLE || rhs.type == TYPE_DOUBLE) {
+			setDouble(getDouble() / rhs.getDouble());
+		} else if (type == TYPE_LONG || rhs.type == TYPE_LONG) {
+			setLong(getLong() / rhs.getLong());
+		} else if (type == TYPE_BOOL && rhs.type == TYPE_BOOL) {
+			setBool(getBool() ^ rhs.getBool());
+		} else {
+			//IMPOSSIBLE!
+			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+		}
+	}
 }

@@ -11,6 +11,7 @@ import io.proffitt.coherence.settings.Value;
 
 import java.util.ArrayList;
 
+import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
@@ -28,6 +29,7 @@ public class Window implements SettingsListener {
 	int							glProfile;
 	int							resizable;
 	GLFWKeyCallback				keyCall;
+	GLFWCharCallback			charCall;
 	GLFWScrollCallback			scrollCall;
 	GLFWCursorPosCallback		cursorCall;
 	GLFWMouseButtonCallback		mouseCall;
@@ -53,12 +55,15 @@ public class Window implements SettingsListener {
 	public int getHeight() {
 		return height;
 	}
-	public void setCallbacks(GLFWKeyCallback keyC, GLFWScrollCallback scrollC, GLFWCursorPosCallback cursorC, GLFWMouseButtonCallback mouseC) {
+	public void setCallbacks(GLFWKeyCallback keyC, GLFWCharCallback charC, GLFWScrollCallback scrollC, GLFWCursorPosCallback cursorC, GLFWMouseButtonCallback mouseC) {
+		cleanupCallbacks();
 		keyCall = keyC;
+		charCall = charC;
 		scrollCall = scrollC;
 		cursorCall = cursorC;
 		mouseCall = mouseC;
 		glfwSetKeyCallback(id, keyCall);
+		glfwSetCharCallback(id, charCall);
 		glfwSetScrollCallback(id, scrollCall);
 		glfwSetCursorPosCallback(id, cursorCall);
 		glfwSetMouseButtonCallback(id, mouseCall);
@@ -92,8 +97,25 @@ public class Window implements SettingsListener {
 	public void swap() {
 		glfwSwapBuffers(id);
 	}
+	private void cleanupCallbacks() {
+		if (keyCall != null) {
+			keyCall.release();
+		}
+		if (charCall != null) {
+			charCall.release();
+		}
+		if (scrollCall != null) {
+			scrollCall.release();
+		}
+		if (cursorCall != null) {
+			cursorCall.release();
+		}
+		if (mouseCall != null) {
+			mouseCall.release();
+		}
+	}
 	public void destroy() {
-		keyCall.release();
+		cleanupCallbacks();
 		glfwDestroyWindow(id);
 	}
 	public long getID() {

@@ -35,6 +35,7 @@ public class ResourceHandler {
 		fonts = new HashMap<String, Font>();
 		shaders = new HashMap<String, Shader>();
 		models = new HashMap<String, Model>();
+		configs.put("globals", new Configuration());
 	}
 	/**
 	 * Removes and cleans up all cached resources. ResourceHandler may still be
@@ -105,7 +106,7 @@ public class ResourceHandler {
 	}
 	private Font loadFont(String name) {
 		String fontData[] = name.split(",");
-		return new Font(fontData[0], Integer.parseInt(fontData[1]));
+		return new Font(fontData[0].trim(), Integer.parseInt(fontData[1].trim()));
 	}
 	public Shader getShader(String name) {
 		if (!shaders.containsKey(name)) {

@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.opengl.GL20.glUniform1f;
 import io.proffitt.coherence.graphics.*;
+import io.proffitt.coherence.gui.Console;
 import io.proffitt.coherence.gui.MenuComponent;
 import io.proffitt.coherence.gui.MenuParent;
 import io.proffitt.coherence.resource.ResourceHandler;
@@ -23,12 +24,14 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	boolean			running;
 	Configuration	globals;
 	Window			w;
+	Console			console;
 	Camera			perspectiveCam	= new Camera();
 	Camera			orthoCam		= new Camera();
-	boolean			debugConsole	= false;
 	public Game(Window wind) {
-		globals = new Configuration();
+		globals = ResourceHandler.get().getConfig("globals");
+		globals.nullGet("console").setBool(false);
 		ResourceHandler.get().getConfig("settings").register(this);
+		console = new Console();
 		running = false;
 		w = wind;
 	}
@@ -41,21 +44,53 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	public boolean isRunning() {
 		return running;
 	}
+	public void handleTextInput(long window, int key) {
+		if (globals.get("console").getBool()) {
+			if (Character.charCount(key) == 1) {
+				char c = Character.toChars(key)[0];
+				boolean valid = false;
+				if (c >= 'a' && c <= 'z') {
+					valid = true;
+				} else if (c >= 'A' && c <= 'Z') {
+					valid = true;
+				} else if (c >= '0' && c <= '9') {
+					valid = true;
+				} else if (c == ' ' || c == '=') {//list all operators here
+					valid = true;
+				}
+				if (valid) {
+					console.registerTextInput(c);
+				}
+			}
+		}
+	}
 	public void handleKeyPress(long window, int key, int scancode, int action, int mods) {
 		if (action == GLFW_PRESS) {
 			if (key == GLFW_KEY_GRAVE_ACCENT) {
-				debugConsole = !debugConsole;
-				if (debugConsole) {
+				globals.get("console").Divide(new Value(true));
+				if (globals.get("console").getBool()) {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				} else {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				}
 			} else if (key == GLFW_KEY_ESCAPE) {
-				Window.getWindow(window).destroy();
-				System.exit(0);
-			} else if (key == GLFW_KEY_V) {
-				Value vsync = ResourceHandler.get().getConfig("settings").nullGet("VSYNC");
-				vsync.setBool(!vsync.getBool());
+				if (globals.get("console").getBool()) {
+					globals.get("console").setBool(false);
+				} else {
+					Window.getWindow(window).destroy();
+					System.exit(0);
+				}
+			} else {
+				if (globals.get("console").getBool()) {
+					if (key == GLFW_KEY_ENTER) {
+						console.registerTextInput('\n');
+					}
+				} else {
+					if (key == GLFW_KEY_V) {
+						Value vsync = ResourceHandler.get().getConfig("settings").nullGet("VSYNC");
+						vsync.setBool(!vsync.getBool());
+					}
+				}
 			}
 		} else if (action == GLFW_RELEASE) {
 		}
@@ -85,7 +120,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	@Override
 	public void run() {
 		w.create();
-		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
+		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWCharCallback(this::handleTextInput), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
 		glfwSetInputMode(w.getID(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPos(w.getID(), w.getWidth() / 2f, w.getHeight() / 2f);
 		mx = w.getWidth() / 2f;
@@ -144,7 +179,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			if (w.isKeyDown(GLFW_KEY_SPACE)) {
 				speed = 300;
 			}
-			if (!debugConsole) {
+			if (globals.get("console").getBool()) {
+				console.draw(w);
+			} else {
 				if (w.isKeyDown(GLFW_KEY_W)) {
 					zMod--;
 				}
@@ -218,7 +255,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			orthoCam.bind();
 			HUD.draw();
 			// render debug console
-			// TODO: render debug console
+			if (globals.get("console").getBool()) {
+				console.draw(w);
+			}
 			// End of gameloop
 			w.swap();
 			int err = GL_NO_ERROR;
