@@ -2,6 +2,7 @@ package io.proffitt.coherence.graphics;
 
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.math.Matrix4f;
+import io.proffitt.coherence.math.Vector4f;
 
 public class Camera {
 	private float		x, y, z;							// position
@@ -127,8 +128,8 @@ public class Camera {
 	public Camera rotate(float mAX, float mAY, float mAZ) {
 		return this.setRot(aX + mAX, aY + mAY, aZ + mAZ);
 	}
-	public Camera move(float forward, float right) {
-		return this.translate((float) ((forward * Math.sin(aY)) + (right * Math.cos(-aY))), 0, (float) ((forward * Math.cos(aY)) + (right * Math.sin(-aY))));
+	public Vector4f getMoveVector(float forward, float right) {
+		return new Vector4f((float) ((forward * Math.sin(aY)) + (right * Math.cos(-aY))), 0, (float) ((forward * Math.cos(aY)) + (right * Math.sin(-aY))), 1);
 	}
 	public float getFOV() {
 		return fov;

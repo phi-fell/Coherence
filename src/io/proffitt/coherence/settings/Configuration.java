@@ -4,6 +4,7 @@ import io.proffitt.coherence.resource.CMLTag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class Configuration implements ValueOwner {
 	private ArrayList<SettingsListener>	listeners;
@@ -11,10 +12,6 @@ public class Configuration implements ValueOwner {
 	public Configuration() {
 		listeners = new ArrayList<SettingsListener>();
 		settings = new HashMap<String, Value>();
-		//defaults
-		settings.put("vsync", new Value(true));
-		settings.put("msaa", new Value(16));
-		//end defaults
 	}
 	public void loadFromCML(CMLTag ct) {
 		for (String k : ct.getTagIDs()) {
@@ -25,6 +22,10 @@ public class Configuration implements ValueOwner {
 	}
 	public void register(SettingsListener newSL) {
 		listeners.add(newSL);
+	}
+	public void remove(String k) {
+		settings.remove(k);
+		notifyListeners(k, null);
 	}
 	public void set(String k, Value newVal) {
 		setNoNotify(k, newVal);
@@ -54,5 +55,12 @@ public class Configuration implements ValueOwner {
 	@Override
 	public void alert(String id) {
 		notifyListeners(id, get(id));
+	}
+	public String toString() {
+		String ret = "";
+		for (String k : settings.keySet()){
+			ret += k + ": " + settings.get(k).toString() + "\n";
+		}
+		return ret;
 	}
 }

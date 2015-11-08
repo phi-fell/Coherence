@@ -4,6 +4,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.opengl.GL20.glUniform1f;
+import io.proffitt.coherence.ai.EnemyAI;
+import io.proffitt.coherence.ai.PlayerAI;
 import io.proffitt.coherence.graphics.*;
 import io.proffitt.coherence.gui.Console;
 import io.proffitt.coherence.gui.MenuComponent;
@@ -21,7 +23,7 @@ import org.lwjgl.BufferUtils;
 
 public class Game implements Runnable, SettingsListener, MenuParent {
 	Thread			t;
-	boolean			running;
+	boolean			running, exitGracefully;
 	Configuration	globals;
 	Window			w;
 	Console			console;
@@ -33,6 +35,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		ResourceHandler.get().getConfig("settings").register(this);
 		console = new Console();
 		running = false;
+		exitGracefully = false;
 		w = wind;
 	}
 	@Override
@@ -55,6 +58,8 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 					valid = true;
 				} else if (c >= '0' && c <= '9') {
 					valid = true;
+				} else if (c == '_' || c == '.') {//list all non alphanumeric characters here
+					valid = true;
 				} else if (c == ' ' || c == '=') {//list all operators here
 					valid = true;
 				}
@@ -69,23 +74,29 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			if (key == GLFW_KEY_GRAVE_ACCENT) {
 				globals.get("console").Divide(new Value(true));
 				if (globals.get("console").getBool()) {
+					console.clearInput();
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				} else {
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				}
 			} else if (key == GLFW_KEY_ESCAPE) {
 				if (globals.get("console").getBool()) {
-					globals.get("console").setBool(false);
+					if (!console.clearInput()) {
+						globals.get("console").setBool(false);
+					}
 				} else {
-					Window.getWindow(window).destroy();
-					System.exit(0);
+					exitGracefully = true;
 				}
 			} else {
 				if (globals.get("console").getBool()) {
 					if (key == GLFW_KEY_ENTER) {
 						console.registerTextInput('\n');
-					} else if (key == GLFW_KEY_BACKSPACE){
+					} else if (key == GLFW_KEY_BACKSPACE) {
 						console.registerTextInput('\b');
+					} else if (key == GLFW_KEY_UP) {
+						console.inputUp();
+					} else if (key == GLFW_KEY_DOWN) {
+						console.inputDown();
 					}
 				} else {
 					if (key == GLFW_KEY_V) {
@@ -97,7 +108,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		} else if (action == GLFW_RELEASE) {
 		}
 	}
-	double mx = 0, my = 0;
+	double	mx	= 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
 		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
 			perspectiveCam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
@@ -133,8 +144,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		Entity monkey = new Entity(ResourceHandler.get().getModel("smoothmonkey"));
 		Level level = new Level(10, 10);
+		level.addEntity(new Entity(ResourceHandler.get().getModel("smoothmonkey"), new EnemyAI()));
+		level.addEntity(new Entity(null, new PlayerAI(w, perspectiveCam)));
 		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setFOV(65).setNearPlane(0.01f).setFarPlane(1000f);
 		orthoCam.setOrtho().setWidth(w.getWidth()).setHeight(w.getHeight());
 		MenuComponent HUD = ResourceHandler.get().getMenu("hud");
@@ -154,10 +166,10 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		long lastTime = System.nanoTime();
 		long sinceFPS = lastTime;
 		int FPS = 0;
-		while (running) {
+		while (!exitGracefully) {
 			long nT = System.nanoTime();
 			double delta = (nT - lastTime) / 1000000000f;
-			while (1.0 / delta > 400) {// avoid overheating at high fps
+			while (1.0 / delta > 150) {// avoid overheating at high fps
 				nT = System.nanoTime();
 				delta = (nT - lastTime) / 1000000000f;
 			}
@@ -172,30 +184,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			w.poll();
 			// Start of gameloop
 			// handleinput
-			int zMod = 0;
-			int xMod = 0;
-			float speed = 5;
-			if (w.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-				speed = 30;
-			}
-			if (w.isKeyDown(GLFW_KEY_SPACE)) {
-				speed = 300;
-			}
 			if (globals.get("console").getBool()) {
 				console.draw(w);
 			} else {
-				if (w.isKeyDown(GLFW_KEY_W)) {
-					zMod--;
-				}
-				if (w.isKeyDown(GLFW_KEY_S)) {
-					zMod++;
-				}
-				if (w.isKeyDown(GLFW_KEY_A)) {
-					xMod--;
-				}
-				if (w.isKeyDown(GLFW_KEY_D)) {
-					xMod++;
-				}
 				if (w.isKeyDown(GLFW_KEY_H)) {
 					globals.get("calcHDR").setBool(true);
 				}
@@ -220,20 +211,13 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 					level.setHeight(perspectiveCam.getX(), perspectiveCam.getZ(), level.getHeight(perspectiveCam.getX(), perspectiveCam.getZ()) - 0.1f);
 				}
 			}
-			perspectiveCam.move(zMod * speed * (float) delta, xMod * speed * (float) delta);
 			// update
-			monkey.getTransfrom().getRotation().y += (float) (delta / 10);
+			level.update(delta);
 			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			HDRFBO.bind();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			ResourceHandler.get().getShader("HDRdefault").bind();
-			perspectiveCam.bind();
-			monkey.draw(); // render monkey
-			ResourceHandler.get().getShader("terrain").bind();
-			ResourceHandler.get().getTexture("grass").bind();
-			perspectiveCam.bind();
-			level.draw(); // draw level
+			level.draw(perspectiveCam); // draw level
 			HDRFBO.unbind();
 			// calculate HDRmax
 			if (globals.get("calcHDR").getBool()) {
@@ -267,8 +251,8 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 				System.out.println("OpenGL Error in render loop: 0x" + Integer.toHexString(err));
 			}
 		}
-		monkey.destroy();
 		ResourceHandler.get().cleanup();
+		w.destroy();
 		running = false;
 	}
 	@Override

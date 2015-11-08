@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -35,7 +36,6 @@ public class ResourceHandler {
 		fonts = new HashMap<String, Font>();
 		shaders = new HashMap<String, Shader>();
 		models = new HashMap<String, Model>();
-		configs.put("globals", new Configuration());
 	}
 	/**
 	 * Removes and cleans up all cached resources. ResourceHandler may still be
@@ -43,22 +43,24 @@ public class ResourceHandler {
 	 * reloaded from disk (or generated) and into memory (and/or onto the GPU).
 	 */
 	public void cleanup() {
-		for (String s : configs.keySet()) {
+		//this.saveConfig("settings");//save settings
+		this.saveConfig("keybindings");//save bound keys
+		for (String s : configs.keySet().toArray(new String[0])) {
 			configs.remove(s);// configs don't need cleanup
 		}
-		for (String s : menus.keySet()) {
+		for (String s : menus.keySet().toArray(new String[0])) {
 			menus.remove(s);// menus don't need cleanup
 		}
-		for (String s : textures.keySet()) {
+		for (String s : textures.keySet().toArray(new String[0])) {
 			textures.remove(s).destroy();
 		}
-		for (String s : fonts.keySet()) {
+		for (String s : fonts.keySet().toArray(new String[0])) {
 			fonts.remove(s);// fonts don't need cleanup
 		}
-		for (String s : shaders.keySet()) {
+		for (String s : shaders.keySet().toArray(new String[0])) {
 			shaders.remove(s).destroy();
 		}
-		for (String s : models.keySet()) {
+		for (String s : models.keySet().toArray(new String[0])) {
 			models.remove(s).destroy();
 		}
 	}
@@ -183,6 +185,9 @@ public class ResourceHandler {
 		CMLTag ret = new CMLTag("", loadResourceAsString(path).replace("\t", "    "));
 		return ret;
 	}
+	private void saveConfig(String name) {
+		this.saveResourceAsString("res/config/" + name + ".cml", configs.get(name).toString());
+	}
 	private String loadResourceAsString(String path) {
 		Scanner scanner = null;
 		try {
@@ -196,5 +201,16 @@ public class ResourceHandler {
 		}
 		scanner.close();
 		return contents.toString();
+	}
+	private void saveResourceAsString(String path, String contents) {
+		System.out.println("Saving: " + path);
+		PrintWriter pw;
+		try {
+			pw = new PrintWriter(path);
+			pw.println(contents);
+			pw.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 }

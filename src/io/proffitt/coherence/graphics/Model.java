@@ -10,6 +10,7 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import io.proffitt.coherence.math.AABB;
 
 import java.nio.FloatBuffer;
 
@@ -19,9 +20,11 @@ public class Model {
 	int				VAO;
 	int				VBO;
 	int				vertnum;
-	public float[]	verts;
+	private float[]	verts;
+	private AABB aabb;
 	public Model(float[] v) {
 		verts = v;
+		aabb = new AABB(verts);
 		vertnum = verts.length / 6;
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts).flip();
@@ -33,6 +36,9 @@ public class Model {
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 24, 0);
 		glVertexAttribPointer(1, 3, GL_FLOAT, false, 24, 12);
 		glBindVertexArray(0);
+	}
+	public AABB getAABB(){
+		return aabb;
 	}
 	public void destroy() {
 		glBindVertexArray(0);

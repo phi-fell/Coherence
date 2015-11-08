@@ -12,6 +12,12 @@ public class Transform {
 	public Vector4f getPosition() {
 		return pos;
 	}
+	public void setPosition(Vector4f newPos) {
+		pos.x = newPos.x;
+		pos.y = newPos.y;
+		pos.z = newPos.z;
+		pos.w = newPos.w;
+	}
 	public Vector4f getRotation() {
 		return rot;
 	}

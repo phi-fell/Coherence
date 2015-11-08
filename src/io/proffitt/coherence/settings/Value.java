@@ -31,6 +31,9 @@ public class Value {
 	public Value(boolean v) {
 		setBool(v);
 	}
+	public String toString(){
+		return getString();
+	}
 	void setOwner(ValueOwner vo, String id) {
 		if (OWNER != null || ID != null) {
 			throw new RuntimeException("Value is already owned!");

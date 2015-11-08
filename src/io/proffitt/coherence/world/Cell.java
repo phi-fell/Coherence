@@ -4,9 +4,11 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
 import java.util.ArrayList;
 
+import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
+import io.proffitt.coherence.resource.ResourceHandler;
 
 public class Cell {
 	public final int	SIZE;
@@ -27,6 +29,13 @@ public class Cell {
 			}
 		}
 		model = null;
+	}
+	public void update(double delta, int x, int y, Cell[][] adj) {
+		for (Entity e : entities){
+			e.update(delta);
+			// move entity from cell to cell if exceeds borders
+			//if (e.getTransfrom().getPosition().x < x)
+		}
 	}
 	public void addEntity(Entity e) {
 		entities.add(e);
@@ -50,12 +59,18 @@ public class Cell {
 		}
 		model = new Model(getVerts(adj));
 	}
-	public void draw(float x, float y, float z) {
+	public void draw(float x, float y, float z, Camera cam) {
 		if (model == null) {
 			throw new RuntimeException("draw() failed, Cell Model is obsolete.");
 		}
+		ResourceHandler.get().getShader("terrain").bind();
+		ResourceHandler.get().getTexture("grass").bind();
+		cam.bind();
 		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x, y, z).toFloatBuffer());// model
 		model.render();
+		for (Entity e : entities){
+			e.draw(cam);
+		}
 	}
 	private float getStitchingHeight(int x, int y, Cell[][] adj) {
 		int cx = 1;

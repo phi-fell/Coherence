@@ -11,6 +11,14 @@ public class AABB {
 		cy = 0;
 		cz = 0;
 	}
+	public AABB(AABB aabb, Transform t) {
+		cx = aabb.cx + t.getPosition().x;
+		cy = aabb.cy + t.getPosition().y;
+		cz = aabb.cz + t.getPosition().z;
+		rx = aabb.rx * t.getScale().x;
+		ry = aabb.ry * t.getScale().y;
+		rz = aabb.rz * t.getScale().z;
+	}
 	public AABB(float[] verts) {//assumes format of {x1,y1,z1,nx1,ny1,nz1,...,xn,yn,zn,nxn,nyn,nzn}
 		Vector4f min = new Vector4f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, 0);
 		Vector4f max = new Vector4f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, 0);
