@@ -211,12 +211,12 @@ public class Value {
 			setBool(getBool() || rhs.getBool());
 		} else {
 			//IMPOSSIBLE!
-			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+			throw new RuntimeException("Could not add values.");
 		}
 	}
 	public void Subtract(Value rhs) {
 		if (type == TYPE_STRING || rhs.type == TYPE_STRING) {
-			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+			throw new RuntimeException("Cannot subtract Strings.");
 		} else if (type == TYPE_DOUBLE || rhs.type == TYPE_DOUBLE) {
 			setDouble(getDouble() - rhs.getDouble());
 		} else if (type == TYPE_LONG || rhs.type == TYPE_LONG) {
@@ -225,12 +225,12 @@ public class Value {
 			setBool(getBool() && rhs.getBool());
 		} else {
 			//IMPOSSIBLE!
-			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+			throw new RuntimeException("Could not subtract values.");
 		}
 	}
 	public void Multiply(Value rhs) {
 		if (type == TYPE_STRING || rhs.type == TYPE_STRING) {
-			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+			throw new RuntimeException("Cannot multiply Strings.");
 		} else if (type == TYPE_DOUBLE || rhs.type == TYPE_DOUBLE) {
 			setDouble(getDouble() * rhs.getDouble());
 		} else if (type == TYPE_LONG || rhs.type == TYPE_LONG) {
@@ -239,12 +239,12 @@ public class Value {
 			setBool(getBool() && rhs.getBool());
 		} else {
 			//IMPOSSIBLE!
-			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+			throw new RuntimeException("Could not multiply values");
 		}
 	}
 	public void Divide(Value rhs) {
 		if (type == TYPE_STRING || rhs.type == TYPE_STRING) {
-			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+			throw new RuntimeException("Cannot divide Strings.");
 		} else if (type == TYPE_DOUBLE || rhs.type == TYPE_DOUBLE) {
 			setDouble(getDouble() / rhs.getDouble());
 		} else if (type == TYPE_LONG || rhs.type == TYPE_LONG) {
@@ -253,7 +253,7 @@ public class Value {
 			setBool(getBool() ^ rhs.getBool());
 		} else {
 			//IMPOSSIBLE!
-			throw new RuntimeException("IMPOSSIBLE TO ADD VALUES!!!");
+			throw new RuntimeException("Could not divide values.");
 		}
 	}
 }
