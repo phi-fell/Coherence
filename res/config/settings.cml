@@ -1,5 +1,5 @@
 // VSYNC can be true, false, or an integer >= 0 (frames are rendered at FPS <= MONITOR_REFRESH_RATE / VSYNC)
-VSYNC: true
+VSYNC: true,
 // MSAA should generally be one of {false, 0, 2, 4, 8, 16}
 // false or 0 is off, 1 would be equivalent, should be a power of 2, probably not greater than 16
 MSAA: 16

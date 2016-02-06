@@ -38,6 +38,7 @@ public abstract class MenuComponent implements MenuParent {
 	}
 	public void addComponent(MenuComponent mc) {
 		components.add(mc);
+		mc.setParent(this);
 	}
 	/**
 	 * @param xmod

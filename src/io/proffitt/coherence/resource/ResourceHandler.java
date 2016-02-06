@@ -1,10 +1,5 @@
 package io.proffitt.coherence.resource;
 
-import io.proffitt.coherence.graphics.Model;
-import io.proffitt.coherence.gui.Menu;
-import io.proffitt.coherence.gui.MenuComponent;
-import io.proffitt.coherence.settings.Configuration;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,8 +10,11 @@ import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
+import io.proffitt.coherence.graphics.Model;
+import io.proffitt.coherence.settings.Configuration;
+
 public class ResourceHandler {
-	private static ResourceHandler	rh;
+	private static ResourceHandler rh;
 	public static ResourceHandler get() {
 		if (rh == null) {
 			rh = new ResourceHandler();
@@ -24,14 +22,12 @@ public class ResourceHandler {
 		return rh;
 	}
 	private HashMap<String, Configuration>	configs;
-	private HashMap<String, MenuComponent>	menus;
 	private HashMap<String, Texture>		textures;
 	private HashMap<String, Font>			fonts;
 	private HashMap<String, Shader>			shaders;
 	private HashMap<String, Model>			models;
 	private ResourceHandler() {
 		configs = new HashMap<String, Configuration>();
-		menus = new HashMap<String, MenuComponent>();
 		textures = new HashMap<String, Texture>();
 		fonts = new HashMap<String, Font>();
 		shaders = new HashMap<String, Shader>();
@@ -47,9 +43,6 @@ public class ResourceHandler {
 		this.saveConfig("keybindings");//save bound keys
 		for (String s : configs.keySet().toArray(new String[0])) {
 			configs.remove(s);// configs don't need cleanup
-		}
-		for (String s : menus.keySet().toArray(new String[0])) {
-			menus.remove(s);// menus don't need cleanup
 		}
 		for (String s : textures.keySet().toArray(new String[0])) {
 			textures.remove(s).destroy();
@@ -74,15 +67,6 @@ public class ResourceHandler {
 		Configuration ret = new Configuration();
 		ret.loadFromCML(this.loadResourceAsCML("res/config/" + name + ".cml"));
 		return ret;
-	}
-	public MenuComponent getMenu(String name) {
-		if (!menus.containsKey(name)) {
-			menus.put(name, loadMenu(name));
-		}
-		return menus.get(name);
-	}
-	private MenuComponent loadMenu(String name) {
-		return Menu.createFromCML(loadResourceAsCML("res/gui/" + name + ".mnu").getTag("root"));
 	}
 	public Texture getTexture(String name) {
 		if (!textures.containsKey(name)) {
@@ -181,9 +165,8 @@ public class ResourceHandler {
 		Model m = new Model(verts);
 		return m;
 	}
-	private CMLTag loadResourceAsCML(String path) {
-		CMLTag ret = new CMLTag("", loadResourceAsString(path).replace("\t", "    "));
-		return ret;
+	private CMLFile loadResourceAsCML(String path) {
+		return new CMLFile(loadResourceAsString(path));
 	}
 	private void saveConfig(String name) {
 		this.saveResourceAsString("res/config/" + name + ".cml", configs.get(name).toString());

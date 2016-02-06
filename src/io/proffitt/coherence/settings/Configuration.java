@@ -1,10 +1,10 @@
 package io.proffitt.coherence.settings;
 
-import io.proffitt.coherence.resource.CMLTag;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
+
+import io.proffitt.coherence.resource.CMLFile;
+import io.proffitt.coherence.resource.CMLObject;
 
 public class Configuration implements ValueOwner {
 	private ArrayList<SettingsListener>	listeners;
@@ -13,11 +13,11 @@ public class Configuration implements ValueOwner {
 		listeners = new ArrayList<SettingsListener>();
 		settings = new HashMap<String, Value>();
 	}
-	public void loadFromCML(CMLTag ct) {
-		for (String k : ct.getTagIDs()) {
-			Value next = ct.getTag(k).getValue();
-			next.setOwner(this, k);
-			settings.put(k, next);
+	public void loadFromCML(CMLFile f) {
+		for (CMLObject co : f.getObjs()) {
+			Value next = new Value(co.getValue());
+			next.setOwner(this, co.getName());
+			settings.put(co.getName(), next);
 		}
 	}
 	public void register(SettingsListener newSL) {
@@ -58,8 +58,15 @@ public class Configuration implements ValueOwner {
 	}
 	public String toString() {
 		String ret = "";
-		for (String k : settings.keySet()){
-			ret += k + ": " + settings.get(k).toString() + "\n";
+		boolean first = true;
+		;
+		for (String k : settings.keySet()) {
+			if (first) {
+				first = false;
+			} else {
+				ret += ",\n";
+			}
+			ret += k + ": " + settings.get(k).toString();
 		}
 		return ret;
 	}

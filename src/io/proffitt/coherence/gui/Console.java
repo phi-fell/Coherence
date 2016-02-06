@@ -2,11 +2,6 @@ package io.proffitt.coherence.gui;
 
 import java.util.ArrayList;
 
-import javax.annotation.Resource;
-import javax.annotation.Resources;
-
-import com.sun.org.apache.xml.internal.security.utils.resolver.ResourceResolverSpi;
-
 import io.proffitt.coherence.command.Command;
 import io.proffitt.coherence.graphics.Text;
 import io.proffitt.coherence.graphics.Window;
@@ -81,8 +76,8 @@ public class Console {
 	private void cleanupText() {
 		if (t != null) {
 			t.destroy();
+			t = null;
 		}
-		t = null;
 	}
 	public void draw(Window w) {
 		if (t == null) {

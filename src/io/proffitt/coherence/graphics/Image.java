@@ -16,28 +16,28 @@ public class Image {
 		return tex;
 	}
 	/**
-	 * fewer param version of {@link Text#draw(Vector4f, float, float)
+	 * fewer param version of {@link Image#draw(Vector4f, float, float)
 	 * draw(pos, hOffset, vOffset)}
 	 */
 	public void draw(Vector4f pos) {
 		draw(pos, 0);
 	}
 	/**
-	 * fewer param version of {@link Text#draw(int, int, float, float)
+	 * fewer param version of {@link Image#draw(int, int, float, float)
 	 * draw(x, y, hOffset, vOffset)}
 	 */
 	public void draw(int x, int y) {
 		draw(x, y, 0);
 	}
 	/**
-	 * fewer param version of {@link Text#draw(Vector4f, float, float)
+	 * fewer param version of {@link Image#draw(Vector4f, float, float)
 	 * draw(pos, hOffset, vOffset)}
 	 */
 	public void draw(Vector4f pos, float offset) {
 		draw(pos, offset, offset);
 	}
 	/**
-	 * fewer param version of {@link Text#draw(int, int, float, float)
+	 * fewer param version of {@link Image#draw(int, int, float, float)
 	 * draw(x, y, hOffset, vOffset)}
 	 */
 	public void draw(int x, int y, float offset) {
