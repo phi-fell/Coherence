@@ -2,6 +2,7 @@
 
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec3 normal;
+layout(location = 2) in vec2 UV;
 
 layout (location = 3) uniform mat4 model;
 layout (location = 4) uniform mat4 view;
@@ -15,8 +16,8 @@ out vec2 pass_UV;
 
 void main()
 {
-	pass_UV = pos.xz / 9.657;
-	pass_lightPos = (view * vec4(3,30,3,1)).xyz;
+	pass_UV = UV;
+	pass_lightPos = (view * vec4(3,3,3,1)).xyz;
     pass_normal = normalize((view * model * vec4(normal, 0)).xyz);
     pass_pos = (view * model * vec4(pos, 1.0)).xyz;
     pass_view = view;

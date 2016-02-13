@@ -39,7 +39,7 @@ public class PlayerAI implements EntityAI {
 			int zMod = (forward == backward) ? 0 : (forward ? -1 : 1);
 			int xMod = (left == right) ? 0 : (left ? -1 : 1);
 			Vector4f ret = c.getMoveVector(zMod * speed * (float) dt, xMod * speed * (float) dt);
-			c.translate(ret.x, ret.y, ret.z);
+			//c.translate(ret.x, ret.y, ret.z);
 			return ret;
 		}
 	}

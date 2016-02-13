@@ -14,7 +14,7 @@ public class CMLObject {
 	 */
 	private CMLObject() {
 	}
-	private int parse(String data) {
+	private String parse(String data) {
 		int splitIndex = data.indexOf(':');
 		if (splitIndex < 0) {
 			if (data.length() <= 32) {
@@ -23,17 +23,17 @@ public class CMLObject {
 				throw new RuntimeException("Invalid CMLObject, no \':\' present");
 			}
 		}
-		id = data.substring(0, splitIndex);
-		String v = data.substring(splitIndex + 1);
+		id = data.substring(0, splitIndex).trim();
+		String v = data.substring(splitIndex + 1).trim();
 		if (v.startsWith("{")) {
 			objects = new HashMap<String, CMLObject>();
 			while (v.length() > 0 && !v.startsWith("}")) {
 				CMLObject n = new CMLObject();
-				v = v.substring(1);
-				v = v.substring(n.parse(v));
+				v = v.substring(1).trim();
+				v = n.parse(v);
 				objects.put(n.id, n);
 			}
-			return (data.length() - v.length()) + 1;
+			return v.substring(1).trim();
 		} else {
 			int commaIndex = v.indexOf(',');
 			int braceIndex = v.indexOf('}');
@@ -41,9 +41,9 @@ public class CMLObject {
 			if (commaIndex == -1 || braceIndex < commaIndex) {
 				endIndex = braceIndex;
 			}
-			value = new Value(v.substring(0, endIndex));
+			value = new Value(v.substring(0, endIndex).trim());
 			value.parse();
-			return endIndex + splitIndex + 1;
+			return v.substring(endIndex).trim();
 		}
 	}
 	public CMLObject(String name, Value val) {
@@ -55,14 +55,14 @@ public class CMLObject {
 		if (splitIndex < 0) {
 			throw new RuntimeException("Invalid CMLObject, no \':\' present");
 		}
-		id = data.substring(0, splitIndex);
-		String v = data.substring(splitIndex + 1);
+		id = data.substring(0, splitIndex).trim();
+		String v = data.substring(splitIndex + 1).trim();
 		if (v.startsWith("{")) {
 			objects = new HashMap<String, CMLObject>();
 			while (v.length() > 0 && !v.startsWith("}")) {
 				CMLObject n = new CMLObject();
-				v = v.substring(1);
-				v = v.substring(n.parse(v));
+				v = v.substring(1).trim();
+				v = n.parse(v);
 				objects.put(n.id, n);
 			}
 		} else {

@@ -21,12 +21,14 @@ public class ResourceHandler {
 		}
 		return rh;
 	}
+	private HashMap<String, ItemSchematic>	items;
 	private HashMap<String, Configuration>	configs;
 	private HashMap<String, Texture>		textures;
 	private HashMap<String, Font>			fonts;
 	private HashMap<String, Shader>			shaders;
 	private HashMap<String, Model>			models;
 	private ResourceHandler() {
+		items = new HashMap<String, ItemSchematic>();
 		configs = new HashMap<String, Configuration>();
 		textures = new HashMap<String, Texture>();
 		fonts = new HashMap<String, Font>();
@@ -41,6 +43,9 @@ public class ResourceHandler {
 	public void cleanup() {
 		//this.saveConfig("settings");//save settings
 		this.saveConfig("keybindings");//save bound keys
+		for (String s : items.keySet().toArray(new String[0])) {//TODO: is there a reason for '.toArray(new String[0])' ???
+			items.remove(s);// items don't need cleanup
+		}
 		for (String s : configs.keySet().toArray(new String[0])) {
 			configs.remove(s);// configs don't need cleanup
 		}
@@ -56,6 +61,15 @@ public class ResourceHandler {
 		for (String s : models.keySet().toArray(new String[0])) {
 			models.remove(s).destroy();
 		}
+	}
+	public ItemSchematic getItem(String name) {
+		if (!items.containsKey(name)) {
+			items.put(name, loadItem(name));
+		}
+		return items.get(name);
+	}
+	public ItemSchematic loadItem(String name) {
+		return new ItemSchematic(this.loadResourceAsCML("res/item/" + name + ".item"));
 	}
 	public Configuration getConfig(String name) {
 		if (!configs.containsKey(name)) {
@@ -115,11 +129,14 @@ public class ResourceHandler {
 		int facenum = 0;
 		int vertnum = 0;
 		int normnum = 0;
+		int uvnum = 0;
 		for (int i = 0; i < lines.length; i++) {
 			if (lines[i].startsWith("f")) {
 				facenum++;
 			} else if (lines[i].startsWith("vn")) {
 				normnum++;
+			} else if (lines[i].startsWith("vt")) {
+				uvnum++;
 			} else if (lines[i].startsWith("v")) {
 				vertnum++;
 			}
@@ -128,6 +145,8 @@ public class ResourceHandler {
 		int vertpos = 0;
 		float[] rawnorms = new float[normnum * 3];
 		int normpos = 0;
+		float[] rawuvs = new float[uvnum * 2];
+		int uvpos = 0;
 		for (int i = 0; i < lines.length; i++) {
 			if (lines[i].startsWith("vn")) {
 				String[] components = lines[i].split(" ");
@@ -135,6 +154,11 @@ public class ResourceHandler {
 				rawnorms[normpos + 1] = Float.parseFloat(components[2]);
 				rawnorms[normpos + 2] = Float.parseFloat(components[3]);
 				normpos += 3;
+			} else if (lines[i].startsWith("vt")) {
+				String[] components = lines[i].split(" ");
+				rawuvs[uvpos] = Float.parseFloat(components[1]);
+				rawuvs[uvpos + 1] = 1 - Float.parseFloat(components[2]);
+				uvpos += 2;
 			} else if (lines[i].startsWith("v")) {
 				String[] components = lines[i].split(" ");
 				rawverts[vertpos] = Float.parseFloat(components[1]);
@@ -143,26 +167,30 @@ public class ResourceHandler {
 				vertpos += 3;
 			}
 		}
-		float[] verts = new float[facenum * 18];
+		float[] verts = new float[facenum * 24];
 		int facepos = 0;
 		for (int i = 0; i < lines.length; i++) {
 			if (lines[i].startsWith("f")) {
 				String[] components = lines[i].split(" ");
 				for (int k = 0; k < 3; k++) {
-					String[] c = components[k + 1].split("//");
+					String[] c = components[k + 1].split("/");
 					int vpos = (Integer.parseInt(c[0]) - 1) * 3;
-					int npos = (Integer.parseInt(c[1]) - 1) * 3;
+					int upos = (Integer.parseInt(c[1]) - 1) * 2;
+					int npos = (Integer.parseInt(c[2]) - 1) * 3;
 					for (int j = 0; j < 3; j++) {
 						verts[facepos + j] = rawverts[vpos + j];
 					}
 					for (int j = 0; j < 3; j++) {
 						verts[facepos + j + 3] = rawnorms[npos + j];
 					}
-					facepos += 6;
+					for (int j = 0; j < 2; j++) {
+						verts[facepos + j + 6] = rawuvs[upos + j];
+					}
+					facepos += 8;
 				}
 			}
 		}
-		Model m = new Model(verts);
+		Model m = new Model(verts, true);
 		return m;
 	}
 	private CMLFile loadResourceAsCML(String path) {

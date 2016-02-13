@@ -8,7 +8,7 @@ import io.proffitt.coherence.resource.Texture;
 public class Image {
 	Texture					tex;
 	static final float[]	imgVerts	= { 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 };
-	static final Model		model		= new Model(imgVerts);
+	static final Model		model		= new Model(imgVerts, false);
 	public Image(Texture t) {
 		tex = t;
 	}

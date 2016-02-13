@@ -13,7 +13,6 @@ public class CMLFile {
 			data = data.substring(0, commentIndex) + data.substring(data.indexOf("\n", commentIndex + 1));
 			commentIndex = data.indexOf("//");
 		}
-		data = data.replace(" ", "").replace("\t", "").replace("\n", "");
 		if (data.length() == 0) {
 			data = ":null";
 		}

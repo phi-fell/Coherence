@@ -21,11 +21,13 @@ public class Model {
 	int				VBO;
 	int				vertnum;
 	private float[]	verts;
-	private AABB aabb;
-	public Model(float[] v) {
+	private AABB	aabb;
+	private boolean	uv;
+	public Model(float[] v, boolean doUV) {
+		uv = doUV;
 		verts = v;
 		aabb = new AABB(verts);
-		vertnum = verts.length / 6;
+		vertnum = verts.length / (uv ? 8 : 6);
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts).flip();
 		VAO = glGenVertexArrays();
@@ -33,11 +35,14 @@ public class Model {
 		VBO = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, 24, 0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, false, 24, 12);
+		glVertexAttribPointer(0, 3, GL_FLOAT, false, uv ? 32 : 24, 0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, false, uv ? 32 : 24, 12);
+		if (uv) {
+			glVertexAttribPointer(2, 2, GL_FLOAT, false, 32, 24);
+		}
 		glBindVertexArray(0);
 	}
-	public AABB getAABB(){
+	public AABB getAABB() {
 		return aabb;
 	}
 	public void destroy() {
@@ -53,7 +58,13 @@ public class Model {
 		glBindVertexArray(VAO);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
+		if (uv) {
+			glEnableVertexAttribArray(2);
+		}
 		glDrawArrays(GL_TRIANGLES, 0, vertnum);
+		if (uv) {
+			glDisableVertexAttribArray(2);
+		}
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
 		glBindVertexArray(0);

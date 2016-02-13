@@ -1,7 +1,7 @@
 package io.proffitt.coherence.math;
 
 public class Vector4f {
-	public float	x, y, z, w; // 3d vector in homogeneous coordinates
+	public float x, y, z, w; // 3d vector in homogeneous coordinates
 	public Vector4f() {
 		x = 0;
 		y = 0;
@@ -50,5 +50,26 @@ public class Vector4f {
 	}
 	public Vector4f cross(Vector4f rhs) {
 		return new Vector4f((y * rhs.z) - (z * rhs.y), (z * rhs.x) - (x * rhs.z), (x * rhs.y) - (y * rhs.x), w * rhs.w);
+	}
+	public Vector4f multiplyInPlace(float s) {
+		x *= s;
+		y *= s;
+		z *= s;
+		w *= s;
+		return this;
+	}
+	public Vector4f addInPlace(Vector4f rhs) {
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		w += rhs.w;
+		return this;
+	}
+	public Vector4f subtractInPlace(Vector4f rhs) {
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		w -= rhs.w;
+		return this;
 	}
 }

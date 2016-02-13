@@ -13,7 +13,9 @@ import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.settings.Value;
 import io.proffitt.coherence.world.Entity;
+import io.proffitt.coherence.world.Item;
 import io.proffitt.coherence.world.Level;
+import io.proffitt.coherence.world.Mob;
 
 import java.nio.FloatBuffer;
 
@@ -81,6 +83,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 				if (globals.get("console").getBool()) {
 					if (!console.clearInput()) {
 						globals.get("console").setBool(false);
+						glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 					}
 				} else {
 					exitGracefully = true;
@@ -106,7 +109,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		} else if (action == GLFW_RELEASE) {
 		}
 	}
-	double	mx	= 0, my = 0;
+	double mx = 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
 		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
 			perspectiveCam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
@@ -143,9 +146,15 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		Level level = new Level(10, 10);
-		level.addEntity(new Entity(ResourceHandler.get().getModel("smoothmonkey"), new EnemyAI()));
-		level.addEntity(new Entity(null, new PlayerAI(w, perspectiveCam)));
-		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setFOV(65).setNearPlane(0.01f).setFarPlane(1000f);
+		Entity penny = new Item("gold");
+		penny.getTransfrom().getPosition().y--;
+		penny.getTransfrom().getPosition().z+=1;
+		penny.getTransfrom().getPosition().x+=1;
+		level.addEntity(penny);
+		Entity player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
+		perspectiveCam.lockTo(player);
+		level.addEntity(player);
+		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setFOV(65).setNearPlane(0.01f).setFarPlane(1000f).setRot(-0.2f, (float)(Math.PI * 1.25), 0);
 		orthoCam.setOrtho().setWidth(w.getWidth()).setHeight(w.getHeight());
 		MenuComponent HUD = new Menu(null, 0, 0, 0, 0);
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "Text Test!", 5, 5));
@@ -157,7 +166,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		FrameBuffer HDRFBO = new FrameBuffer(w.getWidth(), w.getHeight());
 		FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 3);
 		float[] fbverts = { -1, -1, 0, 0, 0, 0, 1, -1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, -1, -1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, -1, 1, 0, 0, 1, 0 };
-		Model FBModel = new Model(fbverts);
+		Model FBModel = new Model(fbverts, false);
 		int er = GL_NO_ERROR;
 		while ((er = glGetError()) != GL_NO_ERROR) {
 			System.out.println("OpenGL Error in initialization: " + Integer.toHexString(er));

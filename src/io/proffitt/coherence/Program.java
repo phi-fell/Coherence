@@ -2,8 +2,6 @@ package io.proffitt.coherence;
 
 import io.proffitt.coherence.graphics.GLFWContext;
 import io.proffitt.coherence.graphics.Window;
-import io.proffitt.coherence.resource.CMLFile;
-import io.proffitt.coherence.resource.CMLObject;
 
 public class Program {
 	public static void main(String[] args) {

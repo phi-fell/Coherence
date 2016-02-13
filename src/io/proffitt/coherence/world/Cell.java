@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
 import java.util.ArrayList;
 
+import io.proffitt.coherence.ai.PlayerAI;
 import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.math.Matrix4f;
@@ -21,9 +22,7 @@ public class Cell {
 		entities = new ArrayList<Entity>();
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
-				// height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE /
-				// 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE *
-				// SIZE) / 16.0) - 8);
+				//height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
 				height[i][j] = -1.5f;
 				height[i][j] += (Math.random() - 0.5f) * 0.2;
 			}
@@ -31,10 +30,50 @@ public class Cell {
 		model = null;
 	}
 	public void update(double delta, int x, int y, Cell[][] adj) {
-		for (Entity e : entities){
+		for (Entity e : entities) {
 			e.update(delta);
-			// move entity from cell to cell if exceeds borders
-			//if (e.getTransfrom().getPosition().x < x)
+			if (e.getClass().equals(Mob.class) && ((Mob) e).ai.getClass().equals(PlayerAI.class)) {
+				//e.getTransfrom().getPosition().y = 0;
+			}
+			//quick access
+			float eX = e.getTransfrom().getPosition().x;
+			float eY = e.getTransfrom().getPosition().y;
+			float eZ = e.getTransfrom().getPosition().z;
+			//TODO: move entity from cell to cell if exceeds borders
+			//check bounds
+			if (eX < 0 || eX >= Level.CELL_SIZE - 1 || eZ < 0 || eZ >= Level.CELL_SIZE - 1) {
+			} else {
+				//gravity
+				float hBL = height[(int) eX][(int) eZ];
+				float hBR = height[((int) eX) + 1][(int) eZ];
+				float hTL = height[(int) eX][((int) eZ) + 1];
+				float hTR = height[((int) eX) + 1][((int) eZ) + 1];
+				float aX = eX - ((int) eX);
+				float aZ = eZ - ((int) eZ);
+				float h;
+				if (aX + aZ < 1) {
+					float hDX = hBR - hBL;
+					float hDZ = hTL - hBL;
+					float hX = hBL + (aX * hDX);
+					float dZ = aZ * hDZ;
+					h = hX + dZ;
+				} else {
+					float hDX = hTR - hTL;
+					float hDZ = hTR - hBR;
+					float hX = hBR + (aX * hDX);
+					float dZ = aZ * hDZ;
+					h = hX + dZ;
+				}
+				h = hBL;
+				float playerHeight = 1.5f;
+				if (eY > h + playerHeight) {
+					e.getVelocity().y -= 0.01f;
+				}
+				if (eY < h + playerHeight) {
+					e.getTransfrom().getPosition().y = h + playerHeight;
+					e.getVelocity().y = 0;
+				}
+			}
 		}
 	}
 	public void addEntity(Entity e) {
@@ -57,7 +96,7 @@ public class Cell {
 		if (model != null) {
 			model.destroy();
 		}
-		model = new Model(getVerts(adj));
+		model = new Model(getVerts(adj), false);
 	}
 	public void draw(float x, float y, float z, Camera cam) {
 		if (model == null) {
@@ -68,7 +107,7 @@ public class Cell {
 		cam.bind();
 		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x, y, z).toFloatBuffer());// model
 		model.render();
-		for (Entity e : entities){
+		for (Entity e : entities) {
 			e.draw(cam);
 		}
 	}

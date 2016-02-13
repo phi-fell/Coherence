@@ -3,6 +3,7 @@ package io.proffitt.coherence.graphics;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
+import io.proffitt.coherence.world.Entity;
 
 public class Camera {
 	private float		x, y, z;							// position
@@ -133,5 +134,8 @@ public class Camera {
 	}
 	public float getFOV() {
 		return fov;
+	}
+	public void lockTo(Entity e){
+		e.lockCamera(this);
 	}
 }
