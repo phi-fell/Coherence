@@ -148,13 +148,13 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		Level level = new Level(10, 10);
 		Entity penny = new Item("gold");
 		penny.getTransfrom().getPosition().y--;
-		penny.getTransfrom().getPosition().z+=1;
-		penny.getTransfrom().getPosition().x+=1;
+		penny.getTransfrom().getPosition().z += 1;
+		penny.getTransfrom().getPosition().x += 1;
 		level.addEntity(penny);
 		Entity player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
 		perspectiveCam.lockTo(player);
 		level.addEntity(player);
-		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setFOV(65).setNearPlane(0.01f).setFarPlane(1000f).setRot(-0.2f, (float)(Math.PI * 1.25), 0);
+		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setFOV(65).setNearPlane(0.01f).setFarPlane(1000f).setRot(-0.2f, (float) (Math.PI * 1.25), 0);
 		orthoCam.setOrtho().setWidth(w.getWidth()).setHeight(w.getHeight());
 		MenuComponent HUD = new Menu(null, 0, 0, 0, 0);
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "Text Test!", 5, 5));

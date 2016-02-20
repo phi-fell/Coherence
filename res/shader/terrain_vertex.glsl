@@ -15,7 +15,7 @@ out vec2 pass_UV;
 
 void main()
 {
-	pass_UV = pos.xz / 9.657;
+	pass_UV = (model * vec4(pos, 1.0)).xz / 9.657;
 	pass_lightPos = (view * vec4(3,30,3,1)).xyz;
     pass_normal = normalize((view * model * vec4(normal, 0)).xyz);
     pass_pos = (view * model * vec4(pos, 1.0)).xyz;

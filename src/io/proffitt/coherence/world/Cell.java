@@ -13,10 +13,12 @@ import io.proffitt.coherence.resource.ResourceHandler;
 
 public class Cell {
 	public final int	SIZE;
+	Level				parentLevel;
 	float[][]			height;
 	Model				model;
 	ArrayList<Entity>	entities;
-	public Cell(int size) {
+	public Cell(Level l, int x, int y, int size) {
+		parentLevel = l;
 		SIZE = size;
 		height = new float[SIZE][SIZE];
 		entities = new ArrayList<Entity>();
@@ -25,29 +27,44 @@ public class Cell {
 				//height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
 				height[i][j] = -1.5f;
 				height[i][j] += (Math.random() - 0.5f) * 0.2;
+				height[i][j] += Math.sin(((x * SIZE) + i) * 0.07);
+				height[i][j] += Math.cos(((y * SIZE) + j) * 0.04);
+				height[i][j] += 3 * Math.sin((((x * SIZE) + i) + ((y * SIZE) + j)) * 0.03);
 			}
 		}
 		model = null;
 	}
 	public void update(double delta, int x, int y, Cell[][] adj) {
-		for (Entity e : entities) {
+		for (int eNum = 0; eNum < entities.size(); eNum++) {
+			Entity e = entities.get(eNum);
 			e.update(delta);
 			if (e.getClass().equals(Mob.class) && ((Mob) e).ai.getClass().equals(PlayerAI.class)) {
 				//e.getTransfrom().getPosition().y = 0;
 			}
 			//quick access
-			float eX = e.getTransfrom().getPosition().x;
+			float eX = e.getTransfrom().getPosition().x - (x * SIZE);
 			float eY = e.getTransfrom().getPosition().y;
-			float eZ = e.getTransfrom().getPosition().z;
-			//TODO: move entity from cell to cell if exceeds borders
+			float eZ = e.getTransfrom().getPosition().z - (y * SIZE);
 			//check bounds
-			if (eX < 0 || eX >= Level.CELL_SIZE - 1 || eZ < 0 || eZ >= Level.CELL_SIZE - 1) {
+			if (eX < 0 || eX >= SIZE || eZ < 0 || eZ >= SIZE) {
+				System.out.println(x + ", " + y + "  |  " + eX + ", " + eZ);
+				parentLevel.addEntity(entities.remove(eNum));
+				eNum--;
+				continue;
 			} else {
 				//gravity
-				float hBL = height[(int) eX][(int) eZ];
-				float hBR = height[((int) eX) + 1][(int) eZ];
-				float hTL = height[(int) eX][((int) eZ) + 1];
-				float hTR = height[((int) eX) + 1][((int) eZ) + 1];
+				float hBL, hBR, hTL, hTR;
+				if (eX > SIZE - 1 || eZ > SIZE - 1) {
+					hBL = height[(int) eX][(int) eZ];
+					hBR = getStitchingHeight((int) eX + 1, (int) eZ, adj);
+					hTL = getStitchingHeight((int) eX, (int) eZ + 1, adj);
+					hTR = getStitchingHeight((int) eX + 1, (int) eZ + 1, adj);
+				} else {
+					hBL = height[(int) eX][(int) eZ];
+					hBR = height[((int) eX) + 1][(int) eZ];
+					hTL = height[(int) eX][((int) eZ) + 1];
+					hTR = height[((int) eX) + 1][((int) eZ) + 1];
+				}
 				float aX = eX - ((int) eX);
 				float aZ = eZ - ((int) eZ);
 				float h;
@@ -58,20 +75,34 @@ public class Cell {
 					float dZ = aZ * hDZ;
 					h = hX + dZ;
 				} else {
-					float hDX = hTR - hTL;
-					float hDZ = hTR - hBR;
-					float hX = hBR + (aX * hDX);
+					aX = 1 - aX;
+					aZ = 1 - aZ;
+					float hDX = hTL - hTR;
+					float hDZ = hBR - hTR;
+					float hX = hTR + (aX * hDX);
 					float dZ = aZ * hDZ;
 					h = hX + dZ;
 				}
-				h = hBL;
 				float playerHeight = 1.5f;
-				if (eY > h + playerHeight) {
-					e.getVelocity().y -= 0.01f;
+				float buffer = 0.2f;
+				float correctionVel = 0.004f;
+				float dH = eY - (h + playerHeight);
+				if (dH > 0) {
+					if (dH > buffer) {
+						e.getVelocity().y -= 0.01f;
+					} else {
+						if (e.getVelocity().y >= 0) {
+							e.getVelocity().y = -1 * correctionVel;
+						}
+					}
 				}
-				if (eY < h + playerHeight) {
-					e.getTransfrom().getPosition().y = h + playerHeight;
-					e.getVelocity().y = 0;
+				if (dH < 0) {
+					if (-1 * dH > buffer) {
+						e.getTransfrom().getPosition().y = h + playerHeight;
+						e.getVelocity().y = 0;
+					} else {
+						e.getVelocity().y = correctionVel;
+					}
 				}
 			}
 		}

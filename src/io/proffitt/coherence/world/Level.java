@@ -12,7 +12,7 @@ public class Level {
 		cells = new Cell[w][h];
 		for (int a = 0; a < w; a++) {
 			for (int b = 0; b < h; b++) {
-				cells[a][b] = new Cell(CELL_SIZE);
+				cells[a][b] = new Cell(this, a, b, CELL_SIZE);
 			}
 		}
 		for (int a = 0; a < w; a++) {
@@ -28,8 +28,7 @@ public class Level {
 		}
 	}
 	public void addEntity(Entity e) {
-		cells[(int) (e.getTransfrom().getPosition().x / CELL_SIZE)][(int) (e.getTransfrom().getPosition().y / CELL_SIZE)].addEntity(e);
-		;
+		cells[(int) (e.getTransfrom().getPosition().x / CELL_SIZE)][(int) (e.getTransfrom().getPosition().z / CELL_SIZE)].addEntity(e);
 	}
 	public void update(double delta) {
 		for (int a = 0; a < w; a++) {
