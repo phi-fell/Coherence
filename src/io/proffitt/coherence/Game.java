@@ -4,22 +4,22 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.opengl.GL20.glUniform1f;
-import io.proffitt.coherence.ai.EnemyAI;
+
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
+
 import io.proffitt.coherence.ai.PlayerAI;
 import io.proffitt.coherence.graphics.*;
 import io.proffitt.coherence.gui.*;
+import io.proffitt.coherence.items.Item;
 import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.settings.Value;
 import io.proffitt.coherence.world.Entity;
-import io.proffitt.coherence.world.Item;
 import io.proffitt.coherence.world.Level;
 import io.proffitt.coherence.world.Mob;
-
-import java.nio.FloatBuffer;
-
-import org.lwjgl.BufferUtils;
 
 public class Game implements Runnable, SettingsListener, MenuParent {
 	Thread			t;
@@ -163,17 +163,12 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "VSYNC:", 5, 35));
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "VSYNC", 54, 35));
 		HUD.setParent(this);
-		FrameBuffer HDRFBO = new FrameBuffer(w.getWidth(), w.getHeight());
-		FloatBuffer pbuffer = BufferUtils.createFloatBuffer(HDRFBO.getWidth() * HDRFBO.getHeight() * 3);
-		float[] fbverts = { -1, -1, 0, 0, 0, 0, 1, -1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, -1, -1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, -1, 1, 0, 0, 1, 0 };
-		Model FBModel = new Model(fbverts, false);
 		int er = GL_NO_ERROR;
 		while ((er = glGetError()) != GL_NO_ERROR) {
 			System.out.println("OpenGL Error in initialization: " + Integer.toHexString(er));
 		}
 		globals.nullGet("calcHDR").setBool(false);
 		globals.nullGet("HDRMax").setDouble(1);
-		HDRCalculator HDRcalc = new HDRCalculator();
 		// time stuff, no more init after this
 		long lastTime = System.nanoTime();
 		long sinceFPS = lastTime;
@@ -227,27 +222,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			level.update(delta);
 			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			HDRFBO.bind();
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			level.draw(perspectiveCam); // draw level
-			HDRFBO.unbind();
-			// calculate HDRmax
-			if (globals.get("calcHDR").getBool()) {
-				// HDRFBO.blit();
-				HDRFBO.ssbind();
-				pbuffer.clear();
-				glReadPixels(0, 0, HDRFBO.getWidth(), HDRFBO.getHeight(), GL_RGB, GL_FLOAT, pbuffer);
-				HDRFBO.unbind();
-				HDRcalc.calculate(pbuffer, HDRFBO.getWidth(), HDRFBO.getHeight());
-				globals.get("HDRMax").setDouble((globals.get("HDRMax").getDouble() * 0.98f) + (HDRcalc.getValue() * 0.02f));
-			}
-			// Render HDRFBO
-			ResourceHandler.get().getShader("HDR").bind();
-			glUniform1f(7, globals.get("HDRMax").getFloat());
-			HDRFBO.blit();
-			HDRFBO.getTexture().bind();
-			FBModel.render();
-			HDRFBO.getTexture().unbind();
 			// render text
 			ResourceHandler.get().getShader("2dOrtho").bind();
 			orthoCam.bind();

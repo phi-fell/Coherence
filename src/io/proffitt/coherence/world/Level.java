@@ -27,6 +27,32 @@ public class Level {
 			}
 		}
 	}
+	public void boundEntity(Entity e) {
+		if (e.getTransfrom().getPosition().x < 0) {
+			e.getTransfrom().getPosition().x = 0;
+			if (e.getVelocity().x < 0) {
+				e.getVelocity().x = 0;
+			}
+		}
+		if (e.getTransfrom().getPosition().z < 0) {
+			e.getTransfrom().getPosition().z = 0;
+			if (e.getVelocity().z < 0) {
+				e.getVelocity().z = 0;
+			}
+		}
+		if (e.getTransfrom().getPosition().x >= w * CELL_SIZE) {
+			e.getTransfrom().getPosition().x = w * CELL_SIZE - 0.01f;
+			if (e.getVelocity().x > 0) {
+				e.getVelocity().x = 0;
+			}
+		}
+		if (e.getTransfrom().getPosition().z >= h * CELL_SIZE) {
+			e.getTransfrom().getPosition().z = h * CELL_SIZE - 0.01f;
+			if (e.getVelocity().z > 0) {
+				e.getVelocity().z = 0;
+			}
+		}
+	}
 	public void addEntity(Entity e) {
 		cells[(int) (e.getTransfrom().getPosition().x / CELL_SIZE)][(int) (e.getTransfrom().getPosition().z / CELL_SIZE)].addEntity(e);
 	}

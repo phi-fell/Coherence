@@ -35,20 +35,24 @@ public class Cell {
 		model = null;
 	}
 	public void update(double delta, int x, int y, Cell[][] adj) {
+		ArrayList<Entity> leftCell = new ArrayList<Entity>();
 		for (int eNum = 0; eNum < entities.size(); eNum++) {
 			Entity e = entities.get(eNum);
 			e.update(delta);
 			if (e.getClass().equals(Mob.class) && ((Mob) e).ai.getClass().equals(PlayerAI.class)) {
-				//e.getTransfrom().getPosition().y = 0;
+				//TODO: anything player specific
 			}
+			//lock within level
+			parentLevel.boundEntity(e);
 			//quick access
 			float eX = e.getTransfrom().getPosition().x - (x * SIZE);
 			float eY = e.getTransfrom().getPosition().y;
 			float eZ = e.getTransfrom().getPosition().z - (y * SIZE);
 			//check bounds
 			if (eX < 0 || eX >= SIZE || eZ < 0 || eZ >= SIZE) {
+				e.lockCamera();
 				System.out.println(x + ", " + y + "  |  " + eX + ", " + eZ);
-				parentLevel.addEntity(entities.remove(eNum));
+				leftCell.add(entities.remove(eNum));
 				eNum--;
 				continue;
 			} else {
@@ -83,28 +87,13 @@ public class Cell {
 					float dZ = aZ * hDZ;
 					h = hX + dZ;
 				}
-				float playerHeight = 1.5f;
-				float buffer = 0.2f;
-				float correctionVel = 0.004f;
-				float dH = eY - (h + playerHeight);
-				if (dH > 0) {
-					if (dH > buffer) {
-						e.getVelocity().y -= 0.01f;
-					} else {
-						if (e.getVelocity().y >= 0) {
-							e.getVelocity().y = -1 * correctionVel;
-						}
-					}
-				}
-				if (dH < 0) {
-					if (-1 * dH > buffer) {
-						e.getTransfrom().getPosition().y = h + playerHeight;
-						e.getVelocity().y = 0;
-					} else {
-						e.getVelocity().y = correctionVel;
-					}
-				}
+				float dH = eY - h;
+				e.lockToGround(dH, delta);
+				e.lockCamera();
 			}
+		}
+		for (Entity e : leftCell) {
+			parentLevel.addEntity(e);
 		}
 	}
 	public void addEntity(Entity e) {

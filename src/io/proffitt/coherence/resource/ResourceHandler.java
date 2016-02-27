@@ -69,7 +69,7 @@ public class ResourceHandler {
 		return items.get(name);
 	}
 	public ItemSchematic loadItem(String name) {
-		return new ItemSchematic(this.loadResourceAsCML("res/item/" + name + ".item"));
+		return new ItemSchematic(name, this.loadResourceAsCML("res/item/" + name + ".item"));
 	}
 	public Configuration getConfig(String name) {
 		if (!configs.containsKey(name)) {
