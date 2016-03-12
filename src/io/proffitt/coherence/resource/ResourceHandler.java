@@ -21,6 +21,7 @@ public class ResourceHandler {
 		}
 		return rh;
 	}
+	private HashMap<String, CMLFile>		properties;
 	private HashMap<String, ItemSchematic>	items;
 	private HashMap<String, Configuration>	configs;
 	private HashMap<String, Texture>		textures;
@@ -28,6 +29,7 @@ public class ResourceHandler {
 	private HashMap<String, Shader>			shaders;
 	private HashMap<String, Model>			models;
 	private ResourceHandler() {
+		properties = new HashMap<String, CMLFile>();
 		items = new HashMap<String, ItemSchematic>();
 		configs = new HashMap<String, Configuration>();
 		textures = new HashMap<String, Texture>();
@@ -43,6 +45,9 @@ public class ResourceHandler {
 	public void cleanup() {
 		//this.saveConfig("settings");//save settings
 		this.saveConfig("keybindings");//save bound keys
+		for (String s : items.keySet().toArray(new String[0])) {
+			properties.remove(s);// props don't need cleanup
+		}
 		for (String s : items.keySet().toArray(new String[0])) {//TODO: is there a reason for '.toArray(new String[0])' ???
 			items.remove(s);// items don't need cleanup
 		}
@@ -61,6 +66,15 @@ public class ResourceHandler {
 		for (String s : models.keySet().toArray(new String[0])) {
 			models.remove(s).destroy();
 		}
+	}
+	public CMLFile getProperty(String name) {
+		if (!properties.containsKey(name)) {
+			properties.put(name, loadProperty(name));
+		}
+		return properties.get(name);
+	}
+	public CMLFile loadProperty(String name) {
+		return this.loadResourceAsCML("res/prop/" + name + ".cml");
 	}
 	public ItemSchematic getItem(String name) {
 		if (!items.containsKey(name)) {

@@ -7,7 +7,6 @@ import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.math.AABB;
 import io.proffitt.coherence.math.Transform;
 import io.proffitt.coherence.math.Vector4f;
-import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.resource.Texture;
 
 public abstract class Entity {
@@ -57,11 +56,9 @@ public abstract class Entity {
 	public AABB getAABB() {
 		return new AABB(model.getAABB(), transform);
 	}
-	public void draw(Camera cam) {
+	public void draw() {
 		if (model != null) {
-			ResourceHandler.get().getShader("HDRtextured").bind();
 			tex.bind();
-			cam.bind();
 			glUniformMatrix4fv(3, false, transform.getAsMatrix().toFloatBuffer());// model
 			model.render();
 		}

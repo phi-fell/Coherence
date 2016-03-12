@@ -13,13 +13,14 @@ public class Console {
 	private ArrayList<String>	history;
 	private String				input;
 	private int					historyPos;
-	private final int			rollover	= 10;
+	private final int			rollover	= 20;
 	public Console() {
 		historyPos = 0;
 		t = null;
 		log = new ArrayList<String>();
 		history = new ArrayList<String>();
 		input = "";
+		addMessage("Coherence Console.  \'help\' or \'?\' for help.");
 	}
 	public void registerTextInput(char c) {
 		if (c == '\n') {
@@ -63,10 +64,34 @@ public class Console {
 		cleanupText();
 	}
 	public void pushString(String s) {
+		if (s.equalsIgnoreCase("help") || s.equalsIgnoreCase("?")){
+			addMessage("---------<HELP>---------");
+			addMessage("You can enter an expression such as");
+			addMessage("\tLOG_INPUT = true");
+			addMessage("or");
+			addMessage("\tVSYNC = false");
+			addMessage("or even");
+			addMessage("\tFPS = 100");
+			addMessage("but this will only change the displayed FPS, not the actual # of rendered frames.");
+			addMessage("the FPS variable is also reset whenever FPS is recalculated (approx. every second).");
+			addMessage("");
+			addMessage("You can also enter a command such as");
+			addMessage("\tbind KEY_SPACE JUMP");
+			addMessage("");
+			addMessage("To list commands use \'list commands\'");
+			addMessage("To list variables use \'list globals\'");
+			addMessage("---------</HELP>---------");
+			return;
+		}
 		Command c = new Command(s);
 		addMessage(s);
 		if (!c.execute(ResourceHandler.get().getConfig("globals"))) {
-			addMessage("Invalid Command!");
+			String lower = s.toLowerCase();
+			if ((lower.contains(" ") && ResourceHandler.get().getProperty("commands").getObj(lower.substring(0, lower.indexOf(' '))) != null) || ResourceHandler.get().getProperty("commands").getObj(lower) != null) {
+				addMessage("Correct usage: " + ResourceHandler.get().getProperty("commands").getObj("bind").getSub("usage").getValue().getString());
+			} else {
+				addMessage("Invalid Command!");
+			}
 		}
 	}
 	public void addMessage(String s) {

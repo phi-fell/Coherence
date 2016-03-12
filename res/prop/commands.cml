@@ -1,0 +1,9 @@
+bind: {
+	usage: bind <key> <action>
+},
+unbind: {
+	usage: unbind <key>
+},
+list: {
+	usage: list <commands/keys/globals/etc...>
+}

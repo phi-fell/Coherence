@@ -1,5 +1,7 @@
 package io.proffitt.coherence.items;
 
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+
 import io.proffitt.coherence.math.AABB;
 import io.proffitt.coherence.math.Transform;
 import io.proffitt.coherence.resource.ItemSchematic;
@@ -7,8 +9,15 @@ import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.world.Entity;
 
 public class Item extends Entity {
-	ItemSchematic schema;
-	int count;
+	static Transform inventoryTransform;
+	static {
+		inventoryTransform = new Transform();
+		inventoryTransform.getScale().x = Inventory.ITEM_SIZE_PIX / 2;
+		inventoryTransform.getScale().y = Inventory.ITEM_SIZE_PIX / 2;
+		inventoryTransform.getScale().z = Inventory.ITEM_SIZE_PIX / 2;
+	}
+	ItemSchematic	schema;
+	int				count;
 	public Item(String id) {
 		super(null, null);
 		count = 1;
@@ -19,6 +28,19 @@ public class Item extends Entity {
 	public void update(double delta) {
 		super.update(delta);
 		//TODO: anything else?
+	}
+	public void draw(int x, int y) {
+		if (model != null) {
+			tex.bind();
+			inventoryTransform.getPosition().x = x + (Inventory.ITEM_SIZE_PIX / 2);
+			inventoryTransform.getPosition().y = y + (Inventory.ITEM_SIZE_PIX / 2);
+			double t = System.nanoTime() / 1000000000f;
+			inventoryTransform.getRotation().x = (float) (t);
+			inventoryTransform.getRotation().y = (float) (t / 5);
+			inventoryTransform.getRotation().z = (float) (t / 13);
+			glUniformMatrix4fv(3, false, inventoryTransform.getAsMatrix().toFloatBuffer());// model
+			model.render();
+		}
 	}
 	public Transform getTransfrom() {
 		return transform;

@@ -25,6 +25,6 @@ public class Transform {
 		return scale;
 	}
 	public Matrix4f getAsMatrix() {
-		return Matrix4f.getScale(scale.x, scale.y, scale.z).multiply(Matrix4f.getRotationZ(rot.z).multiply(Matrix4f.getRotationX(rot.x).multiply(Matrix4f.getRotationY(rot.y).multiply(Matrix4f.getTranslation(pos.x, pos.y, pos.z)))));
+		return Matrix4f.getTranslation(pos.x, pos.y, pos.z).multiply(Matrix4f.getRotationZ(rot.z)).multiply(Matrix4f.getRotationX(rot.x)).multiply(Matrix4f.getRotationY(rot.y)).multiply(Matrix4f.getScale(scale.x, scale.y, scale.z));
 	}
 }

@@ -10,7 +10,7 @@ public class Command {
 	public Command(String s) {
 		e = null;
 		String lower = s.toLowerCase();
-		if (lower.startsWith("bind ") || lower.startsWith("unbind ")) {
+		if ((lower.contains(" ") && ResourceHandler.get().getProperty("commands").getObj(lower.substring(0, lower.indexOf(' '))) != null) || ResourceHandler.get().getProperty("commands").getObj(lower) != null) {
 			com = s;
 		} else {
 			e = new Expression(s);
@@ -21,12 +21,20 @@ public class Command {
 			if (e == null) {
 				if (com.toLowerCase().startsWith("bind ")) {
 					String[] tokens = com.toUpperCase().replace("BIND ", "").trim().split(" ");
-					ResourceHandler.get().getConfig("keybindings").nullGet("" + Keys.getKey(tokens[0])).setString(tokens[1]);
-					return true;
+					if (tokens.length == 2) {
+						ResourceHandler.get().getConfig("keybindings").nullGet("" + Keys.getKey(tokens[0])).setString(tokens[1]);
+						return true;
+					} else {
+						return false;
+					}
 				} else if (com.toLowerCase().startsWith("unbind ")) {
 					String token = com.toUpperCase().replace("UNBIND ", "").trim();
-					ResourceHandler.get().getConfig("keybindings").remove("" + Keys.getKey(token));
-					return true;
+					if (ResourceHandler.get().getConfig("keybindings").get("" + Keys.getKey(token)) != null) {
+						ResourceHandler.get().getConfig("keybindings").remove("" + Keys.getKey(token));
+						return true;
+					} else {
+						return false;
+					}
 				}
 				return false;
 			}

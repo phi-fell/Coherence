@@ -3,14 +3,10 @@ package io.proffitt.coherence;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
-import static org.lwjgl.opengl.GL20.glUniform1f;
-
-import java.nio.FloatBuffer;
-
-import org.lwjgl.BufferUtils;
 
 import io.proffitt.coherence.ai.PlayerAI;
-import io.proffitt.coherence.graphics.*;
+import io.proffitt.coherence.graphics.Camera;
+import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.gui.*;
 import io.proffitt.coherence.items.Item;
 import io.proffitt.coherence.resource.ResourceHandler;
@@ -71,6 +67,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	}
 	public void handleKeyPress(long window, int key, int scancode, int action, int mods) {
 		if (action == GLFW_PRESS) {
+			if (globals.nullGet("LOG_INPUT").getBool()) {
+				System.out.println("Key " + key + " pressed.");
+			}
 			if (key == GLFW_KEY_GRAVE_ACCENT) {
 				globals.get("console").Divide(new Value(true));
 				if (globals.get("console").getBool()) {
@@ -107,6 +106,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 				}
 			}
 		} else if (action == GLFW_RELEASE) {
+			if (globals.nullGet("LOG_INPUT").getBool()) {
+				System.out.println("Key " + key + " released.");
+			}
 		}
 	}
 	double mx = 0, my = 0;
@@ -151,7 +153,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		penny.getTransfrom().getPosition().z += 1;
 		penny.getTransfrom().getPosition().x += 1;
 		level.addEntity(penny);
-		Entity player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
+		Mob player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
 		perspectiveCam.lockTo(player);
 		level.addEntity(player);
 		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setFOV(65).setNearPlane(0.01f).setFarPlane(1000f).setRot(-0.2f, (float) (Math.PI * 1.25), 0);
@@ -159,9 +161,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		MenuComponent HUD = new Menu(null, 0, 0, 0, 0);
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "Text Test!", 5, 5));
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "FPS:", 5, 20));
-		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "FPS", 40, 20));
+		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "$FPS", 40, 20));
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "VSYNC:", 5, 35));
-		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "VSYNC", 54, 35));
+		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "$VSYNC", 54, 35));
 		HUD.setParent(this);
 		int er = GL_NO_ERROR;
 		while ((er = glGetError()) != GL_NO_ERROR) {
@@ -222,11 +224,22 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			level.update(delta);
 			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			level.draw(perspectiveCam); // draw level
+			ResourceHandler.get().getShader("terrain").bind();
+			perspectiveCam.bind();
+			level.draw(); // draw level
+			ResourceHandler.get().getShader("HDRtextured").bind();
+			perspectiveCam.bind();
+			level.drawContents();
 			// render text
+			glClear(GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("2dOrtho").bind();
 			orthoCam.bind();
 			HUD.draw();
+			player.getInventory().drawGUI();
+			glClear(GL_DEPTH_BUFFER_BIT);
+			ResourceHandler.get().getShader("3dOrtho").bind();
+			orthoCam.bind();
+			player.getInventory().drawContents();
 			// render debug console
 			if (globals.get("console").getBool()) {
 				console.draw(w);

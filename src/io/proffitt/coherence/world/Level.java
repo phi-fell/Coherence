@@ -1,7 +1,5 @@
 package io.proffitt.coherence.world;
 
-import io.proffitt.coherence.graphics.Camera;
-
 public class Level {
 	public static final int	CELL_SIZE	= 64;
 	final int				w, h;
@@ -69,7 +67,7 @@ public class Level {
 			}
 		}
 	}
-	public void draw(Camera cam) {
+	public void draw() {
 		for (int a = 0; a < w; a++) {
 			for (int b = 0; b < h; b++) {
 				if (!cells[a][b].modelValid()) {
@@ -81,7 +79,14 @@ public class Level {
 					}
 					cells[a][b].generateModel(adj);
 				}
-				cells[a][b].draw(a * CELL_SIZE, 0, b * CELL_SIZE, cam);
+				cells[a][b].draw(a * CELL_SIZE, 0, b * CELL_SIZE);
+			}
+		}
+	}
+	public void drawContents() {
+		for (int a = 0; a < w; a++) {
+			for (int b = 0; b < h; b++) {
+				cells[a][b].drawContents(a * CELL_SIZE, 0, b * CELL_SIZE);
 			}
 		}
 	}

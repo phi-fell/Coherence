@@ -23,15 +23,15 @@ public class PlayerAI implements EntityAI {
 			boolean left = false;
 			boolean right = false;
 			float speed = 5;
-			boolean flying = false;
+			boolean jumping = false;
 			Configuration config = ResourceHandler.get().getConfig("keybindings");
 			for (int i = 0; i < 350; i++) {
 				String key = "" + i;
 				if (speed < 50 && config.get(key) != null && config.get(key).getString().equals("SPRINT") && w.isKeyDown(i)) {
 					speed = 50;
 				}
-				if (!flying && config.get(key) != null && config.get(key).getString().equals("FLY") && w.isKeyDown(i)) {
-					flying = true;
+				if (!jumping && config.get(key) != null && config.get(key).getString().equals("JUMP") && w.isKeyDown(i)) {
+					jumping = true;
 				}
 				forward = forward || (config.get(key) != null && config.get(key).getString().equals("FORWARD") && w.isKeyDown(i));
 				backward = backward || (config.get(key) != null && config.get(key).getString().equals("BACKWARD") && w.isKeyDown(i));
@@ -40,7 +40,7 @@ public class PlayerAI implements EntityAI {
 			}
 			int zMod = (forward == backward) ? 0 : (forward ? -1 : 1);
 			int xMod = (left == right) ? 0 : (left ? -1 : 1);
-			Vector4f ret = c.getMoveVector(zMod * speed, xMod * speed).plus(new Vector4f(0, flying ? 1 : 0, 0, 1));
+			Vector4f ret = c.getMoveVector(zMod * speed, xMod * speed).plus(new Vector4f(0, jumping ? 1 : 0, 0, 1));
 			//c.translate(ret.x, ret.y, ret.z);
 			return ret;
 		}

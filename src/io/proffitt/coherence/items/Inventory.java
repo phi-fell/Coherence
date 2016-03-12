@@ -1,6 +1,7 @@
 package io.proffitt.coherence.items;
 
 import io.proffitt.coherence.gui.MenuComponent;
+import io.proffitt.coherence.resource.ResourceHandler;
 
 public class Inventory extends MenuComponent {
 	public static final int	ITEM_SIZE_PIX	= 64;
@@ -10,7 +11,7 @@ public class Inventory extends MenuComponent {
 	public static final int	TITLE_HEIGHT	= 20;
 	private final int		width, height;
 	private Item[][]		contents;
-	Inventory(int wi, int he) {
+	public Inventory(int wi, int he) {
 		super(null, 200, 200, (wi * ITEM_SIZE_PIX) + ((wi - 1) * ITEM_BUFFER_PIX) + (BORDER_PIX * 2), (wi * ITEM_SIZE_PIX) + ((wi - 1) * ITEM_BUFFER_PIX) + (BORDER_PIX * 2) + TITLE_BUFFER + TITLE_HEIGHT);
 		width = wi;
 		height = he;
@@ -20,6 +21,7 @@ public class Inventory extends MenuComponent {
 				contents[i][j] = null;
 			}
 		}
+		contents[0][1] = new Item("gold");
 	}
 	public boolean addItem(Item item) {
 		if (item.schema.maxStackSize > 1) {
@@ -27,7 +29,7 @@ public class Inventory extends MenuComponent {
 				for (int j = 0; j < height; j++) {
 					if (contents[i][j] != null && item.sameType(contents[i][j])) {
 						contents[i][j].count += item.count;
-						if (contents[i][j].count > contents[i][j].schema.maxStackSize){
+						if (contents[i][j].count > contents[i][j].schema.maxStackSize) {
 							item.count = contents[i][j].count - contents[i][j].schema.maxStackSize;
 						} else {
 							item.count = 0;
@@ -47,7 +49,20 @@ public class Inventory extends MenuComponent {
 		}
 		return false;
 	}
-	public void draw() {
-		super.draw();
+	public void drawGUI() {
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				ResourceHandler.get().getTexture("INV_itemBG").getAsImage().draw(i * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX), j * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX));
+			}
+		}
+	}
+	public void drawContents() {
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				if (contents[i][j] != null) {
+					contents[i][j].draw(i * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX), j * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX));
+				}
+			}
+		}
 	}
 }

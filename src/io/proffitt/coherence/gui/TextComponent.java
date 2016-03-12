@@ -16,8 +16,8 @@ public class TextComponent extends MenuComponent {
 		text = font.getText(textCache);
 	}
 	public void draw() {
-		if (getValue(val) != null && !textCache.equals(getValue(val).getString())) {
-			textCache = getValue(val).getString();
+		if (val.startsWith("$") && getValue(val.substring(1)) != null && !textCache.equals(getValue(val.substring(1)).getString())) {
+			textCache = getValue(val.substring(1)).getString();
 			text.destroy();
 			text = font.getText(textCache);
 		}
