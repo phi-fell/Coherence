@@ -54,6 +54,7 @@ public class Image {
 	 */
 	public void draw(Vector4f pos, float hOffset, float vOffset) {
 		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(pos.x - (tex.width * hOffset), pos.y - (tex.height * vOffset), pos.z).multiply(Matrix4f.getScale(tex.width, tex.height, 1)).toFloatBuffer());// model
+		glUniformMatrix4fv(6, false, Matrix4f.getScale(1, 1, 0).toFloatBuffer());// uv matrix
 		tex.bind();
 		model.render();
 	}
@@ -69,7 +70,23 @@ public class Image {
 	 *            vertical alignment about pos
 	 */
 	public void draw(int x, int y, float hOffset, float vOffset) {
-		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(tex.width, tex.height, 1)).toFloatBuffer());// model
+		draw(x, y, hOffset, vOffset, 1);
+	}
+	public void draw(int x, int y, float hOffset, float vOffset, float scale) {
+		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(tex.width * scale, tex.height * scale, 1)).toFloatBuffer());// model
+		glUniformMatrix4fv(6, false, Matrix4f.getScale(1, 1, 0).toFloatBuffer());// uv matrix
+		tex.bind();
+		model.render();
+	}
+	public void draw(int x, int y, float hOffset, float vOffset, float width, float height) {
+		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(width, height, 1)).toFloatBuffer());// model
+		glUniformMatrix4fv(6, false, Matrix4f.getScale(1, 1, 0).toFloatBuffer());// uv matrix
+		tex.bind();
+		model.render();
+	}
+	public void draw(int x, int y, float hOffset, float vOffset, float width, float height, float hReps, float vReps) {
+		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(width, height, 1)).toFloatBuffer());// model
+		glUniformMatrix4fv(6, false, Matrix4f.getScale(hReps, vReps, 1).toFloatBuffer());// uv matrix
 		tex.bind();
 		model.render();
 	}
