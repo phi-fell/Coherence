@@ -4,7 +4,7 @@ import io.proffitt.coherence.gui.MenuComponent;
 import io.proffitt.coherence.resource.ResourceHandler;
 
 public class Inventory extends MenuComponent {
-	public static final int	ITEM_SIZE_PIX	= 64;
+	public static final int	ITEM_SIZE_PIX	= 32;
 	public static final int	ITEM_BUFFER_PIX	= 2;
 	public static final int	BORDER_PIX		= 4;
 	public static final int	TITLE_BUFFER	= 4;
@@ -57,7 +57,7 @@ public class Inventory extends MenuComponent {
 		ResourceHandler.get().getTexture("INV_borderRight").getAsImage().draw(X + (width * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX)) + (BORDER_PIX - ITEM_BUFFER_PIX), Y + BORDER_PIX, 0, 0, BORDER_PIX, (height * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX)) - ITEM_BUFFER_PIX, 1, height);
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				ResourceHandler.get().getTexture("INV_itemBG").getAsImage().draw(X + (i * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX)) + BORDER_PIX, Y + (j * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX)) + BORDER_PIX);
+				ResourceHandler.get().getTexture("INV_itemBG").getAsImage().draw(X + (i * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX)) + BORDER_PIX, Y + (j * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX)) + BORDER_PIX,0,0,ITEM_SIZE_PIX,ITEM_SIZE_PIX);
 			}
 		}
 	}

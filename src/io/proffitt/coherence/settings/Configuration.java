@@ -33,6 +33,7 @@ public class Configuration implements ValueOwner {
 	}
 	//requires that listeners be notified soon after!
 	private void setNoNotify(String k, Value newVal) {
+		newVal.setOwner(this, k);
 		settings.put(k, newVal);
 	}
 	private void notifyListeners(String k, Value nv) {
@@ -41,8 +42,7 @@ public class Configuration implements ValueOwner {
 		}
 	}
 	public Value get(String k) {
-		Value ret = settings.get(k);
-		return ret;
+		return settings.get(k);
 	}
 	public Value nullGet(String k) {
 		Value ret = get(k);
@@ -59,7 +59,6 @@ public class Configuration implements ValueOwner {
 	public String toString() {
 		String ret = "";
 		boolean first = true;
-		;
 		for (String k : settings.keySet()) {
 			if (first) {
 				first = false;

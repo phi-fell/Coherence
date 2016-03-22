@@ -37,9 +37,29 @@ public class Expression {
 		return valid;
 	}
 	public Value execute(Configuration c) {
+		return this.execute(new Configuration[] { c });
+	}
+	public Value execute(Configuration[] c) {
 		Value vA, vB, vC;
-		vA = (v1.getType() == Value.TYPE_STRING) ? c.nullGet(v1.getString()) : v1;
-		vB = (v2.getType() == Value.TYPE_STRING) ? (c.get(v2.getString()) == null ? v2 : c.get(v2.getString())) : v2;
+		vA = null;
+		vB = null;
+		if (v1.getType() == Value.TYPE_STRING) {
+			for (int i = 0; i < c.length && vA == null; i++) {
+				vA = c[i].get(v1.getString());
+			}
+		}
+		if (vA == null){
+			vA = v1;
+		}
+		if (v2.getType() == Value.TYPE_STRING) {
+			for (int i = 0; i < c.length && vB == null; i++) {
+				vB = c[i].get(v2.getString());
+			}
+		}
+		if (vB == null){
+			vB = v2;
+		}
+		System.out.println(vA);
 		vC = null;
 		switch (op) {
 		case OP_SET:
@@ -79,6 +99,7 @@ public class Expression {
 			vC.Divide(vB);
 			break;
 		}
+		System.out.println(vA);
 		return vC;
 	}
 }

@@ -29,6 +29,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		globals = ResourceHandler.get().getConfig("globals");
 		globals.nullGet("console").setBool(false);
 		ResourceHandler.get().getConfig("settings").register(this);
+		globals.register(perspectiveCam);
 		console = new Console();
 		running = false;
 		exitGracefully = false;
@@ -156,7 +157,8 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		Mob player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
 		perspectiveCam.lockTo(player);
 		level.addEntity(player);
-		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setFOV(65).setNearPlane(0.01f).setFarPlane(1000f).setRot(-0.2f, (float) (Math.PI * 1.25), 0);
+		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setNearPlane(0.01f).setFarPlane(1000f).setRot(-0.2f, (float) (Math.PI * 1.25), 0);
+		globals.nullGet("FOV").setFloat(65);
 		orthoCam.setOrtho().setWidth(w.getWidth()).setHeight(w.getHeight());
 		MenuComponent HUD = new Menu(null, 0, 0, 0, 0);
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "Text Test!", 5, 5));
@@ -193,25 +195,14 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			w.poll();
 			// Start of gameloop
 			// handleinput
-			if (globals.get("console").getBool()) {
-				console.draw(w);
-			} else {
-				if (w.isKeyDown(GLFW_KEY_H)) {
-					globals.get("calcHDR").setBool(true);
-				}
-				if (w.isKeyDown(GLFW_KEY_R)) {
-					globals.get("calcHDR").setBool(false);
-					globals.get("HDRMax").setDouble(globals.get("HDRMax").getDouble() + 0.01);
-				}
-				if (w.isKeyDown(GLFW_KEY_F)) {
-					globals.get("calcHDR").setBool(false);
-					globals.get("HDRMax").setDouble(globals.get("HDRMax").getDouble() - 0.01);
-				}
+			if (!globals.get("console").getBool()) {
 				if (w.isKeyDown(GLFW_KEY_O)) {
-					perspectiveCam.setFOV(perspectiveCam.getFOV() - 1f);
+					globals.get("FOV").Subtract(new Value(1));
+					perspectiveCam.setFOV(globals.get("FOV").getFloat());
 				}
 				if (w.isKeyDown(GLFW_KEY_L)) {
-					perspectiveCam.setFOV(perspectiveCam.getFOV() + 1f);
+					globals.get("FOV").Add(new Value(1));
+					perspectiveCam.setFOV(globals.get("FOV").getFloat());
 				}
 				if (w.isKeyDown(GLFW_KEY_M)) {
 					level.setHeight(perspectiveCam.getX(), perspectiveCam.getZ(), level.getHeight(perspectiveCam.getX(), perspectiveCam.getZ()) + 0.1f);
@@ -230,7 +221,8 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			ResourceHandler.get().getShader("HDRtextured").bind();
 			perspectiveCam.bind();
 			level.drawContents();
-			// render text
+			// render UI
+			//if (globals.get("renderUI").getBool()) {
 			glClear(GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("2dOrtho").bind();
 			orthoCam.bind();
@@ -242,9 +234,17 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			player.getInventory().drawContents();
 			// render debug console
 			if (globals.get("console").getBool()) {
+				ResourceHandler.get().getShader("2dOrtho").bind();
+				orthoCam.bind();
 				console.draw(w);
 			}
 			// End of gameloop
+			double frameLenMs = (System.nanoTime() - lastTime) / 1000000f;
+			if (frameLenMs < 8){
+				System.gc();
+			} else {
+				
+			}
 			w.swap();
 			int err = GL_NO_ERROR;
 			while ((err = glGetError()) != GL_NO_ERROR) {
@@ -273,6 +273,10 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	}
 	@Override
 	public Value getValue(String k) {
-		return globals.get(k);
+		if (globals.get(k) != null) {
+			return globals.get(k);
+		} else {
+			return ResourceHandler.get().getConfig("settings").get(k);
+		}
 	}
 }

@@ -3,9 +3,12 @@ package io.proffitt.coherence.graphics;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector4f;
+import io.proffitt.coherence.settings.SettingsListener;
+import io.proffitt.coherence.settings.Value;
+import io.proffitt.coherence.settings.ValueOwner;
 import io.proffitt.coherence.world.Entity;
 
-public class Camera {
+public class Camera implements SettingsListener {
 	private float		x, y, z;							// position
 	private float		aX, aY, aZ;							// euler angles
 	private boolean		ortho, projGenerated, viewGenerated;
@@ -137,5 +140,12 @@ public class Camera {
 	}
 	public void lockTo(Entity e){
 		e.lockCamera(this);
+	}
+	@Override
+	public void onSettingChanged(String setting, Value newValue) {
+		if (setting.equals("FOV")){
+			setFOV(newValue.getFloat());
+		}
+		
 	}
 }

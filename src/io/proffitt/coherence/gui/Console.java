@@ -6,6 +6,7 @@ import io.proffitt.coherence.command.Command;
 import io.proffitt.coherence.graphics.Text;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.resource.ResourceHandler;
+import io.proffitt.coherence.settings.Configuration;
 
 public class Console {
 	private Text				t;
@@ -85,7 +86,7 @@ public class Console {
 		}
 		Command c = new Command(s);
 		addMessage(s);
-		if (!c.execute(ResourceHandler.get().getConfig("globals"))) {
+		if (!c.execute(new Configuration[] {ResourceHandler.get().getConfig("globals"), ResourceHandler.get().getConfig("settings")})) {
 			String lower = s.toLowerCase();
 			if ((lower.contains(" ") && ResourceHandler.get().getProperty("commands").getObj(lower.substring(0, lower.indexOf(' '))) != null) || ResourceHandler.get().getProperty("commands").getObj(lower) != null) {
 				addMessage("Correct usage: " + ResourceHandler.get().getProperty("commands").getObj("bind").getSub("usage").getValue().getString());

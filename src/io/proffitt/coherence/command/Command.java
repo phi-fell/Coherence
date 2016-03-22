@@ -17,6 +17,9 @@ public class Command {
 		}
 	}
 	public boolean execute(Configuration c) {
+		return this.execute(new Configuration[] { c });
+	}
+	public boolean execute(Configuration[] c) {
 		try {
 			if (e == null) {
 				if (com.toLowerCase().startsWith("bind ")) {
