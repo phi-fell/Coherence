@@ -65,7 +65,7 @@ public class Console {
 		cleanupText();
 	}
 	public void pushString(String s) {
-		if (s.equalsIgnoreCase("help") || s.equalsIgnoreCase("?")){
+		if (s.equalsIgnoreCase("help") || s.equalsIgnoreCase("?")) {
 			addMessage("---------<HELP>---------");
 			addMessage("You can enter an expression such as");
 			addMessage("\tLOG_INPUT = true");
@@ -84,9 +84,12 @@ public class Console {
 			addMessage("---------</HELP>---------");
 			return;
 		}
-		Command c = new Command(s);
 		addMessage(s);
-		if (!c.execute(new Configuration[] {ResourceHandler.get().getConfig("globals"), ResourceHandler.get().getConfig("settings")})) {
+		executeCommand(s);
+	}
+	public void executeCommand(String s) {
+		Command c = new Command(s);
+		if (!c.execute(new Configuration[] { ResourceHandler.get().getConfig("globals"), ResourceHandler.get().getConfig("settings") })) {
 			String lower = s.toLowerCase();
 			if ((lower.contains(" ") && ResourceHandler.get().getProperty("commands").getObj(lower.substring(0, lower.indexOf(' '))) != null) || ResourceHandler.get().getProperty("commands").getObj(lower) != null) {
 				addMessage("Correct usage: " + ResourceHandler.get().getProperty("commands").getObj("bind").getSub("usage").getValue().getString());

@@ -23,15 +23,16 @@ public class Command {
 		try {
 			if (e == null) {
 				if (com.toLowerCase().startsWith("bind ")) {
-					String[] tokens = com.toUpperCase().replace("BIND ", "").trim().split(" ");
-					if (tokens.length == 2) {
-						ResourceHandler.get().getConfig("keybindings").nullGet("" + Keys.getKey(tokens[0])).setString(tokens[1]);
+					String remainder = com.substring("bind ".length()).trim();
+					int spaceIndex = remainder.indexOf(' ');
+					if (spaceIndex > 0) {
+						ResourceHandler.get().getConfig("keybindings").nullGet("" + Keys.getKey(remainder.substring(0, spaceIndex).trim())).setString(remainder.substring(spaceIndex).trim());
 						return true;
 					} else {
 						return false;
 					}
 				} else if (com.toLowerCase().startsWith("unbind ")) {
-					String token = com.toUpperCase().replace("UNBIND ", "").trim();
+					String token = com.substring("bind ".length()).trim();
 					if (ResourceHandler.get().getConfig("keybindings").get("" + Keys.getKey(token)) != null) {
 						ResourceHandler.get().getConfig("keybindings").remove("" + Keys.getKey(token));
 						return true;

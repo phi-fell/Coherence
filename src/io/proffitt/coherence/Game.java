@@ -25,6 +25,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	Console			console;
 	Camera			perspectiveCam	= new Camera();
 	Camera			orthoCam		= new Camera();
+	Mob				player = null;
 	public Game(Window wind) {
 		globals = ResourceHandler.get().getConfig("globals");
 		globals.nullGet("console").setBool(false);
@@ -49,15 +50,15 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			if (Character.charCount(key) == 1) {
 				char c = Character.toChars(key)[0];
 				boolean valid = false;
-				if (c >= 'a' && c <= 'z') {
+				if ((c >= 'a' && c <= 'z') || c >= 'A' && c <= 'Z') {//letters
 					valid = true;
-				} else if (c >= 'A' && c <= 'Z') {
+				} else if (c >= '0' && c <= '9') {//numbers
 					valid = true;
-				} else if (c >= '0' && c <= '9') {
+				} else if (c == '~') {//used for meta commands (binding a command to a key or somesuch)
 					valid = true;
-				} else if (c == '_' || c == '.') {//list all non alphanumeric characters here
+				} else if (c == ' ' || c == '=' || c == '!' || c == '+' || c == '-' || c == '*' || c == '/') {//list all operators here
 					valid = true;
-				} else if (c == ' ' || c == '=') {//list all operators here
+				} else if (c == '_' || c == '.') {//list all other non alphanumeric characters here
 					valid = true;
 				}
 				if (valid) {
@@ -68,16 +69,21 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	}
 	public void handleKeyPress(long window, int key, int scancode, int action, int mods) {
 		if (action == GLFW_PRESS) {
+			//logging
 			if (globals.nullGet("LOG_INPUT").getBool()) {
 				System.out.println("Key " + key + " pressed.");
 			}
+			//hardcoded behavior
 			if (key == GLFW_KEY_GRAVE_ACCENT) {
-				globals.get("console").Divide(new Value(true));
-				if (globals.get("console").getBool()) {
-					console.clearInput();
-					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				if ((mods & GLFW_MOD_SHIFT) == 1 && globals.get("console").getBool()) {
 				} else {
-					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+					globals.get("console").Divide(new Value(true));
+					if (globals.get("console").getBool()) {
+						console.clearInput();
+						glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+					} else {
+						glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+					}
 				}
 			} else if (key == GLFW_KEY_ESCAPE) {
 				if (globals.get("console").getBool()) {
@@ -89,6 +95,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 					exitGracefully = true;
 				}
 			} else {
+				//type into console
 				if (globals.get("console").getBool()) {
 					if (key == GLFW_KEY_ENTER) {
 						console.registerTextInput('\n');
@@ -100,9 +107,18 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 						console.inputDown();
 					}
 				} else {
-					if (key == GLFW_KEY_V) {
-						Value vsync = ResourceHandler.get().getConfig("settings").nullGet("VSYNC");
-						vsync.setBool(!vsync.getBool());
+					//bindable behavior
+					Configuration bindings = ResourceHandler.get().getConfig("keybindings");
+					if (bindings.get("" + key) != null) {
+						String boundEvent = bindings.get("" + key).getString();
+						//execute command bound to key
+						if (boundEvent.startsWith("~")) {
+							console.executeCommand(boundEvent.substring(1));
+						} else {
+							//various other behaviors
+							//TODO: move keyboard checking out of PlayerAI, and make functions such as PlayerAI.jump() or
+							//maybe PlayerAI.performAction("JUMP") or something, so it doesn't reference keyboard input directly.
+						}
 					}
 				}
 			}
@@ -126,6 +142,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		}
 	}
 	public void handleMouseClick(long window, int button, int action, int mods) {
+		if (globals.nullGet("inventory_open").getBool()){
+			player.getInventory().handleClick((int)mx, (int)my);
+		}
 	}
 	public void handleMouseScroll(long window, double xoffset, double yoffset) {
 	}
@@ -154,7 +173,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		penny.getTransfrom().getPosition().z += 1;
 		penny.getTransfrom().getPosition().x += 1;
 		level.addEntity(penny);
-		Mob player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
+		player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
 		perspectiveCam.lockTo(player);
 		level.addEntity(player);
 		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setNearPlane(0.01f).setFarPlane(1000f).setRot(-0.2f, (float) (Math.PI * 1.25), 0);
@@ -222,16 +241,19 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			perspectiveCam.bind();
 			level.drawContents();
 			// render UI
-			//if (globals.get("renderUI").getBool()) {
-			glClear(GL_DEPTH_BUFFER_BIT);
-			ResourceHandler.get().getShader("2dOrtho").bind();
-			orthoCam.bind();
-			HUD.draw();
-			player.getInventory().drawGUI();
-			glClear(GL_DEPTH_BUFFER_BIT);
-			ResourceHandler.get().getShader("3dOrtho").bind();
-			orthoCam.bind();
-			player.getInventory().drawContents();
+			if (globals.get("renderUI").getBool()) {
+				glClear(GL_DEPTH_BUFFER_BIT);
+				ResourceHandler.get().getShader("2dOrtho").bind();
+				orthoCam.bind();
+				HUD.draw();
+				if (globals.nullGet("inventory_open").getBool()) {
+					player.getInventory().drawGUI();
+					glClear(GL_DEPTH_BUFFER_BIT);
+					ResourceHandler.get().getShader("3dOrtho").bind();
+					orthoCam.bind();
+					player.getInventory().drawContents();
+				}
+			}
 			// render debug console
 			if (globals.get("console").getBool()) {
 				ResourceHandler.get().getShader("2dOrtho").bind();
@@ -240,10 +262,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			}
 			// End of gameloop
 			double frameLenMs = (System.nanoTime() - lastTime) / 1000000f;
-			if (frameLenMs < 8){
+			if (frameLenMs < 8) {
 				System.gc();
 			} else {
-				
 			}
 			w.swap();
 			int err = GL_NO_ERROR;

@@ -1,5 +1,7 @@
 68: RIGHT,
+258: ~inventory_open = !inventory_open,
 83: BACKWARD,
+86: ~VSYNC = !VSYNC,
 340: SPRINT,
 87: FORWARD,
 65: LEFT,

@@ -67,7 +67,6 @@ public class Value {
 					long l = Long.parseLong(sVal);
 					type = TYPE_LONG;
 					lVal = l;
-					return;
 				} catch (NumberFormatException e1) {
 					try {
 						double d = Double.parseDouble(sVal);
@@ -100,6 +99,9 @@ public class Value {
 			break;
 		default:
 			break;
+		}
+		if (OWNER != null) {
+			OWNER.alert(ID);
 		}
 	}
 	public void setLong(long v) {
@@ -175,9 +177,9 @@ public class Value {
 	public boolean getBool() {
 		switch (type) {
 		case 0:
-			return !(lVal == 0);
+			return !(lVal >= 0);
 		case 1:
-			return dVal > 0;
+			return dVal >= 0;
 		case 2:
 			return Boolean.parseBoolean(sVal);
 		case 3:
