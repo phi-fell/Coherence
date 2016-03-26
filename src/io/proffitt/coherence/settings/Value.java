@@ -31,7 +31,7 @@ public class Value {
 	public Value(boolean v) {
 		setBool(v);
 	}
-	public String toString(){
+	public String toString() {
 		return getString();
 	}
 	void setOwner(ValueOwner vo, String id) {
@@ -256,6 +256,19 @@ public class Value {
 		} else {
 			//IMPOSSIBLE!
 			throw new RuntimeException("Could not divide values.");
+		}
+	}
+	public boolean equals(Value rhs) {
+		if (type != rhs.type) {
+			return false;
+		} else if (type == TYPE_BOOL) {
+			return getBool() == rhs.getBool();
+		} else if (type == TYPE_DOUBLE) {
+			return getDouble() == rhs.getDouble();
+		} else if (type == TYPE_LONG) {
+			return getLong() == rhs.getLong();
+		} else {
+			return getString().equals(rhs.getString());
 		}
 	}
 }

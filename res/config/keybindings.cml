@@ -1,5 +1,5 @@
 68: RIGHT,
-258: ~inventory_open = !inventory_open,
+258: ~inventory_open=!inventory_open;inventory_open?cursor=normal:cursor=disabled,
 83: BACKWARD,
 86: ~VSYNC = !VSYNC,
 340: SPRINT,

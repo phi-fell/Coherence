@@ -87,15 +87,32 @@ public class Console {
 		addMessage(s);
 		executeCommand(s);
 	}
-	public void executeCommand(String s) {
+	private void executeCommandRaw(String s) {
 		Command c = new Command(s);
 		if (!c.execute(new Configuration[] { ResourceHandler.get().getConfig("globals"), ResourceHandler.get().getConfig("settings") })) {
 			String lower = s.toLowerCase();
 			if ((lower.contains(" ") && ResourceHandler.get().getProperty("commands").getObj(lower.substring(0, lower.indexOf(' '))) != null) || ResourceHandler.get().getProperty("commands").getObj(lower) != null) {
 				addMessage("Correct usage: " + ResourceHandler.get().getProperty("commands").getObj("bind").getSub("usage").getValue().getString());
 			} else {
-				addMessage("Invalid Command!");
+				addMessage("Invalid command: " + c.getErrorString());
 			}
+		}
+	}
+	public void executeCommand(String s) {
+		if (s.contains(";")) {
+			int comIndex = s.indexOf('~');
+			String suffix = "";
+			if (comIndex != -1) {
+				suffix = s.substring(comIndex);
+				s = s.substring(0, comIndex);
+			}
+			String[] coms = s.split(";");
+			coms[coms.length - 1] += suffix;
+			for (String com : coms) {
+				executeCommandRaw(com);
+			}
+		} else {
+			executeCommandRaw(s);
 		}
 	}
 	public void addMessage(String s) {

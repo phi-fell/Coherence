@@ -25,7 +25,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	Console			console;
 	Camera			perspectiveCam	= new Camera();
 	Camera			orthoCam		= new Camera();
-	Mob				player = null;
+	Mob				player			= null;
 	public Game(Window wind) {
 		globals = ResourceHandler.get().getConfig("globals");
 		globals.nullGet("console").setBool(false);
@@ -54,11 +54,11 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 					valid = true;
 				} else if (c >= '0' && c <= '9') {//numbers
 					valid = true;
-				} else if (c == '~') {//used for meta commands (binding a command to a key or somesuch)
+				} else if (c == '~' || c == ';') {//used for meta commands (binding a command to a key or somesuch)
 					valid = true;
-				} else if (c == ' ' || c == '=' || c == '!' || c == '+' || c == '-' || c == '*' || c == '/') {//list all operators here
+				} else if (c == ' ' || c == '=' || c == '!' || c == '+' || c == '-' || c == '*' || c == '/' || c == '?' || c == ':') {//list all operators here
 					valid = true;
-				} else if (c == '_' || c == '.') {//list all other non alphanumeric characters here
+				} else if (c == '_' || c == '.') {//list all other allowed non-alphanumeric characters here
 					valid = true;
 				}
 				if (valid) {
@@ -80,16 +80,16 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 					globals.get("console").Divide(new Value(true));
 					if (globals.get("console").getBool()) {
 						console.clearInput();
-						glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+						globals.nullGet("cursor").setString("normal");
 					} else {
-						glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+						globals.nullGet("cursor").setString("disabled");
 					}
 				}
 			} else if (key == GLFW_KEY_ESCAPE) {
 				if (globals.get("console").getBool()) {
 					if (!console.clearInput()) {
 						globals.get("console").setBool(false);
-						glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+						globals.nullGet("cursor").setString("disabled");
 					}
 				} else {
 					exitGracefully = true;
@@ -130,7 +130,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	}
 	double mx = 0, my = 0;
 	public void handleMousePos(long window, double xpos, double ypos) {
-		if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
+		if (globals.nullGet("cursor").equals("disabled")) {
 			perspectiveCam.rotate((float) (ypos - my) / -200f, (float) (xpos - mx) / -200f, 0);
 			Window wind = Window.getWindow(window);
 			glfwSetCursorPos(window, wind.getWidth() / 2f, wind.getHeight() / 2f);
@@ -142,8 +142,8 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		}
 	}
 	public void handleMouseClick(long window, int button, int action, int mods) {
-		if (globals.nullGet("inventory_open").getBool()){
-			player.getInventory().handleClick((int)mx, (int)my);
+		if (globals.nullGet("inventory_open").getBool()) {
+			player.getInventory().handleClick((int) mx, (int) my);
 		}
 	}
 	public void handleMouseScroll(long window, double xoffset, double yoffset) {
@@ -157,7 +157,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	public void run() {
 		w.create();
 		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWCharCallback(this::handleTextInput), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
-		glfwSetInputMode(w.getID(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		globals.nullGet("cursor").setString("disabled");
 		glfwSetCursorPos(w.getID(), w.getWidth() / 2f, w.getHeight() / 2f);
 		mx = w.getWidth() / 2f;
 		my = w.getHeight() / 2f;

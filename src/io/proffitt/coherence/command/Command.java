@@ -7,6 +7,7 @@ import io.proffitt.coherence.settings.Keys;
 public class Command {
 	Expression	e;
 	String		com;
+	String		errMsg = "No Error";
 	public Command(String s) {
 		e = null;
 		String lower = s.toLowerCase();
@@ -19,6 +20,13 @@ public class Command {
 	public boolean execute(Configuration c) {
 		return this.execute(new Configuration[] { c });
 	}
+	public String getErrorString() {
+		if (e == null) {
+			return errMsg;
+		} else {
+			return e.getErrorMessage();
+		}
+	}
 	public boolean execute(Configuration[] c) {
 		try {
 			if (e == null) {
@@ -29,6 +37,7 @@ public class Command {
 						ResourceHandler.get().getConfig("keybindings").nullGet("" + Keys.getKey(remainder.substring(0, spaceIndex).trim())).setString(remainder.substring(spaceIndex).trim());
 						return true;
 					} else {
+						errMsg = "";
 						return false;
 					}
 				} else if (com.toLowerCase().startsWith("unbind ")) {
@@ -37,9 +46,11 @@ public class Command {
 						ResourceHandler.get().getConfig("keybindings").remove("" + Keys.getKey(token));
 						return true;
 					} else {
+						errMsg = "Key was not bound";
 						return false;
 					}
 				}
+				errMsg = "Not an extant command or expression";
 				return false;
 			}
 			if (e.isValid()) {

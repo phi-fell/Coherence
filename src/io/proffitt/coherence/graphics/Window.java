@@ -47,6 +47,8 @@ public class Window implements SettingsListener {
 	public void onSettingChanged(String setting, Value newValue) {
 		if (setting.equals("VSYNC")) {
 			glfwSwapInterval(newValue.getBool() ? 1 : 0);
+		} else if (setting.equals("cursor")) {
+			setCursorMode(newValue.getString());
 		}
 	}
 	public int getWidth() {
@@ -54,6 +56,17 @@ public class Window implements SettingsListener {
 	}
 	public int getHeight() {
 		return height;
+	}
+	public void setCursorMode(String mode) {
+		if (mode.equals("disabled")) {
+			glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		} else if (mode.equals("hidden")) {
+			glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		} else if (mode.equals("normal")) {
+			glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		} else {
+			System.out.println("INVALID CURSOR MODE!");
+		}
 	}
 	public void setCallbacks(GLFWKeyCallback keyC, GLFWCharCallback charC, GLFWScrollCallback scrollC, GLFWCursorPosCallback cursorC, GLFWMouseButtonCallback mouseC) {
 		cleanupCallbacks();
@@ -84,6 +97,7 @@ public class Window implements SettingsListener {
 		GL.createCapabilities();
 		glfwSwapInterval(ResourceHandler.get().getConfig("settings").get("VSYNC").getBool() ? 1 : 0);
 		ResourceHandler.get().getConfig("settings").register(this);
+		ResourceHandler.get().getConfig("globals").register(this);
 	}
 	public boolean isKeyDown(int key) {
 		return glfwGetKey(id, key) == GLFW_PRESS;
