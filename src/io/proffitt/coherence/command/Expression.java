@@ -6,17 +6,17 @@ import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.Value;
 
 public class Expression {
-	public static final int			OP_SET				= 0;
+	public static final int			OP_EQUALITY			= 0;
 	public static final int			OP_MUL_BY			= 1;
 	public static final int			OP_DIV_BY			= 2;
 	public static final int			OP_ADD_TO			= 3;
 	public static final int			OP_SUB_FROM			= 4;
-	public static final int			OP_EQUALITY			= 5;
+	public static final int			OP_SET				= 5;
 	public static final int			OP_DIV				= 6;
 	public static final int			OP_ADD				= 7;
 	public static final int			OP_SUB				= 8;
 	public static final int			OP_MUL				= 9;
-	public static final String[]	binOps				= { "=", "*=", "/=", "+=", "-=", "==", "/", "+", "-", "*" };
+	public static final String[]	binOps				= { "==", "*=", "/=", "+=", "-=", "=", "/", "+", "-", "*" };
 	//binary operators until 99, binary from 100 to 199
 	public static final int			UNARY_OFFSET		= 100;
 	public static final int			OP_IDENTITY			= UNARY_OFFSET;												//no unary operator on value
@@ -194,7 +194,6 @@ public class Expression {
 			vC = new Value(!vA.getBool());
 			break;
 		case OP_TERNARY_IF:
-			System.out.println(ec.execute(c));
 			vC = ec.execute(c).getBool() ? (e1 == null ? v1 : e1.execute(c)) : (e2 == null ? v2 : e2.execute(c));
 			break;
 		}

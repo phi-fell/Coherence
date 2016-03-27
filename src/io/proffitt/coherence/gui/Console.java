@@ -91,11 +91,7 @@ public class Console {
 		Command c = new Command(s);
 		if (!c.execute(new Configuration[] { ResourceHandler.get().getConfig("globals"), ResourceHandler.get().getConfig("settings") })) {
 			String lower = s.toLowerCase();
-			if ((lower.contains(" ") && ResourceHandler.get().getProperty("commands").getObj(lower.substring(0, lower.indexOf(' '))) != null) || ResourceHandler.get().getProperty("commands").getObj(lower) != null) {
-				addMessage("Correct usage: " + ResourceHandler.get().getProperty("commands").getObj("bind").getSub("usage").getValue().getString());
-			} else {
-				addMessage("Invalid command: " + c.getErrorString());
-			}
+			addMessage("Invalid command: " + c.getErrorString());
 		}
 	}
 	public void executeCommand(String s) {

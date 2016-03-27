@@ -41,7 +41,7 @@ public class Command {
 						return false;
 					}
 				} else if (com.toLowerCase().startsWith("unbind ")) {
-					String token = com.substring("bind ".length()).trim();
+					String token = com.substring("unbind ".length()).trim();
 					if (ResourceHandler.get().getConfig("keybindings").get("" + Keys.getKey(token)) != null) {
 						ResourceHandler.get().getConfig("keybindings").remove("" + Keys.getKey(token));
 						return true;

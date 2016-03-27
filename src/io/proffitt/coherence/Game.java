@@ -58,7 +58,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 					valid = true;
 				} else if (c == ' ' || c == '=' || c == '!' || c == '+' || c == '-' || c == '*' || c == '/' || c == '?' || c == ':') {//list all operators here
 					valid = true;
-				} else if (c == '_' || c == '.') {//list all other allowed non-alphanumeric characters here
+				} else if (c == '_' || c == '.' || c == '(' || c == ')') {//list all other allowed non-alphanumeric characters here
 					valid = true;
 				}
 				if (valid) {
