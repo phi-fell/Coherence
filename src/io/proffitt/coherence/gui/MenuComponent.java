@@ -54,15 +54,15 @@ public abstract class MenuComponent implements MenuParent {
 	}
 	/**
 	 * @param xrel
-	 *            X position within this component
+	 *            X position within parent component
 	 * @param yrel
-	 *            Y position within this component
+	 *            Y position within parent component
 	 * @return true if click was handled by this component, false otherwise.
 	 */
 	public boolean handleClick(int xrel, int yrel) {
 		// This method should be overriden by ANY interactive component
 		for (MenuComponent mc : components) {
-			if (mc.handleClick(xrel, yrel)) {
+			if (mc.handleClick(xrel - x, yrel - y)) {
 				return true;
 			}
 		}

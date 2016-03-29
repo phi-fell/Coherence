@@ -139,11 +139,19 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		} else {
 			mx = xpos;
 			my = ypos;
+			if (globals.nullGet("inventory_open").getBool()) {
+				player.getInventory().handleMouse((int) mx, (int) my);
+			}
 		}
 	}
 	public void handleMouseClick(long window, int button, int action, int mods) {
-		if (globals.nullGet("inventory_open").getBool()) {
-			player.getInventory().handleClick((int) mx, (int) my);
+		if (action == GLFW_PRESS) {
+			if (button == GLFW_MOUSE_BUTTON_LEFT) {
+				//LMB pressed
+				if (globals.nullGet("inventory_open").getBool()) {
+					player.getInventory().handleClick((int) mx, (int) my);
+				}
+			}
 		}
 	}
 	public void handleMouseScroll(long window, double xoffset, double yoffset) {
@@ -174,6 +182,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		penny.getTransfrom().getPosition().x += 1;
 		level.addEntity(penny);
 		player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
+		globals.register(player.getInventory());
 		perspectiveCam.lockTo(player);
 		level.addEntity(player);
 		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setNearPlane(0.01f).setFarPlane(1000f).setRot(-0.2f, (float) (Math.PI * 1.25), 0);

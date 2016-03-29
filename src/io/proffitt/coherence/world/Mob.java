@@ -12,7 +12,7 @@ public class Mob extends Entity {
 	public Mob(Model m, Texture t, EntityAI eAI) {
 		super(m, t);
 		ai = eAI;
-		inv = new Inventory(10, 10);
+		inv = new Inventory(10, 10, "Inventory");
 	}
 	public void update(double delta) {
 		Vector4f goal = ai.getMoveVector(delta);
