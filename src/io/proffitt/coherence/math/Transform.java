@@ -1,27 +1,26 @@
 package io.proffitt.coherence.math;
 
 public class Transform {
-	Vector4f	pos;
-	Vector4f	rot;
-	Vector4f	scale;
+	Vector3f	pos;
+	Vector3f	rot;
+	Vector3f	scale;
 	public Transform() {
-		pos = new Vector4f();
-		rot = new Vector4f();
-		scale = new Vector4f(1, 1, 1, 1);
+		pos = new Vector3f();
+		rot = new Vector3f();
+		scale = new Vector3f(1, 1, 1);
 	}
-	public Vector4f getPosition() {
+	public Vector3f getPosition() {
 		return pos;
 	}
-	public void setPosition(Vector4f newPos) {
+	public void setPosition(Vector3f newPos) {
 		pos.x = newPos.x;
 		pos.y = newPos.y;
 		pos.z = newPos.z;
-		pos.w = newPos.w;
 	}
-	public Vector4f getRotation() {
+	public Vector3f getRotation() {
 		return rot;
 	}
-	public Vector4f getScale() {
+	public Vector3f getScale() {
 		return scale;
 	}
 	public Matrix4f getAsMatrix() {

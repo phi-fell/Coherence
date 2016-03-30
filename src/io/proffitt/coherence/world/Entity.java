@@ -6,20 +6,21 @@ import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.math.AABB;
 import io.proffitt.coherence.math.Transform;
-import io.proffitt.coherence.math.Vector4f;
+import io.proffitt.coherence.math.Vector3f;
 import io.proffitt.coherence.resource.Texture;
 
 public abstract class Entity {
+	public String name;//DELME
 	private final float	height	= 1.5f;
 	float				onGround;
 	protected Model		model;
 	protected Texture	tex;
 	protected Transform	transform;
-	Vector4f			velocity;
+	Vector3f			velocity;
 	private Camera		locked	= null;
 	public Entity(Model m, Texture t) {
 		onGround = 0;
-		velocity = new Vector4f();
+		velocity = new Vector3f();
 		model = m;
 		tex = t;
 		transform = new Transform();
@@ -43,14 +44,14 @@ public abstract class Entity {
 	}
 	void lockCamera() {
 		if (locked != null) {
-			Vector4f pos = transform.getPosition();
+			Vector3f pos = transform.getPosition();
 			locked.setPos(pos.x, pos.y, pos.z);
 		}
 	}
 	public Transform getTransfrom() {
 		return transform;
 	}
-	public Vector4f getVelocity() {
+	public Vector3f getVelocity() {
 		return velocity;
 	}
 	public AABB getAABB() {

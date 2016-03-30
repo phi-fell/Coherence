@@ -2,7 +2,7 @@ package io.proffitt.coherence.graphics;
 
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.math.Matrix4f;
-import io.proffitt.coherence.math.Vector4f;
+import io.proffitt.coherence.math.Vector3f;
 import io.proffitt.coherence.resource.Texture;
 
 public class Image {
@@ -16,10 +16,10 @@ public class Image {
 		return tex;
 	}
 	/**
-	 * fewer param version of {@link Image#draw(Vector4f, float, float)
+	 * fewer param version of {@link Image#draw(Vector3f, float, float)
 	 * draw(pos, hOffset, vOffset)}
 	 */
-	public void draw(Vector4f pos) {
+	public void draw(Vector3f pos) {
 		draw(pos, 0);
 	}
 	/**
@@ -30,10 +30,10 @@ public class Image {
 		draw(x, y, 0);
 	}
 	/**
-	 * fewer param version of {@link Image#draw(Vector4f, float, float)
+	 * fewer param version of {@link Image#draw(Vector3f, float, float)
 	 * draw(pos, hOffset, vOffset)}
 	 */
-	public void draw(Vector4f pos, float offset) {
+	public void draw(Vector3f pos, float offset) {
 		draw(pos, offset, offset);
 	}
 	/**
@@ -52,7 +52,7 @@ public class Image {
 	 * @param vOffset
 	 *            vertical alignment about pos
 	 */
-	public void draw(Vector4f pos, float hOffset, float vOffset) {
+	public void draw(Vector3f pos, float hOffset, float vOffset) {
 		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(pos.x - (tex.width * hOffset), pos.y - (tex.height * vOffset), pos.z).multiply(Matrix4f.getScale(tex.width, tex.height, 1)).toFloatBuffer());// model
 		glUniformMatrix4fv(6, false, Matrix4f.getScale(1, 1, 0).toFloatBuffer());// uv matrix
 		tex.bind();

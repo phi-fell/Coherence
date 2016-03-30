@@ -1,5 +1,8 @@
 package io.proffitt.coherence.world;
 
+import io.proffitt.coherence.graphics.Camera;
+import io.proffitt.coherence.math.Vector3f;
+
 public class Level {
 	public static final int	CELL_SIZE	= 64;
 	final int				w, h;
@@ -24,6 +27,27 @@ public class Level {
 				cells[a][b].generateModel(adj);
 			}
 		}
+	}
+	public Entity getClosestEntity(Camera c, float hdif) {
+		int cx = (int) (c.getX() / CELL_SIZE);
+		int cy = (int) (c.getZ() / CELL_SIZE);
+		Entity ret = null;
+		float rDist = -1;
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				if (cx + i - 1 > 0 && cx + i - 1 < w && cy + j - 1 > 0 && cy + j - 1 < h) {
+					Entity candidate = cells[cx + i - 1][cy + j - 1].getClosestEntity(c, hdif);
+					if (candidate != null) {
+						float cDist = c.getPointAsViewed(candidate.getTransfrom().getPosition()).getProjectionOnto(new Vector3f(0, 0, -1)).getLength();
+						if (cDist > 0 && (ret == null || cDist < rDist)) {
+							ret = candidate;
+							rDist = cDist;
+						}
+					}
+				}
+			}
+		}
+		return ret;
 	}
 	public void boundEntity(Entity e) {
 		if (e.getTransfrom().getPosition().x < 0) {

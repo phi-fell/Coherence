@@ -2,7 +2,7 @@ package io.proffitt.coherence.graphics;
 
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.math.Matrix4f;
-import io.proffitt.coherence.math.Vector4f;
+import io.proffitt.coherence.math.Vector3f;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.settings.Value;
 import io.proffitt.coherence.settings.ValueOwner;
@@ -132,8 +132,14 @@ public class Camera implements SettingsListener {
 	public Camera rotate(float mAX, float mAY, float mAZ) {
 		return this.setRot(aX + mAX, aY + mAY, aZ + mAZ);
 	}
-	public Vector4f getMoveVector(float forward, float right) {
-		return new Vector4f((float) ((forward * Math.sin(aY)) + (right * Math.cos(-aY))), 0, (float) ((forward * Math.cos(aY)) + (right * Math.sin(-aY))), 1);
+	public Vector3f getMoveVector(float forward, float right) {
+		return new Vector3f((float) ((forward * Math.sin(aY)) + (right * Math.cos(-aY))), 0, (float) ((forward * Math.cos(aY)) + (right * Math.sin(-aY))));
+	}
+	public Vector3f getPointAsViewed(Vector3f v){
+		return getViewMatrix().TransformPoint(v);
+	}
+	public Vector3f getTransformedPoint(Vector3f v){
+		return getProjectionMatrix().multiply(getViewMatrix()).TransformPoint(v);
 	}
 	public float getFOV() {
 		return fov;

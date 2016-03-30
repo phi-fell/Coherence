@@ -5,9 +5,10 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import java.util.ArrayList;
 
 import io.proffitt.coherence.ai.PlayerAI;
+import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.math.Matrix4f;
-import io.proffitt.coherence.math.Vector4f;
+import io.proffitt.coherence.math.Vector3f;
 import io.proffitt.coherence.resource.ResourceHandler;
 
 public class Cell {
@@ -32,6 +33,19 @@ public class Cell {
 			}
 		}
 		model = null;
+	}
+	public Entity getClosestEntity(Camera c, float hdif) {
+		Entity ret = null;
+		float rDist = -1;
+		for (Entity candidate : entities) {
+			float cDist = c.getPointAsViewed(candidate.getTransfrom().getPosition()).getProjectionOnto(new Vector3f(0, 0, -1)).getLength();
+			float cDif = c.getPointAsViewed(candidate.getTransfrom().getPosition()).getRejectionRatioFrom(new Vector3f(0,0,-1));
+			if (cDif < hdif && cDist > 0 && (rDist < 0 || cDist < rDist)) {
+				ret = candidate;
+				rDist = cDist;
+			}
+		}
+		return ret;
 	}
 	public void update(double delta, int x, int y, Cell[][] adj) {
 		ArrayList<Entity> leftCell = new ArrayList<Entity>();
@@ -129,9 +143,9 @@ public class Cell {
 			e.draw();
 		}
 	}
-	private float getStitchingHeight(int x, int y, Cell[][] adj) {
+	private float getStitchingHeight(int x, int z, Cell[][] adj) {
 		int cx = 1;
-		int cy = 1;
+		int cz = 1;
 		if (x < 0) {
 			x += SIZE;
 			cx--;
@@ -139,38 +153,37 @@ public class Cell {
 			x -= SIZE;
 			cx++;
 		}
-		if (y < 0) {
-			y += SIZE;
-			cy--;
-		} else if (y >= SIZE) {
-			y -= SIZE;
-			cy++;
+		if (z < 0) {
+			z += SIZE;
+			cz--;
+		} else if (z >= SIZE) {
+			z -= SIZE;
+			cz++;
 		}
-		if (adj[cx][cy] == null) {
+		if (adj[cx][cz] == null) {
 			x += (cx - 1) * SIZE;
-			y += (cy - 1) * SIZE;
+			z += (cz - 1) * SIZE;
 			x = x < 0 ? 0 : x;
 			x = x < SIZE ? x : SIZE - 1;
-			y = y < 0 ? 0 : y;
-			y = y < SIZE ? y : SIZE - 1;
-			return height[x][y];
+			z = z < 0 ? 0 : z;
+			z = z < SIZE ? z : SIZE - 1;
+			return height[x][z];
 		}
-		return adj[cx][cy].height[x][y];
+		return adj[cx][cz].height[x][z];
 	}
-	private Vector4f pos(int x, int y, Cell[][] adj) {
-		return new Vector4f(x, getStitchingHeight(x, y, adj), y, 1);
+	private Vector3f pos(int x, int z, Cell[][] adj) {
+		return new Vector3f(x, getStitchingHeight(x, z, adj), z);
 	}
 	private float[] getVerts(Cell[][] adj) {
 		float[] verts = new float[(SIZE) * (SIZE) * 36];
-		Vector4f[][] norm = new Vector4f[SIZE + 1][SIZE + 1];
+		Vector3f[][] norm = new Vector3f[SIZE + 1][SIZE + 1];
 		for (int i = 0; i <= SIZE; i++) {
 			for (int j = 0; j <= SIZE; j++) {
-				norm[i][j] = new Vector4f(0, 0, 0, 0);
+				norm[i][j] = new Vector3f(0, 0, 0);
 				norm[i][j] = norm[i][j].plus(pos(i, j, adj).minus(pos(i, j - 1, adj)).cross(pos(i, j, adj).minus(pos(i - 1, j, adj))));
 				norm[i][j] = norm[i][j].plus(pos(i, j, adj).minus(pos(i + 1, j, adj)).cross(pos(i, j, adj).minus(pos(i, j - 1, adj))));
 				norm[i][j] = norm[i][j].plus(pos(i, j, adj).minus(pos(i - 1, j, adj)).cross(pos(i, j, adj).minus(pos(i, j + 1, adj))));
 				norm[i][j] = norm[i][j].plus(pos(i, j, adj).minus(pos(i, j + 1, adj)).cross(pos(i, j, adj).minus(pos(i + 1, j, adj))));
-				norm[i][j].w = 0;
 				norm[i][j].normalize();
 			}
 		}

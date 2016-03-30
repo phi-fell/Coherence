@@ -20,8 +20,8 @@ public class AABB {
 		rz = aabb.rz * t.getScale().z;
 	}
 	public AABB(float[] verts) {//assumes format of {x1,y1,z1,nx1,ny1,nz1,...,xn,yn,zn,nxn,nyn,nzn}
-		Vector4f min = new Vector4f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, 0);
-		Vector4f max = new Vector4f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, 0);
+		Vector3f min = new Vector3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
+		Vector3f max = new Vector3f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
 		for (int i = 0; i < verts.length; i += 6) {
 			min.x = Math.min(min.x, verts[i]);
 			min.y = Math.min(min.y, verts[i + 1]);
@@ -30,8 +30,8 @@ public class AABB {
 			max.y = Math.max(max.y, verts[i + 1]);
 			max.z = Math.max(max.z, verts[i + 2]);
 		}
-		Vector4f dim = max.minus(min).times(0.5f);
-		Vector4f center = min.plus(dim);
+		Vector3f dim = max.minus(min).times(0.5f);
+		Vector3f center = min.plus(dim);
 		rx = dim.x;
 		ry = dim.y;
 		rz = dim.z;

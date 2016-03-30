@@ -2,7 +2,7 @@ package io.proffitt.coherence.ai;
 
 import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.graphics.Window;
-import io.proffitt.coherence.math.Vector4f;
+import io.proffitt.coherence.math.Vector3f;
 import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.settings.Configuration;
 
@@ -14,9 +14,9 @@ public class PlayerAI implements EntityAI {
 		c = cam;
 	}
 	@Override
-	public Vector4f getMoveVector(double dt) {
+	public Vector3f getMoveVector(double dt) {
 		if (ResourceHandler.get().getConfig("globals").get("console").getBool()) {
-			return new Vector4f();
+			return new Vector3f();
 		} else {
 			boolean forward = false;
 			boolean backward = false;
@@ -40,7 +40,7 @@ public class PlayerAI implements EntityAI {
 			}
 			int zMod = (forward == backward) ? 0 : (forward ? -1 : 1);
 			int xMod = (left == right) ? 0 : (left ? -1 : 1);
-			Vector4f ret = c.getMoveVector(zMod * speed, xMod * speed).plus(new Vector4f(0, jumping ? 1 : 0, 0, 1));
+			Vector3f ret = c.getMoveVector(zMod * speed, xMod * speed).plus(new Vector3f(0, jumping ? 1 : 0, 0));
 			//c.translate(ret.x, ret.y, ret.z);
 			return ret;
 		}

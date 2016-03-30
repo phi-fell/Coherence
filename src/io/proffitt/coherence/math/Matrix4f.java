@@ -5,7 +5,7 @@ import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 
 public class Matrix4f {
-	private float[][]	m	= new float[4][4];
+	private float[][] m = new float[4][4];
 	public boolean equals(Matrix4f rhs) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -48,6 +48,17 @@ public class Matrix4f {
 			}
 		}
 		return ret;
+	}
+	public Vector3f TransformPoint(Vector3f v) {
+		return transform(v.x, v.y, v.z, 1);
+	}
+	public Vector3f TransformVector(Vector3f v) {
+		return transform(v.x, v.y, v.z, 0);
+	}
+	private Vector3f transform(float x, float y, float z, float w) {
+		float nw = (m[0][3] * x) + (m[1][3] * y) + (m[2][3] * z) + (m[3][3] * w);
+		return new Vector3f(((m[0][0] * x) + (m[1][0] * y) + (m[2][0] * z) + (m[3][0] * w)) / nw, ((m[0][1] * x) + (m[1][1] * y) + (m[2][1] * z) + (m[3][1] * w)) / nw,
+				((m[0][2] * x) + (m[1][2] * y) + (m[2][2] * z) + (m[3][2] * w)) / nw);
 	}
 	public String toString() {
 		String ret = "";

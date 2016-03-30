@@ -9,6 +9,7 @@ import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.gui.*;
 import io.proffitt.coherence.items.Item;
+import io.proffitt.coherence.math.Vector3f;
 import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
@@ -164,7 +165,8 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	@Override
 	public void run() {
 		w.create();
-		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWCharCallback(this::handleTextInput), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos), GLFWMouseButtonCallback(this::handleMouseClick));
+		w.setCallbacks(GLFWKeyCallback(this::handleKeyPress), GLFWCharCallback(this::handleTextInput), GLFWScrollCallback(this::handleMouseScroll), GLFWCursorPosCallback(this::handleMousePos),
+				GLFWMouseButtonCallback(this::handleMouseClick));
 		globals.nullGet("cursor").setString("disabled");
 		glfwSetCursorPos(w.getID(), w.getWidth() / 2f, w.getHeight() / 2f);
 		mx = w.getWidth() / 2f;
@@ -177,6 +179,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		Level level = new Level(10, 10);
 		Entity penny = new Item("gold");
+		penny.name = "penny";//DELME
 		penny.getTransfrom().getPosition().y--;
 		penny.getTransfrom().getPosition().z += 1;
 		penny.getTransfrom().getPosition().x += 1;
@@ -185,7 +188,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		globals.register(player.getInventory());
 		perspectiveCam.lockTo(player);
 		level.addEntity(player);
-		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setNearPlane(0.01f).setFarPlane(1000f).setRot(-0.2f, (float) (Math.PI * 1.25), 0);
+		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setNearPlane(0.1f).setFarPlane(1000f).setRot(-0.2f, (float) (Math.PI * 1.25), 0);
 		globals.nullGet("FOV").setFloat(65);
 		orthoCam.setOrtho().setWidth(w.getWidth()).setHeight(w.getHeight());
 		MenuComponent HUD = new Menu(null, 0, 0, 0, 0);
@@ -241,6 +244,10 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			}
 			// update
 			level.update(delta);
+			//		 |
+			//DELME: V
+			Entity lookAt = level.getClosestEntity(perspectiveCam, 0.1f);
+			System.out.println(lookAt == null ? "No entity there." : lookAt.name);
 			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("terrain").bind();
