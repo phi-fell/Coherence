@@ -30,6 +30,7 @@ public class Command {
 	public boolean execute(Configuration[] c) {
 		try {
 			if (e == null) {
+				//TODO: if a command without args (e.g. 'bind' or 'list' is entered. display usage of that command (i.e. print 'usage: bind <key> <action>')
 				if (com.toLowerCase().startsWith("bind ")) {
 					String remainder = com.substring("bind ".length()).trim();
 					int spaceIndex = remainder.indexOf(' ');

@@ -2,6 +2,7 @@ package io.proffitt.coherence.settings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import io.proffitt.coherence.resource.CMLFile;
 import io.proffitt.coherence.resource.CMLObject;
@@ -68,5 +69,8 @@ public class Configuration implements ValueOwner {
 			ret += k + ": " + settings.get(k).toString();
 		}
 		return ret;
+	}
+	public Set<String> getKeys() {
+		return settings.keySet();
 	}
 }

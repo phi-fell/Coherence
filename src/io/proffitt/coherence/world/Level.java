@@ -6,8 +6,10 @@ import io.proffitt.coherence.math.Vector3f;
 public class Level {
 	public static final int	CELL_SIZE	= 64;
 	final int				w, h;
+	private World			parentWorld;
 	private Cell[][]		cells;
-	public Level(int x, int y) {
+	public Level(World wo, int x, int y) {
+		parentWorld = wo;
 		w = x;
 		h = y;
 		cells = new Cell[w][h];
@@ -28,6 +30,9 @@ public class Level {
 			}
 		}
 	}
+	public World getWorld() {
+		return parentWorld;
+	}
 	public Entity getClosestEntity(Camera c, float hdif) {
 		int cx = (int) (c.getX() / CELL_SIZE);
 		int cy = (int) (c.getZ() / CELL_SIZE);
@@ -35,11 +40,11 @@ public class Level {
 		float rDist = -1;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				if (cx + i - 1 > 0 && cx + i - 1 < w && cy + j - 1 > 0 && cy + j - 1 < h) {
+				if (cx + i - 1 >= 0 && cx + i - 1 < w && cy + j - 1 >= 0 && cy + j - 1 < h) {
 					Entity candidate = cells[cx + i - 1][cy + j - 1].getClosestEntity(c, hdif);
 					if (candidate != null) {
 						float cDist = c.getPointAsViewed(candidate.getTransfrom().getPosition()).getProjectionOnto(new Vector3f(0, 0, -1)).getLength();
-						if (cDist > 0 && (ret == null || cDist < rDist)) {
+						if (ret == null || cDist < rDist) {
 							ret = candidate;
 							rDist = cDist;
 						}
@@ -77,6 +82,13 @@ public class Level {
 	}
 	public void addEntity(Entity e) {
 		cells[(int) (e.getTransfrom().getPosition().x / CELL_SIZE)][(int) (e.getTransfrom().getPosition().z / CELL_SIZE)].addEntity(e);
+	}
+	public void removeEntity(Entity e) {
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < h; j++) {
+				cells[i][j].removeEntity(e);
+			}
+		}
 	}
 	public void update(double delta) {
 		for (int a = 0; a < w; a++) {

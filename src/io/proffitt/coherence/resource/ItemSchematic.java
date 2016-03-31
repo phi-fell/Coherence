@@ -15,6 +15,9 @@ public class ItemSchematic {
 		name = c.getObj("name").getValue().getString();
 		maxStackSize = c.getObj("stack").getValue().getInt();
 	}
+	public String getName(){
+		return ID;
+	}
 	public Model getModel() {
 		return model;
 	}

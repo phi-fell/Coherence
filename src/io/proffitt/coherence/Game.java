@@ -6,6 +6,7 @@ import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
 import io.proffitt.coherence.ai.PlayerAI;
 import io.proffitt.coherence.graphics.Camera;
+import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.gui.*;
 import io.proffitt.coherence.items.Item;
@@ -17,6 +18,7 @@ import io.proffitt.coherence.settings.Value;
 import io.proffitt.coherence.world.Entity;
 import io.proffitt.coherence.world.Level;
 import io.proffitt.coherence.world.Mob;
+import io.proffitt.coherence.world.World;
 
 public class Game implements Runnable, SettingsListener, MenuParent {
 	Thread			t;
@@ -27,6 +29,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	Camera			perspectiveCam	= new Camera();
 	Camera			orthoCam		= new Camera();
 	Mob				player			= null;
+	World world;
 	public Game(Window wind) {
 		globals = ResourceHandler.get().getConfig("globals");
 		globals.nullGet("console").setBool(false);
@@ -71,7 +74,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	public void handleKeyPress(long window, int key, int scancode, int action, int mods) {
 		if (action == GLFW_PRESS) {
 			//logging
-			if (globals.nullGet("LOG_INPUT").getBool()) {
+			if (globals.nullGet("log_input").getBool()) {
 				System.out.println("Key " + key + " pressed.");
 			}
 			//hardcoded behavior
@@ -117,6 +120,14 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 							console.executeCommand(boundEvent.substring(1));
 						} else {
 							//various other behaviors
+							if (boundEvent.equals("PICKUP")) {
+								Entity lookAt = world.getLevel().getClosestEntity(perspectiveCam, 1f);
+								if (lookAt != null && lookAt instanceof Item) {
+									player.getInventory().addItem((Item) lookAt);
+									lookAt.getCell().removeEntity(lookAt);
+									//TODO: remove item from level
+								}
+							}
 							//TODO: move keyboard checking out of PlayerAI, and make functions such as PlayerAI.jump() or
 							//maybe PlayerAI.performAction("JUMP") or something, so it doesn't reference keyboard input directly.
 						}
@@ -124,7 +135,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 				}
 			}
 		} else if (action == GLFW_RELEASE) {
-			if (globals.nullGet("LOG_INPUT").getBool()) {
+			if (globals.nullGet("log_input").getBool()) {
 				System.out.println("Key " + key + " released.");
 			}
 		}
@@ -177,17 +188,19 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		Level level = new Level(10, 10);
-		Entity penny = new Item("gold");
-		penny.name = "penny";//DELME
-		penny.getTransfrom().getPosition().y--;
-		penny.getTransfrom().getPosition().z += 1;
-		penny.getTransfrom().getPosition().x += 1;
-		level.addEntity(penny);
+		world = new World();
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				Item penny = new Item("gold");
+				penny.getTransfrom().getPosition().z += 1 + (i * 4.6);
+				penny.getTransfrom().getPosition().x += 1 + (j * 4.6);
+				world.getLevel().addEntity(penny);
+			}
+		}
 		player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
 		globals.register(player.getInventory());
 		perspectiveCam.lockTo(player);
-		level.addEntity(player);
+		world.getLevel().addEntity(player);
 		perspectiveCam.setPos(0, 0, 4).setPerspective().setWidth(w.getWidth()).setHeight(w.getHeight()).setNearPlane(0.1f).setFarPlane(1000f).setRot(-0.2f, (float) (Math.PI * 1.25), 0);
 		globals.nullGet("FOV").setFloat(65);
 		orthoCam.setOrtho().setWidth(w.getWidth()).setHeight(w.getHeight());
@@ -197,13 +210,13 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "$FPS", 40, 20));
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "VSYNC:", 5, 35));
 		HUD.addComponent(new TextComponent(ResourceHandler.get().getFont("Courier New,12"), "$VSYNC", 54, 35));
+		HUD.addComponent(new ImageComponent(ResourceHandler.get().getTexture("crosshair").getAsImage(), w.getWidth() / 2 - ResourceHandler.get().getTexture("crosshair").width / 2,
+				w.getHeight() / 2 - ResourceHandler.get().getTexture("crosshair").height / 2));
 		HUD.setParent(this);
 		int er = GL_NO_ERROR;
 		while ((er = glGetError()) != GL_NO_ERROR) {
 			System.out.println("OpenGL Error in initialization: " + Integer.toHexString(er));
 		}
-		globals.nullGet("calcHDR").setBool(false);
-		globals.nullGet("HDRMax").setDouble(1);
 		// time stuff, no more init after this
 		long lastTime = System.nanoTime();
 		long sinceFPS = lastTime;
@@ -227,47 +240,41 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			// Start of gameloop
 			// handleinput
 			if (!globals.get("console").getBool()) {
-				if (w.isKeyDown(GLFW_KEY_O)) {
-					globals.get("FOV").Subtract(new Value(1));
-					perspectiveCam.setFOV(globals.get("FOV").getFloat());
-				}
-				if (w.isKeyDown(GLFW_KEY_L)) {
-					globals.get("FOV").Add(new Value(1));
-					perspectiveCam.setFOV(globals.get("FOV").getFloat());
-				}
 				if (w.isKeyDown(GLFW_KEY_M)) {
-					level.setHeight(perspectiveCam.getX(), perspectiveCam.getZ(), level.getHeight(perspectiveCam.getX(), perspectiveCam.getZ()) + 0.1f);
+					world.getLevel().setHeight(perspectiveCam.getX(), perspectiveCam.getZ(), world.getLevel().getHeight(perspectiveCam.getX(), perspectiveCam.getZ()) + 0.1f);
 				}
 				if (w.isKeyDown(GLFW_KEY_N)) {
-					level.setHeight(perspectiveCam.getX(), perspectiveCam.getZ(), level.getHeight(perspectiveCam.getX(), perspectiveCam.getZ()) - 0.1f);
+					world.getLevel().setHeight(perspectiveCam.getX(), perspectiveCam.getZ(), world.getLevel().getHeight(perspectiveCam.getX(), perspectiveCam.getZ()) - 0.1f);
 				}
 			}
 			// update
-			level.update(delta);
-			//		 |
-			//DELME: V
-			Entity lookAt = level.getClosestEntity(perspectiveCam, 0.1f);
-			System.out.println(lookAt == null ? "No entity there." : lookAt.name);
+			world.update(delta);
 			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("terrain").bind();
 			perspectiveCam.bind();
-			level.draw(); // draw level
+			world.getLevel().draw(); // draw level
 			ResourceHandler.get().getShader("HDRtextured").bind();
 			perspectiveCam.bind();
-			level.drawContents();
+			world.getLevel().drawContents();
 			// render UI
 			if (globals.get("renderUI").getBool()) {
-				glClear(GL_DEPTH_BUFFER_BIT);
-				ResourceHandler.get().getShader("2dOrtho").bind();
-				orthoCam.bind();
-				HUD.draw();
-				if (globals.nullGet("inventory_open").getBool()) {
-					player.getInventory().drawGUI();
-					glClear(GL_DEPTH_BUFFER_BIT);
-					ResourceHandler.get().getShader("3dOrtho").bind();
+				try {
+					glDisable(GL_DEPTH_TEST);
+					ResourceHandler.get().getShader("2dOrtho").bind();
 					orthoCam.bind();
-					player.getInventory().drawContents();
+					HUD.draw();
+					if (globals.nullGet("inventory_open").getBool()) {
+						player.getInventory().drawGUIBG();
+						ResourceHandler.get().getShader("3dOrtho").bind();
+						orthoCam.bind();
+						player.getInventory().drawContents();
+						ResourceHandler.get().getShader("2dOrtho").bind();
+						orthoCam.bind();
+						player.getInventory().drawGUIOverlay();
+					}
+				} finally {
+					glEnable(GL_DEPTH_TEST);
 				}
 			}
 			// render debug console

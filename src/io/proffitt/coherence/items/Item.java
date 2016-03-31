@@ -35,6 +35,7 @@ public class Item extends Entity {
 			inventoryTransform.getPosition().x = x + (Inventory.ITEM_SIZE_PIX / 2);
 			inventoryTransform.getPosition().y = y + (Inventory.ITEM_SIZE_PIX / 2);
 			double t = System.nanoTime() / 1000000000f;
+			t += GUID * 7;
 			inventoryTransform.getRotation().x = (float) (t);
 			inventoryTransform.getRotation().y = (float) (t / 5);
 			inventoryTransform.getRotation().z = (float) (t / 13);

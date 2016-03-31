@@ -39,8 +39,9 @@ public class Cell {
 		float rDist = -1;
 		for (Entity candidate : entities) {
 			float cDist = c.getPointAsViewed(candidate.getTransfrom().getPosition()).getProjectionOnto(new Vector3f(0, 0, -1)).getLength();
-			float cDif = c.getPointAsViewed(candidate.getTransfrom().getPosition()).getRejectionRatioFrom(new Vector3f(0,0,-1));
-			if (cDif < hdif && cDist > 0 && (rDist < 0 || cDist < rDist)) {
+			float cDif = c.getPointAsViewed(candidate.getTransfrom().getPosition()).getRejectionRatioFrom(new Vector3f(0, 0, -1));
+			float wDif = c.getPointAsViewed(candidate.getTransfrom().getPosition()).getRejectionFrom(new Vector3f(0, 0, -1)).getLength();
+			if (cDist > 0.1 && wDif < candidate.getAABB().getInnerSphereRadius() && cDif < hdif && (ret == null || cDist < rDist)) {
 				ret = candidate;
 				rDist = cDist;
 			}
@@ -109,7 +110,16 @@ public class Cell {
 		}
 	}
 	public void addEntity(Entity e) {
+		e.addToCell(this);
 		entities.add(e);
+	}
+	public void removeEntity(Entity e){
+		for (int i = 0; i < entities.size(); i++){
+			if (entities.get(i).GUID == e.GUID){
+				entities.remove(i).addToCell(null);
+				return;
+			}
+		}
 	}
 	public void setHeight(int x, int z, float h) {
 		height[x][z] = h;

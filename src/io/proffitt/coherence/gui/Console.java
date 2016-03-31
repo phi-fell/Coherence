@@ -65,6 +65,7 @@ public class Console {
 		cleanupText();
 	}
 	public void pushString(String s) {
+		addMessage(s);
 		if (s.equalsIgnoreCase("help") || s.equalsIgnoreCase("?")) {
 			addMessage("---------<HELP>---------");
 			addMessage("You can enter an expression such as");
@@ -83,8 +84,30 @@ public class Console {
 			addMessage("To list variables use \'list globals\'");
 			addMessage("---------</HELP>---------");
 			return;
+		} else if (s.startsWith("list ")){
+			String token = s.substring("list ".length()).trim();
+			if (token.equals("commands")){
+				addMessage("bind, unbind");
+				addMessage("this feature is currently unfinished,");
+				addMessage("so the above list is not dynamic.");
+			} else if (token.equals("globals")){
+				String glob = "";
+				for (String var : ResourceHandler.get().getConfig("globals").getKeys()){
+					glob += var + ", ";
+				}
+				if (glob.endsWith(", ")){
+					glob = glob.substring(0, glob.length() - 2);
+				}
+				addMessage(glob);
+				addMessage("this feature is currently unfinished,");
+				addMessage("so any vars which have been set are listed");
+				addMessage("and unset, but valid, globals are not.");
+			}else {
+				addMessage("Not a valid thing to list!");
+			}
+			
+			return;
 		}
-		addMessage(s);
 		executeCommand(s);
 	}
 	private void executeCommandRaw(String s) {

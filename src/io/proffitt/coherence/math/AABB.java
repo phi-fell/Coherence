@@ -19,10 +19,10 @@ public class AABB {
 		ry = aabb.ry * t.getScale().y;
 		rz = aabb.rz * t.getScale().z;
 	}
-	public AABB(float[] verts) {//assumes format of {x1,y1,z1,nx1,ny1,nz1,...,xn,yn,zn,nxn,nyn,nzn}
+	public AABB(float[] verts, int stride) {//assumes format of {x1,y1,z1,(stride values),...,xn,yn,zn,(stride values)}
 		Vector3f min = new Vector3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
 		Vector3f max = new Vector3f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
-		for (int i = 0; i < verts.length; i += 6) {
+		for (int i = 0; i < verts.length; i += stride) {
 			min.x = Math.min(min.x, verts[i]);
 			min.y = Math.min(min.y, verts[i + 1]);
 			min.z = Math.min(min.z, verts[i + 2]);
@@ -38,5 +38,12 @@ public class AABB {
 		cx = center.x;
 		cy = center.y;
 		cz = center.z;
+	}
+	public double getBoundingSphereRadius() {
+		return Math.sqrt((rx * rx) + (ry * ry) + (rz * rz));
+	}
+	public double getInnerSphereRadius() {
+		double rxy = rx > ry ? rx : ry;
+		return rxy > rz ? rxy : rz;
 	}
 }

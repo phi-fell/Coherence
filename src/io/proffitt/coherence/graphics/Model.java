@@ -26,7 +26,7 @@ public class Model {
 	public Model(float[] v, boolean doUV) {
 		uv = doUV;
 		verts = v;
-		aabb = new AABB(verts);
+		aabb = new AABB(verts, uv ? 8 : 6);
 		vertnum = verts.length / (uv ? 8 : 6);
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts).flip();
