@@ -1,0 +1,4 @@
+name: Rock,
+model: rock,
+texture: rock,
+stack: 1

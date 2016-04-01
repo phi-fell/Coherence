@@ -19,7 +19,7 @@ public class AABB {
 		ry = aabb.ry * t.getScale().y;
 		rz = aabb.rz * t.getScale().z;
 	}
-	public AABB(float[] verts, int stride) {//assumes format of {x1,y1,z1,(stride values),...,xn,yn,zn,(stride values)}
+	public AABB(float[] verts, int stride, boolean autoNormalize) {//assumes format of {x1,y1,z1,(stride values),...,xn,yn,zn,(stride values)}
 		Vector3f min = new Vector3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
 		Vector3f max = new Vector3f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
 		for (int i = 0; i < verts.length; i += stride) {
@@ -38,6 +38,24 @@ public class AABB {
 		cx = center.x;
 		cy = center.y;
 		cz = center.z;
+		if (autoNormalize) {
+			double scale = Math.max(rx, Math.max(ry, rz));
+			//recenter and rescale!
+			for (int i = 0; i < verts.length; i += stride) {
+				verts[i] -= cx;
+				verts[i] /= scale;
+				verts[i + 1] -= cy;
+				verts[i + 1] /= scale;
+				verts[i + 2] -= cz;
+				verts[i + 2] /= scale;
+			}
+			rx /= scale;
+			ry /= scale;
+			rz /= scale;
+			cx = 0;
+			cy = 0;
+			cz = 0;
+		}
 	}
 	public double getBoundingSphereRadius() {
 		return Math.sqrt((rx * rx) + (ry * ry) + (rz * rz));

@@ -20,7 +20,7 @@ public abstract class Entity {
 	public static Entity getEntity(int eID) {
 		return entities.get(eID);
 	}
-	private static Model	defaultModel	= new Model(new float[] { -0.25f, 0, -0.25f, 0, 0, 0, 0.25f, 1.5f, 0.25f, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, false);
+	private static Model	defaultModel	= new Model(new float[] { -0.25f, 0, -0.25f, 0, 0, 0, 0.25f, 1.75f, 0.25f, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, false, false);
 	public final int		GUID;
 	private Cell			parentCell;
 	float					onGround;
@@ -51,7 +51,7 @@ public abstract class Entity {
 		return onGround <= 0;
 	}
 	public void lockToGround(float dH, double delta) {
-		onGround = dH - (float) (model.getAABB().ry * 2);
+		onGround = dH - (float) (model.getAABB().ry);
 		if (onGround > 0) {
 			velocity.y -= 36 * delta;
 		}

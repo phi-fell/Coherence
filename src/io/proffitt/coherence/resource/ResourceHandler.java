@@ -18,7 +18,7 @@ import io.proffitt.coherence.world.Entity;
 import io.proffitt.coherence.world.Level;
 
 public class ResourceHandler {
-	private static ResourceHandler rh;
+	private static ResourceHandler	rh;
 	public static ResourceHandler get() {
 		if (rh == null) {
 			rh = new ResourceHandler();
@@ -208,7 +208,7 @@ public class ResourceHandler {
 				}
 			}
 		}
-		Model m = new Model(verts, true);
+		Model m = new Model(verts, true, true);
 		return m;
 	}
 	private CMLFile loadResourceAsCML(String path) {

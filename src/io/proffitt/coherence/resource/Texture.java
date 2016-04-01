@@ -10,10 +10,11 @@ import java.nio.ByteBuffer;
 import org.lwjgl.BufferUtils;
 
 public class Texture {
-	int					id;
-	public final int	width;
-	public final int	height;
-	Image				img	= null;
+	public static boolean	pennyMode	= false;
+	int						id;
+	public final int		width;
+	public final int		height;
+	Image					img			= null;
 	public Texture(int w, int h) {
 		width = w;
 		height = h;

@@ -188,7 +188,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		world = new World();
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				Item penny = new Item("gold");
+				Item penny = new Item("dagger");
 				penny.getTransfrom().getPosition().z += 1 + (i * 4.6);
 				penny.getTransfrom().getPosition().x += 1 + (j * 4.6);
 				world.getLevel().addEntity(penny);
@@ -257,22 +257,21 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			world.getLevel().drawContents();
 			// render UI
 			if (globals.get("renderUI").getBool()) {
-				try {
-					glDisable(GL_DEPTH_TEST);
+				glClear(GL_DEPTH_BUFFER_BIT);
+				ResourceHandler.get().getShader("2dOrtho").bind();
+				orthoCam.bind();
+				HUD.draw();
+				if (globals.nullGet("inventory_open").getBool()) {
+					glClear(GL_DEPTH_BUFFER_BIT);
+					player.getInventory().drawGUIBG();
+					ResourceHandler.get().getShader("3dOrtho").bind();
+					orthoCam.bind();
+					glClear(GL_DEPTH_BUFFER_BIT);
+					player.getInventory().drawContents();
 					ResourceHandler.get().getShader("2dOrtho").bind();
 					orthoCam.bind();
-					HUD.draw();
-					if (globals.nullGet("inventory_open").getBool()) {
-						player.getInventory().drawGUIBG();
-						ResourceHandler.get().getShader("3dOrtho").bind();
-						orthoCam.bind();
-						player.getInventory().drawContents();
-						ResourceHandler.get().getShader("2dOrtho").bind();
-						orthoCam.bind();
-						player.getInventory().drawGUIOverlay();
-					}
-				} finally {
-					glEnable(GL_DEPTH_TEST);
+					glClear(GL_DEPTH_BUFFER_BIT);
+					player.getInventory().drawGUIOverlay();
 				}
 			}
 			// render debug console

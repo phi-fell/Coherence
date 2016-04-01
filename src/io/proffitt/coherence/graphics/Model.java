@@ -11,6 +11,8 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import io.proffitt.coherence.math.AABB;
+import io.proffitt.coherence.resource.ResourceHandler;
+import io.proffitt.coherence.resource.Texture;
 
 import java.nio.FloatBuffer;
 
@@ -23,10 +25,10 @@ public class Model {
 	private float[]	verts;
 	private AABB	aabb;
 	private boolean	uv;
-	public Model(float[] v, boolean doUV) {
+	public Model(float[] v, boolean doUV, boolean autoNormalize) {
 		uv = doUV;
 		verts = v;
-		aabb = new AABB(verts, uv ? 8 : 6);
+		aabb = new AABB(verts, uv ? 8 : 6, autoNormalize);
 		vertnum = verts.length / (uv ? 8 : 6);
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts).flip();
@@ -55,6 +57,9 @@ public class Model {
 		vertnum = 0;
 	}
 	public void render() {
+		if (Texture.pennyMode) {
+			ResourceHandler.get().getTexture("penny").bind();
+		}
 		glBindVertexArray(VAO);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);

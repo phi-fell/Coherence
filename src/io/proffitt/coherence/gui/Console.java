@@ -6,6 +6,7 @@ import io.proffitt.coherence.command.Command;
 import io.proffitt.coherence.graphics.Text;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.resource.ResourceHandler;
+import io.proffitt.coherence.resource.Texture;
 import io.proffitt.coherence.settings.Configuration;
 
 public class Console {
@@ -106,6 +107,8 @@ public class Console {
 				addMessage("Not a valid thing to list!");
 			}
 			return;
+		} else if (s.equals("PENNYPENNYPENNY")){
+			Texture.pennyMode = !Texture.pennyMode;
 		}
 		executeCommand(s);
 	}

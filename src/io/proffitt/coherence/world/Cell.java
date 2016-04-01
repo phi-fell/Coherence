@@ -163,7 +163,7 @@ public class Cell {
 		if (model != null) {
 			model.destroy();
 		}
-		model = new Model(getVerts(parentLevel.cellz.getAdjacent(this)), false);
+		model = new Model(getVerts(parentLevel.cellz.getAdjacent(this)), false, false);
 	}
 	public void draw() {
 		if (!modelValid()) {
