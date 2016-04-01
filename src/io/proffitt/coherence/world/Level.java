@@ -1,7 +1,5 @@
 package io.proffitt.coherence.world;
 
-import java.util.ArrayList;
-
 import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.math.Vector3f;
 

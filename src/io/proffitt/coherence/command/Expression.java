@@ -1,7 +1,5 @@
 package io.proffitt.coherence.command;
 
-import java.util.ArrayList;
-
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.Value;
 

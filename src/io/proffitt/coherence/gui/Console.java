@@ -84,28 +84,27 @@ public class Console {
 			addMessage("To list variables use \'list globals\'");
 			addMessage("---------</HELP>---------");
 			return;
-		} else if (s.startsWith("list ")){
+		} else if (s.startsWith("list ")) {
 			String token = s.substring("list ".length()).trim();
-			if (token.equals("commands")){
+			if (token.equals("commands")) {
 				addMessage("bind, unbind");
 				addMessage("this feature is currently unfinished,");
 				addMessage("so the above list is not dynamic.");
-			} else if (token.equals("globals")){
+			} else if (token.equals("globals")) {
 				String glob = "";
-				for (String var : ResourceHandler.get().getConfig("globals").getKeys()){
+				for (String var : ResourceHandler.get().getConfig("globals").getKeys()) {
 					glob += var + ", ";
 				}
-				if (glob.endsWith(", ")){
+				if (glob.endsWith(", ")) {
 					glob = glob.substring(0, glob.length() - 2);
 				}
 				addMessage(glob);
 				addMessage("this feature is currently unfinished,");
 				addMessage("so any vars which have been set are listed");
 				addMessage("and unset, but valid, globals are not.");
-			}else {
+			} else {
 				addMessage("Not a valid thing to list!");
 			}
-			
 			return;
 		}
 		executeCommand(s);
@@ -113,7 +112,6 @@ public class Console {
 	private void executeCommandRaw(String s) {
 		Command c = new Command(s);
 		if (!c.execute(new Configuration[] { ResourceHandler.get().getConfig("globals"), ResourceHandler.get().getConfig("settings") })) {
-			String lower = s.toLowerCase();
 			addMessage("Invalid command: " + c.getErrorString());
 		}
 	}

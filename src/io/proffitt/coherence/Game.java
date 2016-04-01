@@ -6,17 +6,14 @@ import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 
 import io.proffitt.coherence.ai.PlayerAI;
 import io.proffitt.coherence.graphics.Camera;
-import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.graphics.Window;
 import io.proffitt.coherence.gui.*;
 import io.proffitt.coherence.items.Item;
-import io.proffitt.coherence.math.Vector3f;
 import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.settings.Value;
 import io.proffitt.coherence.world.Entity;
-import io.proffitt.coherence.world.Level;
 import io.proffitt.coherence.world.Mob;
 import io.proffitt.coherence.world.World;
 

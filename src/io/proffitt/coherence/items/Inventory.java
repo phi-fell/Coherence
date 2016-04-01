@@ -2,7 +2,6 @@ package io.proffitt.coherence.items;
 
 import io.proffitt.coherence.graphics.Text;
 import io.proffitt.coherence.gui.MenuComponent;
-import io.proffitt.coherence.gui.TextComponent;
 import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.settings.Value;
