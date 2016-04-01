@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -12,6 +13,9 @@ import javax.imageio.ImageIO;
 
 import io.proffitt.coherence.graphics.Model;
 import io.proffitt.coherence.settings.Configuration;
+import io.proffitt.coherence.world.Cell;
+import io.proffitt.coherence.world.Entity;
+import io.proffitt.coherence.world.Level;
 
 public class ResourceHandler {
 	private static ResourceHandler rh;
@@ -237,5 +241,25 @@ public class ResourceHandler {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	public Cell loadCell(Level l, int x, int y) {
+		//TODO: implement cell loading (for previously existing cells)
+		//TODO: implement actual cell generation algorithm for nonexistent cells (i.e. not simple trig functions)
+		int SIZE = Level.CELL_SIZE;
+		float[][] height = new float[SIZE][SIZE];
+		for (int i = 0; i < SIZE; i++) {
+			for (int j = 0; j < SIZE; j++) {
+				//height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
+				height[i][j] = -1.5f;
+				height[i][j] += (Math.random() - 0.5f) * 0.2;
+				height[i][j] += Math.sin(((x * SIZE) + i) * 0.07);
+				height[i][j] += Math.cos(((y * SIZE) + j) * 0.04);
+				height[i][j] += 3 * Math.sin((((x * SIZE) + i) + ((y * SIZE) + j)) * 0.03);
+			}
+		}
+		return new Cell(l, x, y, SIZE, height, new ArrayList<Entity>());
+	}
+	public static void saveCell(Cell cell) {
+		//TODO: implement cell saving
 	}
 }

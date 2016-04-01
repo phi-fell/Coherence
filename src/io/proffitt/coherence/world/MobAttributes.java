@@ -61,7 +61,7 @@ public class MobAttributes {
 	//**************************************************
 	public static final int	DEITY_NUM						= 24;
 	public static final int	DEITY_DEFAULT_VALUE				= 0;
-	//TODO: add deities origination from beyond Sek'Drelen. besides wanderer (whose origin should remain ambiguous)?
+	//TODO: add deities origination from beyond world created by DEITY_ARCHITECT, besides wanderer (whose origin should remain ambiguous)?
 	//Dark gods
 	public static final int	DEITY_FIRST						= 0;
 	public static final int	DEITY_ARCHITECT					= 0;

@@ -6,7 +6,7 @@ public class World {
 	private HashMap<String, Level> levels;
 	public World() {
 		levels = new HashMap<String, Level>();
-		levels.put("overworld", new Level(this, 10, 10));
+		levels.put("overworld", new Level(this, 0, 0));
 	}
 	public Level getLevel() {
 		return levels.get("overworld");

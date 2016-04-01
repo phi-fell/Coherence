@@ -7,8 +7,9 @@ import io.proffitt.coherence.math.Vector3f;
 import io.proffitt.coherence.resource.Texture;
 
 public class Mob extends Entity {
-	EntityAI ai;
-	Inventory inv;
+	EntityAI		ai;
+	MobAttributes	attributes;
+	Inventory		inv;
 	public Mob(Model m, Texture t, EntityAI eAI) {
 		super(m, t);
 		ai = eAI;

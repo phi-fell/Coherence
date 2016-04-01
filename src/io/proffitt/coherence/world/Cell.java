@@ -14,24 +14,17 @@ import io.proffitt.coherence.resource.ResourceHandler;
 public class Cell {
 	public final int	SIZE;
 	Level				parentLevel;
+	int					levelX, levelY;
 	float[][]			height;
 	Model				model;
 	ArrayList<Entity>	entities;
-	public Cell(Level l, int x, int y, int size) {
+	public Cell(Level l, int x, int y, int size, float[][] hData, ArrayList<Entity> e) {
 		parentLevel = l;
+		levelX = x;
+		levelY = y;
 		SIZE = size;
-		height = new float[SIZE][SIZE];
-		entities = new ArrayList<Entity>();
-		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0; j < SIZE; j++) {
-				//height[i][j] = (float) ((((i - (SIZE / 2)) * (i - (SIZE / 2))) + ((j - (SIZE / 2)) * (j - (SIZE / 2)))) / ((SIZE * SIZE) / 16.0) - 8);
-				height[i][j] = -1.5f;
-				height[i][j] += (Math.random() - 0.5f) * 0.2;
-				height[i][j] += Math.sin(((x * SIZE) + i) * 0.07);
-				height[i][j] += Math.cos(((y * SIZE) + j) * 0.04);
-				height[i][j] += 3 * Math.sin((((x * SIZE) + i) + ((y * SIZE) + j)) * 0.03);
-			}
-		}
+		height = hData;
+		entities = e;
 		model = null;
 	}
 	public Entity getClosestEntity(Camera c, float hdif) {
@@ -48,74 +41,106 @@ public class Cell {
 		}
 		return ret;
 	}
-	public void update(double delta, int x, int y, Cell[][] adj) {
-		ArrayList<Entity> leftCell = new ArrayList<Entity>();
+	public void update(double delta) {
+		Cell[][] adj = parentLevel.cellz.getAdjacent(this);
 		for (int eNum = 0; eNum < entities.size(); eNum++) {
 			Entity e = entities.get(eNum);
 			e.update(delta);
 			if (e.getClass().equals(Mob.class) && ((Mob) e).ai.getClass().equals(PlayerAI.class)) {
 				//TODO: anything player specific
 			}
+			//				TODO: no more bounding?
 			//lock within level
-			parentLevel.boundEntity(e);
+			//parentLevel.boundEntity(e);
+			//				end bounding
 			//quick access
-			float eX = e.getTransfrom().getPosition().x - (x * SIZE);
+			float eX = e.getTransfrom().getPosition().x - (levelX * SIZE);
 			float eY = e.getTransfrom().getPosition().y;
-			float eZ = e.getTransfrom().getPosition().z - (y * SIZE);
+			float eZ = e.getTransfrom().getPosition().z - (levelY * SIZE);
 			//check bounds
-			if (eX < 0 || eX >= SIZE || eZ < 0 || eZ >= SIZE) {
-				e.lockCamera();
-				leftCell.add(entities.remove(eNum));
-				eNum--;
-				continue;
-			} else {
-				//gravity
-				float hBL, hBR, hTL, hTR;
-				if (eX > SIZE - 1 || eZ > SIZE - 1) {
-					hBL = height[(int) eX][(int) eZ];
-					hBR = getStitchingHeight((int) eX + 1, (int) eZ, adj);
-					hTL = getStitchingHeight((int) eX, (int) eZ + 1, adj);
-					hTR = getStitchingHeight((int) eX + 1, (int) eZ + 1, adj);
+			if (eX < 0) {
+				if (adj[0][1] != null) {
+					adj[0][1].addEntity(entities.remove(eNum));
+					eNum--;
+					continue;
 				} else {
-					hBL = height[(int) eX][(int) eZ];
-					hBR = height[((int) eX) + 1][(int) eZ];
-					hTL = height[(int) eX][((int) eZ) + 1];
-					hTR = height[((int) eX) + 1][((int) eZ) + 1];
+					e.getTransfrom().getPosition().x -= eX;
+					eX = e.getTransfrom().getPosition().x - (levelX * SIZE);
 				}
-				float aX = eX - ((int) eX);
-				float aZ = eZ - ((int) eZ);
-				float h;
-				if (aX + aZ < 1) {
-					float hDX = hBR - hBL;
-					float hDZ = hTL - hBL;
-					float hX = hBL + (aX * hDX);
-					float dZ = aZ * hDZ;
-					h = hX + dZ;
-				} else {
-					aX = 1 - aX;
-					aZ = 1 - aZ;
-					float hDX = hTL - hTR;
-					float hDZ = hBR - hTR;
-					float hX = hTR + (aX * hDX);
-					float dZ = aZ * hDZ;
-					h = hX + dZ;
-				}
-				float dH = eY - h;
-				e.lockToGround(dH, delta);
-				e.lockCamera();
 			}
-		}
-		for (Entity e : leftCell) {
-			parentLevel.addEntity(e);
+			if (eZ < 0) {
+				if (adj[1][0] != null) {
+					adj[1][0].addEntity(entities.remove(eNum));
+					eNum--;
+					continue;
+				} else {
+					e.getTransfrom().getPosition().z -= eZ;
+					eZ = e.getTransfrom().getPosition().z - (levelY * SIZE);
+				}
+			}
+			if (eX >= SIZE) {
+				if (adj[2][1] != null) {
+					adj[2][1].addEntity(entities.remove(eNum));
+					eNum--;
+					continue;
+				} else {
+					e.getTransfrom().getPosition().x -= ((eX - SIZE) + 0.01f);
+					eX = e.getTransfrom().getPosition().x - (levelX * SIZE);
+				}
+			}
+			if (eZ >= SIZE) {
+				if (adj[1][2] != null) {
+					adj[1][2].addEntity(entities.remove(eNum));
+					eNum--;
+					continue;
+				} else {
+					e.getTransfrom().getPosition().z -= ((eZ - SIZE) + 0.01f);
+					eZ = e.getTransfrom().getPosition().z - (levelY * SIZE);
+				}
+			}
+			//gravity
+			float hBL, hBR, hTL, hTR;
+			if (eX > SIZE - 1 || eZ > SIZE - 1) {
+				hBL = height[(int) eX][(int) eZ];
+				hBR = getStitchingHeight((int) eX + 1, (int) eZ);
+				hTL = getStitchingHeight((int) eX, (int) eZ + 1);
+				hTR = getStitchingHeight((int) eX + 1, (int) eZ + 1);
+			} else {
+				hBL = height[(int) eX][(int) eZ];
+				hBR = height[((int) eX) + 1][(int) eZ];
+				hTL = height[(int) eX][((int) eZ) + 1];
+				hTR = height[((int) eX) + 1][((int) eZ) + 1];
+			}
+			float aX = eX - ((int) eX);
+			float aZ = eZ - ((int) eZ);
+			float h;
+			if (aX + aZ < 1) {
+				float hDX = hBR - hBL;
+				float hDZ = hTL - hBL;
+				float hX = hBL + (aX * hDX);
+				float dZ = aZ * hDZ;
+				h = hX + dZ;
+			} else {
+				aX = 1 - aX;
+				aZ = 1 - aZ;
+				float hDX = hTL - hTR;
+				float hDZ = hBR - hTR;
+				float hX = hTR + (aX * hDX);
+				float dZ = aZ * hDZ;
+				h = hX + dZ;
+			}
+			float dH = eY - h;
+			e.lockToGround(dH, delta);
+			e.lockCamera();
 		}
 	}
 	public void addEntity(Entity e) {
 		e.addToCell(this);
 		entities.add(e);
 	}
-	public void removeEntity(Entity e){
-		for (int i = 0; i < entities.size(); i++){
-			if (entities.get(i).GUID == e.GUID){
+	public void removeEntity(Entity e) {
+		for (int i = 0; i < entities.size(); i++) {
+			if (entities.get(i).GUID == e.GUID) {
 				entities.remove(i).addToCell(null);
 				return;
 			}
@@ -134,26 +159,27 @@ public class Cell {
 	public boolean modelValid() {
 		return model != null;
 	}
-	public void generateModel(Cell[][] adj) {
+	public void generateModel() {
 		if (model != null) {
 			model.destroy();
 		}
-		model = new Model(getVerts(adj), false);
+		model = new Model(getVerts(parentLevel.cellz.getAdjacent(this)), false);
 	}
-	public void draw(float x, float y, float z) {
-		if (model == null) {
-			throw new RuntimeException("draw() failed, Cell Model is obsolete.");
+	public void draw() {
+		if (!modelValid()) {
+			generateModel();
 		}
 		ResourceHandler.get().getTexture("grass").bind();
-		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x, y, z).toFloatBuffer());// model
+		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(levelX * SIZE, 0, levelY * SIZE).toFloatBuffer());// model
 		model.render();
 	}
-	public void drawContents(float x, float y, float z) {
+	public void drawContents() {
 		for (Entity e : entities) {
 			e.draw();
 		}
 	}
-	private float getStitchingHeight(int x, int z, Cell[][] adj) {
+	private float getStitchingHeight(int x, int z) {
+		Cell[][] adj = parentLevel.cellz.getAdjacent(this);
 		int cx = 1;
 		int cz = 1;
 		if (x < 0) {
@@ -182,7 +208,7 @@ public class Cell {
 		return adj[cx][cz].height[x][z];
 	}
 	private Vector3f pos(int x, int z, Cell[][] adj) {
-		return new Vector3f(x, getStitchingHeight(x, z, adj), z);
+		return new Vector3f(x, getStitchingHeight(x, z), z);
 	}
 	private float[] getVerts(Cell[][] adj) {
 		float[] verts = new float[(SIZE) * (SIZE) * 36];

@@ -1,34 +1,21 @@
 package io.proffitt.coherence.world;
 
+import java.util.ArrayList;
+
 import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.math.Vector3f;
 
 public class Level {
-	public static final int	CELL_SIZE	= 64;
-	final int				w, h;
-	private World			parentWorld;
-	private Cell[][]		cells;
-	public Level(World wo, int x, int y) {
+	public static final int	CELL_SIZE		= 64;
+	public static final int	VIEW_DISTANCE	= 1;
+	World					parentWorld;
+	CellMatrix				cellz;
+	public Level(World wo, int cx, int cy) {
 		parentWorld = wo;
-		w = x;
-		h = y;
-		cells = new Cell[w][h];
-		for (int a = 0; a < w; a++) {
-			for (int b = 0; b < h; b++) {
-				cells[a][b] = new Cell(this, a, b, CELL_SIZE);
-			}
-		}
-		for (int a = 0; a < w; a++) {
-			for (int b = 0; b < h; b++) {
-				Cell[][] adj = new Cell[3][3];
-				for (int i = 0; i < 3; i++) {
-					for (int j = 0; j < 3; j++) {
-						adj[i][j] = ((a + (i - 1) >= 0 && a + (i - 1) < w) && (b + (j - 1) >= 0 && b + (j - 1) < h)) ? cells[a + (i - 1)][b + (j - 1)] : null;
-					}
-				}
-				cells[a][b].generateModel(adj);
-			}
-		}
+		cellz = new CellMatrix(this, VIEW_DISTANCE, VIEW_DISTANCE, cx, cy);
+	}
+	public void centerOn(Entity e) {
+		cellz.centerOn(e.getCell().levelX, e.getCell().levelY);
 	}
 	public World getWorld() {
 		return parentWorld;
@@ -40,8 +27,8 @@ public class Level {
 		float rDist = -1;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				if (cx + i - 1 >= 0 && cx + i - 1 < w && cy + j - 1 >= 0 && cy + j - 1 < h) {
-					Entity candidate = cells[cx + i - 1][cy + j - 1].getClosestEntity(c, hdif);
+				if (cellz.getCell(cx + i - 1, cy + j - 1) != null) {
+					Entity candidate = cellz.getCell(cx + i - 1, cy + j - 1).getClosestEntity(c, hdif);
 					if (candidate != null) {
 						float cDist = c.getPointAsViewed(candidate.getTransfrom().getPosition()).getProjectionOnto(new Vector3f(0, 0, -1)).getLength();
 						if (ret == null || cDist < rDist) {
@@ -54,86 +41,25 @@ public class Level {
 		}
 		return ret;
 	}
-	public void boundEntity(Entity e) {
-		if (e.getTransfrom().getPosition().x < 0) {
-			e.getTransfrom().getPosition().x = 0;
-			if (e.getVelocity().x < 0) {
-				e.getVelocity().x = 0;
-			}
-		}
-		if (e.getTransfrom().getPosition().z < 0) {
-			e.getTransfrom().getPosition().z = 0;
-			if (e.getVelocity().z < 0) {
-				e.getVelocity().z = 0;
-			}
-		}
-		if (e.getTransfrom().getPosition().x >= w * CELL_SIZE) {
-			e.getTransfrom().getPosition().x = w * CELL_SIZE - 0.01f;
-			if (e.getVelocity().x > 0) {
-				e.getVelocity().x = 0;
-			}
-		}
-		if (e.getTransfrom().getPosition().z >= h * CELL_SIZE) {
-			e.getTransfrom().getPosition().z = h * CELL_SIZE - 0.01f;
-			if (e.getVelocity().z > 0) {
-				e.getVelocity().z = 0;
-			}
-		}
-	}
 	public void addEntity(Entity e) {
-		cells[(int) (e.getTransfrom().getPosition().x / CELL_SIZE)][(int) (e.getTransfrom().getPosition().z / CELL_SIZE)].addEntity(e);
+		cellz.getCell((int) (e.getTransfrom().getPosition().x / CELL_SIZE), (int) (e.getTransfrom().getPosition().z / CELL_SIZE)).addEntity(e);
 	}
 	public void removeEntity(Entity e) {
-		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < h; j++) {
-				cells[i][j].removeEntity(e);
-			}
-		}
+		cellz.removeEntity(e);
 	}
 	public void update(double delta) {
-		for (int a = 0; a < w; a++) {
-			for (int b = 0; b < h; b++) {
-				Cell[][] adj = new Cell[3][3];
-				for (int i = 0; i < 3; i++) {
-					for (int j = 0; j < 3; j++) {
-						adj[i][j] = ((a + (i - 1) >= 0 && a + (i - 1) < w) && (b + (j - 1) >= 0 && b + (j - 1) < h)) ? cells[a + (i - 1)][b + (j - 1)] : null;
-					}
-				}
-				cells[a][b].update(delta, a, b, adj);//TODO: fix other 3 params
-			}
-		}
+		cellz.update(delta);
 	}
 	public void draw() {
-		for (int a = 0; a < w; a++) {
-			for (int b = 0; b < h; b++) {
-				if (!cells[a][b].modelValid()) {
-					Cell[][] adj = new Cell[3][3];
-					for (int i = 0; i < 3; i++) {
-						for (int j = 0; j < 3; j++) {
-							adj[i][j] = ((a + (i - 1) >= 0 && a + (i - 1) < w) && (b + (j - 1) >= 0 && b + (j - 1) < h)) ? cells[a + (i - 1)][b + (j - 1)] : null;
-						}
-					}
-					cells[a][b].generateModel(adj);
-				}
-				cells[a][b].draw(a * CELL_SIZE, 0, b * CELL_SIZE);
-			}
-		}
+		cellz.draw();
 	}
 	public void drawContents() {
-		for (int a = 0; a < w; a++) {
-			for (int b = 0; b < h; b++) {
-				cells[a][b].drawContents(a * CELL_SIZE, 0, b * CELL_SIZE);
-			}
-		}
+		cellz.drawContents();
 	}
 	public float getHeight(float xf, float zf) {
-		int x = (int) (xf + 0.5f);
-		int z = (int) (zf + 0.5f);
-		return cells[x / CELL_SIZE][z / CELL_SIZE].getHeight(x % CELL_SIZE, z % CELL_SIZE);
+		return cellz.getHeight(xf, zf);
 	}
 	public void setHeight(float xf, float zf, float h) {
-		int x = (int) (xf + 0.5f);
-		int z = (int) (zf + 0.5f);
-		cells[x / CELL_SIZE][z / CELL_SIZE].setHeight(x % CELL_SIZE, z % CELL_SIZE, h);
+		cellz.setHeight(xf, zf, h);
 	}
 }

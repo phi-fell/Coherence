@@ -29,7 +29,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	Camera			perspectiveCam	= new Camera();
 	Camera			orthoCam		= new Camera();
 	Mob				player			= null;
-	World world;
+	World			world;
 	public Game(Window wind) {
 		globals = ResourceHandler.get().getConfig("globals");
 		globals.nullGet("console").setBool(false);
@@ -249,6 +249,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			}
 			// update
 			world.update(delta);
+			world.getLevel().centerOn(player);
 			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ResourceHandler.get().getShader("terrain").bind();
