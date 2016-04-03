@@ -4,6 +4,8 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
 import java.util.ArrayList;
 
+import javax.management.RuntimeErrorException;
+
 import io.proffitt.coherence.ai.PlayerAI;
 import io.proffitt.coherence.graphics.Camera;
 import io.proffitt.coherence.graphics.Model;
@@ -42,7 +44,7 @@ public class Cell {
 		return ret;
 	}
 	public void update(double delta) {
-		Cell[][] adj = parentLevel.cellz.getAdjacent(this);
+		Cell[][] adj = parentLevel.cells.getAdjacent(this);
 		for (int eNum = 0; eNum < entities.size(); eNum++) {
 			Entity e = entities.get(eNum);
 			e.update(delta);
@@ -148,10 +150,35 @@ public class Cell {
 	}
 	public void setHeight(int x, int z, float h) {
 		height[x][z] = h;
-		if (model != null) {
-			model.destroy();
+		invalidateModel();
+		if (x == 0 || x == (SIZE - 1) || z == 0 || z == (SIZE - 1)) {
+			Cell[][] adj = parentLevel.cells.getAdjacent(this);
+			if (x == 0) {
+				adj[0][1].invalidateModel();
+				if (z == 0) {
+					adj[1][0].invalidateModel();
+					adj[0][0].invalidateModel();
+				} else if (z == SIZE - 1) {
+					adj[1][2].invalidateModel();
+					adj[0][2].invalidateModel();
+				}
+			} else if (x == SIZE - 1) {
+				adj[2][1].invalidateModel();
+				if (z == 0) {
+					adj[1][0].invalidateModel();
+					adj[2][0].invalidateModel();
+				} else if (z == SIZE - 1) {
+					adj[1][2].invalidateModel();
+					adj[2][2].invalidateModel();
+				}
+			} else if (z == 0) {
+				adj[1][0].invalidateModel();
+			} else if (z == SIZE - 1) {
+				adj[1][2].invalidateModel();
+			} else {
+				throw new RuntimeException("logic error in Cell.setHeight()");
+			}
 		}
-		model = null;
 	}
 	public float getHeight(int x, int z) {
 		return height[x][z];
@@ -159,11 +186,15 @@ public class Cell {
 	public boolean modelValid() {
 		return model != null;
 	}
-	public void generateModel() {
+	public void invalidateModel() {
 		if (model != null) {
 			model.destroy();
+			model = null;
 		}
-		model = new Model(getVerts(parentLevel.cellz.getAdjacent(this)), false, false);
+	}
+	public void generateModel() {
+		invalidateModel();
+		model = new Model(getVerts(parentLevel.cells.getAdjacent(this)), false, false);
 	}
 	public void draw() {
 		if (!modelValid()) {
@@ -179,7 +210,7 @@ public class Cell {
 		}
 	}
 	private float getStitchingHeight(int x, int z) {
-		Cell[][] adj = parentLevel.cellz.getAdjacent(this);
+		Cell[][] adj = parentLevel.cells.getAdjacent(this);
 		int cx = 1;
 		int cz = 1;
 		if (x < 0) {

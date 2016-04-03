@@ -1,0 +1,7 @@
+name: Small Bag,
+model: smallbag,
+texture: smallbag,
+stack: 1,
+scale: {
+	uniform: 0.2
+}

@@ -92,7 +92,7 @@ public class CMLObject {
 			return ret.toString();
 		}
 	}
-	public String toAnonymousString(){
+	public String toAnonymousString() {
 		if (value != null) {
 			return value.toString();
 		} else {
@@ -109,19 +109,26 @@ public class CMLObject {
 			return ret.toString();
 		}
 	}
-	public String getName(){
+	public String getName() {
 		return id;
 	}
-	public boolean isList(){
+	public boolean isList() {
 		return value == null;
 	}
-	public Value getValue(){
+	public Value getValue() {
 		return value;
 	}
-	public CMLObject getSub(String obj){
+	public CMLObject getSub(String obj) {
+		if (obj.contains(".")) {
+			if (objects.get(obj.substring(0, obj.indexOf('.'))) != null) {
+				return objects.get(obj.substring(0, obj.indexOf('.'))).getSub(obj.substring(obj.indexOf('.') + 1));
+			} else {
+				return null;
+			}
+		}
 		return objects.get(obj);
 	}
-	public Collection<CMLObject> getSubs(){
+	public Collection<CMLObject> getSubs() {
 		return objects.values();
 	}
 }

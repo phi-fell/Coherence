@@ -188,7 +188,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 		world = new World();
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				Item penny = new Item("dagger");
+				Item penny = new Item("smallbag");
 				penny.getTransfrom().getPosition().z += 1 + (i * 4.6);
 				penny.getTransfrom().getPosition().x += 1 + (j * 4.6);
 				world.getLevel().addEntity(penny);

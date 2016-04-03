@@ -77,7 +77,7 @@ public class ResourceHandler {
 		}
 		return properties.get(name);
 	}
-	public CMLFile loadProperty(String name) {
+	private CMLFile loadProperty(String name) {
 		return this.loadResourceAsCML("res/prop/" + name + ".cml");
 	}
 	public ItemSchematic getItem(String name) {
@@ -86,7 +86,7 @@ public class ResourceHandler {
 		}
 		return items.get(name);
 	}
-	public ItemSchematic loadItem(String name) {
+	private ItemSchematic loadItem(String name) {
 		return new ItemSchematic(name, this.loadResourceAsCML("res/item/" + name + ".item"));
 	}
 	public Configuration getConfig(String name) {

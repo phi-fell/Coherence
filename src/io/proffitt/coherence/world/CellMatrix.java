@@ -24,14 +24,23 @@ public class CellMatrix {
 		}
 	}
 	public float getHeight(float xf, float zf) {
-		int x = (int) (xf + 0.5f);
-		int z = (int) (zf + 0.5f);
-		return getCell(x / Level.CELL_SIZE, z / Level.CELL_SIZE).getHeight(x % Level.CELL_SIZE, z % Level.CELL_SIZE);
+		int x = xf < 0 ? (int) (xf - 0.5) : (int) (xf + 0.5);
+		int z = zf < 0 ? (int) (zf - 0.5) : (int) (zf + 0.5);
+		int cx = (x / Level.CELL_SIZE) + (x < 0 ? -1 : 0);
+		int cz = (z / Level.CELL_SIZE) + (z < 0 ? -1 : 0);
+		int vx = (x % Level.CELL_SIZE) + (x < 0 && (x % Level.CELL_SIZE != 0) ? Level.CELL_SIZE : 0);
+		int vz = (z % Level.CELL_SIZE) + (z < 0 && (z % Level.CELL_SIZE != 0) ? Level.CELL_SIZE : 0);
+		return getCell(cx, cz).getHeight(vx, vz);
 	}
 	public void setHeight(float xf, float zf, float h) {
-		int x = (int) (xf + 0.5f);
-		int z = (int) (zf + 0.5f);
-		getCell(x / Level.CELL_SIZE, z / Level.CELL_SIZE).setHeight(x % Level.CELL_SIZE, z % Level.CELL_SIZE, h);
+		int x = xf < 0 ? (int) (xf - 0.5) : (int) (xf + 0.5);
+		int z = zf < 0 ? (int) (zf - 0.5) : (int) (zf + 0.5);
+		int cx = (x / Level.CELL_SIZE) + (x < 0 ? -1 : 0);
+		int cz = (z / Level.CELL_SIZE) + (z < 0 ? -1 : 0);
+		int vx = (x % Level.CELL_SIZE) + (x < 0 && (x % Level.CELL_SIZE != 0) ? Level.CELL_SIZE : 0);
+		int vz = (z % Level.CELL_SIZE) + (z < 0 && (z % Level.CELL_SIZE != 0) ? Level.CELL_SIZE : 0);
+		System.out.println(xf + ", " + zf);
+		getCell(cx, cz).setHeight(vx, vz, h);
 	}
 	public void drawContents() {
 		for (int a = 0; a < width; a++) {
@@ -82,7 +91,8 @@ public class CellMatrix {
 	}
 	public void centerOn(int x, int y) {
 		if (cx == x && cy == y) {
-		} else if ((Math.abs(cx - x) == 1 && cy == y) || (Math.abs(cy - y) == 1 && cx == x)) {
+			//do nothing, obviously
+		} else if (Math.abs(cx - x) <= 1 && Math.abs(cy - y) <= 1) {
 			if (x > cx) {
 				//shift left
 				cx++;
@@ -152,6 +162,9 @@ public class CellMatrix {
 				}
 			}
 		} else {
+			//TODO: ***IMPORANT*** remove player from level set and add after or do something, otherwise this will remove the player's cell from
+			//******************** the level, and either save them to file or do who knows what and hang/crash the game or do who knows what
+			//******************** (currently it just makes movement impossible, since player.update can never be called)
 			for (int i = -rx; i <= rx; i++) {
 				for (int j = -ry; j <= ry; j++) {
 					ResourceHandler.saveCell(cells[i + rx][j + ry]);

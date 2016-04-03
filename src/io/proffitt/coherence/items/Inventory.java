@@ -156,6 +156,8 @@ public class Inventory extends MenuComponent implements SettingsListener {
 		return false;
 	}
 	public void drawGUIBG() {
+		ResourceHandler.get().getTexture("INV_titleBG").getAsImage().draw(X + BORDER_PIX, Y + BORDER_PIX, 0, 0, (width * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX)) - ITEM_BUFFER_PIX, titleText.getBackingImage().getBackingTexture().height);
+		titleText.getBackingImage().draw(X + BORDER_PIX, Y + BORDER_PIX);
 		ResourceHandler.get().getTexture("INV_borderCornerTL").getAsImage().draw(X, Y + TITLE_BUFFER + titleText.getBackingImage().getBackingTexture().height, 0, 0, BORDER_PIX, BORDER_PIX, 1, 1);
 		ResourceHandler.get().getTexture("INV_borderCornerTR").getAsImage().draw(X + (width * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX)) + (BORDER_PIX - ITEM_BUFFER_PIX),
 				Y + TITLE_BUFFER + titleText.getBackingImage().getBackingTexture().height, 0, 0, BORDER_PIX, BORDER_PIX, 1, 1);
@@ -180,7 +182,6 @@ public class Inventory extends MenuComponent implements SettingsListener {
 						Y + (j * (ITEM_SIZE_PIX + ITEM_BUFFER_PIX)) + BORDER_PIX + TITLE_BUFFER + titleText.getBackingImage().getBackingTexture().height, 0, 0, ITEM_SIZE_PIX, ITEM_SIZE_PIX);
 			}
 		}
-		titleText.getBackingImage().draw(X + BORDER_PIX, Y + BORDER_PIX);
 	}
 	public void drawContents() {
 		for (int i = 0; i < width; i++) {

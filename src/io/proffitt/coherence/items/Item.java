@@ -22,6 +22,9 @@ public class Item extends Entity {
 		super(null, null);
 		count = 1;
 		schema = ResourceHandler.get().getItem(id);
+		this.transform.getScale().x = schema.getScaleX();
+		this.transform.getScale().y = schema.getScaleY();
+		this.transform.getScale().z = schema.getScaleZ();
 		model = schema.getModel();
 		tex = schema.getTexture();
 	}

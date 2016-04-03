@@ -51,7 +51,7 @@ public abstract class Entity {
 		return onGround <= 0;
 	}
 	public void lockToGround(float dH, double delta) {
-		onGround = dH - (float) (model.getAABB().ry);
+		onGround = dH - (float) (this.getAABB().ry);
 		if (onGround > 0) {
 			velocity.y -= 36 * delta;
 		}
