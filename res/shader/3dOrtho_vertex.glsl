@@ -5,14 +5,15 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 UV;
 
 layout (location = 3) uniform mat4 model;
-layout (location = 4) uniform mat4 view;
-layout (location = 5) uniform mat4 projection;
+layout (location = 4) uniform mat4 entity;
+layout (location = 5) uniform mat4 view;
+layout (location = 6) uniform mat4 projection;
 
 out vec2 pass_UV;
 
 void main()
 {
 	pass_UV = UV;
-    gl_Position = projection * view * model * vec4(pos, 1.0);
+    gl_Position = projection * view * entity * model * vec4(pos, 1.0);
     gl_Position.z *= 0.0001;
 }

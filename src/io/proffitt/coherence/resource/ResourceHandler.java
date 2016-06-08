@@ -11,11 +11,12 @@ import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
-import io.proffitt.coherence.graphics.Model;
+import io.proffitt.coherence.graphics.Mesh;
 import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.world.Cell;
 import io.proffitt.coherence.world.Entity;
 import io.proffitt.coherence.world.Level;
+import io.proffitt.coherence.world.component.Model;
 
 public class ResourceHandler {
 	private static ResourceHandler	rh;
@@ -31,6 +32,7 @@ public class ResourceHandler {
 	private HashMap<String, Texture>		textures;
 	private HashMap<String, Font>			fonts;
 	private HashMap<String, Shader>			shaders;
+	private HashMap<String, Mesh>			meshes;
 	private HashMap<String, Model>			models;
 	private ResourceHandler() {
 		properties = new HashMap<String, CMLFile>();
@@ -39,6 +41,7 @@ public class ResourceHandler {
 		textures = new HashMap<String, Texture>();
 		fonts = new HashMap<String, Font>();
 		shaders = new HashMap<String, Shader>();
+		meshes = new HashMap<String, Mesh>();
 		models = new HashMap<String, Model>();
 	}
 	/**
@@ -49,26 +52,29 @@ public class ResourceHandler {
 	public void cleanup() {
 		//this.saveConfig("settings");//save settings
 		this.saveConfig("keybindings");//save bound keys
-		for (String s : items.keySet().toArray(new String[0])) {
+		for (String s : items.keySet()) {
 			properties.remove(s);// props don't need cleanup
 		}
-		for (String s : items.keySet().toArray(new String[0])) {//TODO: is there a reason for '.toArray(new String[0])' ???
+		for (String s : items.keySet()) {
 			items.remove(s);// items don't need cleanup
 		}
-		for (String s : configs.keySet().toArray(new String[0])) {
+		for (String s : configs.keySet()) {
 			configs.remove(s);// configs don't need cleanup
 		}
-		for (String s : textures.keySet().toArray(new String[0])) {
+		for (String s : textures.keySet()) {
 			textures.remove(s).destroy();
 		}
-		for (String s : fonts.keySet().toArray(new String[0])) {
+		for (String s : fonts.keySet()) {
 			fonts.remove(s);// fonts don't need cleanup
 		}
-		for (String s : shaders.keySet().toArray(new String[0])) {
+		for (String s : shaders.keySet()) {
 			shaders.remove(s).destroy();
 		}
-		for (String s : models.keySet().toArray(new String[0])) {
-			models.remove(s).destroy();
+		for (String s : meshes.keySet()) {
+			meshes.remove(s).destroy();
+		}
+		for (String s : models.keySet()) {
+			models.remove(s);
 		}
 	}
 	public CMLFile getProperty(String name) {
@@ -133,16 +139,17 @@ public class ResourceHandler {
 		return shaders.get(name);
 	}
 	private Shader loadShader(String name) {
+		System.out.println(name);
 		return new Shader(loadResourceAsString("res/shader/" + name + "_vertex.glsl"), loadResourceAsString("res/shader/" + name + "_fragment.glsl"));
 	}
-	public Model getModel(String name) {
-		if (!models.containsKey(name)) {
-			models.put(name, loadModel(name));
+	public Mesh getMesh(String name) {
+		if (!meshes.containsKey(name)) {
+			meshes.put(name, loadMesh(name));
 		}
-		return models.get(name);
+		return meshes.get(name);
 	}
-	private Model loadModel(String name) {
-		String file = this.loadResourceAsString("res/model/" + name + ".obj");
+	private Mesh loadMesh(String name) {
+		String file = this.loadResourceAsString("res/mesh/" + name + ".obj");
 		String[] lines = file.split("\n");
 		int facenum = 0;
 		int vertnum = 0;
@@ -208,8 +215,17 @@ public class ResourceHandler {
 				}
 			}
 		}
-		Model m = new Model(verts, true, true);
+		Mesh m = new Mesh(verts, true, true);
 		return m;
+	}
+	public Model getModel(String name) {
+		if (!models.containsKey(name)) {
+			models.put(name, loadModel(name));
+		}
+		return models.get(name);
+	}
+	private Model loadModel(String name) {
+		return new Model(this.loadResourceAsCML("res/model/" + name + ".mdl"));
 	}
 	private CMLFile loadResourceAsCML(String path) {
 		return new CMLFile(loadResourceAsString(path));

@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector3f;
+import io.proffitt.coherence.resource.Shader;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.settings.Value;
 import io.proffitt.coherence.world.Entity;
@@ -78,8 +79,8 @@ public class Camera implements SettingsListener {
 		viewGenerated = true;
 	}
 	public void bind() {
-		glUniformMatrix4fv(4, false, getViewMatrix().toFloatBuffer());// view
-		glUniformMatrix4fv(5, false, getProjectionMatrix().toFloatBuffer());// projection
+		Shader.setViewMat(getViewMatrix());
+		Shader.setProjectionMat(getProjectionMatrix());
 	}
 	public Matrix4f getViewMatrix() {
 		if (!viewGenerated) {

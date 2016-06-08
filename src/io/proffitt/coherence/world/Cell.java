@@ -4,11 +4,9 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
 import java.util.ArrayList;
 
-import javax.management.RuntimeErrorException;
-
 import io.proffitt.coherence.ai.PlayerAI;
 import io.proffitt.coherence.graphics.Camera;
-import io.proffitt.coherence.graphics.Model;
+import io.proffitt.coherence.graphics.Mesh;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector3f;
 import io.proffitt.coherence.resource.ResourceHandler;
@@ -18,7 +16,7 @@ public class Cell {
 	Level				parentLevel;
 	int					levelX, levelY;
 	float[][]			height;
-	Model				model;
+	Mesh				mesh;
 	ArrayList<Entity>	entities;
 	public Cell(Level l, int x, int y, int size, float[][] hData, ArrayList<Entity> e) {
 		parentLevel = l;
@@ -27,7 +25,7 @@ public class Cell {
 		SIZE = size;
 		height = hData;
 		entities = e;
-		model = null;
+		mesh = null;
 	}
 	public Entity getClosestEntity(Camera c, float hdif) {
 		Entity ret = null;
@@ -184,17 +182,17 @@ public class Cell {
 		return height[x][z];
 	}
 	public boolean modelValid() {
-		return model != null;
+		return mesh != null;
 	}
 	public void invalidateModel() {
-		if (model != null) {
-			model.destroy();
-			model = null;
+		if (mesh != null) {
+			mesh.destroy();
+			mesh = null;
 		}
 	}
 	public void generateModel() {
 		invalidateModel();
-		model = new Model(getVerts(parentLevel.cells.getAdjacent(this)), false, false);
+		mesh = new Mesh(getVerts(parentLevel.cells.getAdjacent(this)), false, false);
 	}
 	public void draw() {
 		if (!modelValid()) {
@@ -202,7 +200,7 @@ public class Cell {
 		}
 		ResourceHandler.get().getTexture("grass").bind();
 		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(levelX * SIZE, 0, levelY * SIZE).toFloatBuffer());// model
-		model.render();
+		mesh.render();
 	}
 	public void drawContents() {
 		for (Entity e : entities) {

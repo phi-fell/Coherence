@@ -2,14 +2,16 @@ package io.proffitt.coherence.resource;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.GL_RGBA32F;
-import io.proffitt.coherence.graphics.Image;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.BufferUtils;
 
-public class Texture {
+import io.proffitt.coherence.graphics.Image;
+import io.proffitt.coherence.world.component.Component;
+
+public class Texture implements Component {
 	public static boolean	pennyMode	= false;
 	int						id;
 	public final int		width;

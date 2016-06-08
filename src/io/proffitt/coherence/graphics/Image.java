@@ -3,12 +3,13 @@ package io.proffitt.coherence.graphics;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import io.proffitt.coherence.math.Matrix4f;
 import io.proffitt.coherence.math.Vector3f;
+import io.proffitt.coherence.resource.Shader;
 import io.proffitt.coherence.resource.Texture;
 
 public class Image {
 	Texture					tex;
 	static final float[]	imgVerts	= { 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 };
-	static final Model		model		= new Model(imgVerts, false, false);
+	static final Mesh		mesh		= new Mesh(imgVerts, false, false);
 	public Image(Texture t) {
 		tex = t;
 	}
@@ -53,10 +54,11 @@ public class Image {
 	 *            vertical alignment about pos
 	 */
 	public void draw(Vector3f pos, float hOffset, float vOffset) {
-		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(pos.x - (tex.width * hOffset), pos.y - (tex.height * vOffset), pos.z).multiply(Matrix4f.getScale(tex.width, tex.height, 1)).toFloatBuffer());// model
+		glUniformMatrix4fv(3, false,
+				Matrix4f.getTranslation(pos.x - (tex.width * hOffset), pos.y - (tex.height * vOffset), pos.z).multiply(Matrix4f.getScale(tex.width, tex.height, 1)).toFloatBuffer());// model
 		glUniformMatrix4fv(6, false, Matrix4f.getScale(1, 1, 0).toFloatBuffer());// uv matrix
 		tex.bind();
-		model.render();
+		mesh.render();
 	}
 	/**
 	 * @param x
@@ -73,22 +75,22 @@ public class Image {
 		draw(x, y, hOffset, vOffset, 1);
 	}
 	public void draw(int x, int y, float hOffset, float vOffset, float scale) {
-		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(tex.width * scale, tex.height * scale, 1)).toFloatBuffer());// model
-		glUniformMatrix4fv(6, false, Matrix4f.getScale(1, 1, 0).toFloatBuffer());// uv matrix
+		Shader.setModelMat(Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(tex.width * scale, tex.height * scale, 1)));
+		Shader.setUVMat(Matrix4f.getScale(1, 1, 0));
 		tex.bind();
-		model.render();
+		mesh.render();
 	}
 	public void draw(int x, int y, float hOffset, float vOffset, float width, float height) {
-		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(width, height, 1)).toFloatBuffer());// model
-		glUniformMatrix4fv(6, false, Matrix4f.getScale(1, 1, 0).toFloatBuffer());// uv matrix
+		Shader.setModelMat(Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(width, height, 1)));
+		Shader.setUVMat(Matrix4f.getScale(1, 1, 0));
 		tex.bind();
-		model.render();
+		mesh.render();
 	}
 	public void draw(int x, int y, float hOffset, float vOffset, float width, float height, float hReps, float vReps) {
-		glUniformMatrix4fv(3, false, Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(width, height, 1)).toFloatBuffer());// model
-		glUniformMatrix4fv(6, false, Matrix4f.getScale(hReps, vReps, 1).toFloatBuffer());// uv matrix
+		Shader.setModelMat(Matrix4f.getTranslation(x - (tex.width * hOffset), y - (tex.height * vOffset), 0).multiply(Matrix4f.getScale(width, height, 1)));// model
+		Shader.setUVMat(Matrix4f.getScale(hReps, vReps, 1));// uv matrix
 		tex.bind();
-		model.render();
+		mesh.render();
 	}
 	public void destroy() {
 		if (tex != null) {

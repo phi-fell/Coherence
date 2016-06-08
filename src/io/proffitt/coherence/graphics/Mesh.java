@@ -18,14 +18,14 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
-public class Model {
+public class Mesh {
 	int				VAO;
 	int				VBO;
 	int				vertnum;
 	private float[]	verts;
 	private AABB	aabb;
 	private boolean	uv;
-	public Model(float[] v, boolean doUV, boolean autoNormalize) {
+	public Mesh(float[] v, boolean doUV, boolean autoNormalize) {
 		uv = doUV;
 		verts = v;
 		aabb = new AABB(verts, uv ? 8 : 6, autoNormalize);

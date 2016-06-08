@@ -3,6 +3,8 @@ package io.proffitt.coherence.resource;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
 
+import io.proffitt.coherence.math.Matrix4f;
+
 public class Shader {
 	int	vertexID;
 	int	fragmentID;
@@ -33,6 +35,42 @@ public class Shader {
 	}
 	public void unbind() {
 		glUseProgram(0);
+	}
+	public int getUniformLocation(String s) {
+		return glGetUniformLocation(programID, s);
+	}
+	public static void setUniformMat4(int loc, Matrix4f mat) {
+		glUniformMatrix4fv(loc, false, mat.toFloatBuffer());
+	}
+	public static void setModelMat(Matrix4f mat) {
+		setUniformMat4(3, mat);
+	}
+	public static void setEntityMat(Matrix4f mat) {
+		setUniformMat4(4, mat);
+	}
+	public static void setViewMat(Matrix4f mat) {
+		setUniformMat4(5, mat);
+	}
+	public static void setProjectionMat(Matrix4f mat) {
+		setUniformMat4(6, mat);
+	}
+	public static void setUVMat(Matrix4f mat) {
+		setUniformMat4(7, mat);
+	}
+	public void setUniformInt(String s, int i) {
+		glUniform1i(getUniformLocation(s), i);
+	}
+	public void setUniformFloat(String s, float f) {
+		glUniform1f(getUniformLocation(s), f);
+	}
+	public void setUniformFloat(String s, float f0, float f1) {
+		glUniform2f(getUniformLocation(s), f0, f1);
+	}
+	public void setUniformFloat(String s, float f0, float f1, float f2) {
+		glUniform3f(getUniformLocation(s), f0, f1, f2);
+	}
+	public void setUniformFloat(String s, float f0, float f1, float f2, float f3) {
+		glUniform4f(getUniformLocation(s), f0, f1, f2, f3);
 	}
 	public void destroy() {
 		unbind();

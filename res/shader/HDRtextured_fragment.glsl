@@ -34,5 +34,5 @@ void main()
     ambient = min(max(ambient, 0),1);
     diffuse = min(max(diffuse, 0),1);//TODO: make this mathematically impossible
     float gamma = 1;
-    fragColor = vec4(pow(ambient + diffuse + specular, vec3(1/gamma)),1) * texture(tex, pass_UV);;
+    fragColor = vec4(pow(ambient + diffuse + specular, vec3(1/gamma)),1) * texture(tex, pass_UV);
 }

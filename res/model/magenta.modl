@@ -1,0 +1,4 @@
+mesh: penny,
+texture: magenta,
+normalized: true,
+scale: 1

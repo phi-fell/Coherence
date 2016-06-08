@@ -1,0 +1,4 @@
+mesh: smallbag,
+texture: smallbag,
+normalized: true,
+scale: 0.2

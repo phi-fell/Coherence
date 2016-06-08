@@ -5,8 +5,9 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 UV;
 
 layout (location = 3) uniform mat4 model;
-layout (location = 4) uniform mat4 view;
-layout (location = 5) uniform mat4 projection;
+layout (location = 4) uniform mat4 entity;
+layout (location = 5) uniform mat4 view;
+layout (location = 6) uniform mat4 projection;
 
 out vec3 pass_normal;
 out vec3 pass_pos;
@@ -18,8 +19,8 @@ void main()
 {
 	pass_UV = UV;
 	pass_lightPos = (view * vec4(3,3,3,1)).xyz;
-    pass_normal = normalize((view * model * vec4(normal, 0)).xyz);
-    pass_pos = (view * model * vec4(pos, 1.0)).xyz;
+    pass_normal = normalize((view * entity * model * vec4(normal, 0)).xyz);
+    pass_pos = (view * entity * model * vec4(pos, 1.0)).xyz;
     pass_view = view;
-    gl_Position = projection * view * model * vec4(pos, 1.0);
+    gl_Position = projection * view * entity * model * vec4(pos, 1.0);
 }

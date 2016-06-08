@@ -122,7 +122,6 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 								if (lookAt != null && lookAt instanceof Item) {
 									player.getInventory().addItem((Item) lookAt);
 									lookAt.getCell().removeEntity(lookAt);
-									//TODO: remove item from level
 								}
 							}
 							//TODO: move keyboard checking out of PlayerAI, and make functions such as PlayerAI.jump() or
@@ -194,7 +193,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 				world.getLevel().addEntity(penny);
 			}
 		}
-		player = new Mob(null, null, new PlayerAI(w, perspectiveCam));
+		player = new Mob(Entity.defaultModel, null, new PlayerAI(w, perspectiveCam));
 		globals.register(player.getInventory());
 		perspectiveCam.lockTo(player);
 		world.getLevel().addEntity(player);
@@ -249,13 +248,15 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 			world.getLevel().centerOn(player);
 			// render
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			//RENDER: terrain
 			ResourceHandler.get().getShader("terrain").bind();
 			perspectiveCam.bind();
 			world.getLevel().draw(); // draw level
+			//RENDER: entities
 			ResourceHandler.get().getShader("HDRtextured").bind();
 			perspectiveCam.bind();
 			world.getLevel().drawContents();
-			// render UI
+			//RENDER: UI
 			if (globals.get("renderUI").getBool()) {
 				glClear(GL_DEPTH_BUFFER_BIT);
 				ResourceHandler.get().getShader("2dOrtho").bind();
@@ -274,7 +275,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 					player.getInventory().drawGUIOverlay();
 				}
 			}
-			// render debug console
+			//RENDER: console
 			if (globals.get("console").getBool()) {
 				ResourceHandler.get().getShader("2dOrtho").bind();
 				orthoCam.bind();
