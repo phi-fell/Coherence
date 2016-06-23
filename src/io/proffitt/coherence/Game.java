@@ -14,7 +14,6 @@ import io.proffitt.coherence.settings.Configuration;
 import io.proffitt.coherence.settings.SettingsListener;
 import io.proffitt.coherence.settings.Value;
 import io.proffitt.coherence.world.Entity;
-import io.proffitt.coherence.world.Mob;
 import io.proffitt.coherence.world.World;
 
 public class Game implements Runnable, SettingsListener, MenuParent {
@@ -25,7 +24,7 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 	Console			console;
 	Camera			perspectiveCam	= new Camera();
 	Camera			orthoCam		= new Camera();
-	Mob				player			= null;
+	Entity			player			= null;
 	World			world;
 	public Game(Window wind) {
 		globals = ResourceHandler.get().getConfig("globals");
@@ -193,7 +192,9 @@ public class Game implements Runnable, SettingsListener, MenuParent {
 				world.getLevel().addEntity(penny);
 			}
 		}
-		player = new Mob(Entity.defaultModel, null, new PlayerAI(w, perspectiveCam));
+		//REFERENCE: player collision box
+		//public static Model	defaultModel	= new Model(new Mesh(new float[] { -0.25f, 0, -0.25f, 0, 0, 0, 0.25f, 1.75f, 0.25f, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, false, false), null);
+		player = new Mob(null, new PlayerAI(w, perspectiveCam));
 		globals.register(player.getInventory());
 		perspectiveCam.lockTo(player);
 		world.getLevel().addEntity(player);

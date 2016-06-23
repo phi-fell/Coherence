@@ -130,8 +130,8 @@ public class Cell {
 				h = hX + dZ;
 			}
 			float dH = eY - h;
-			e.lockToGround(dH, delta);
-			e.lockCamera();
+			//e.lockToGround(dH, delta);
+			//e.lockCamera();
 		}
 	}
 	public void addEntity(Entity e) {

@@ -145,9 +145,6 @@ public class Camera implements SettingsListener {
 	public float getFOV() {
 		return fov;
 	}
-	public void lockTo(Entity e) {
-		e.lockCamera(this);
-	}
 	@Override
 	public void onSettingChanged(String setting, Value newValue) {
 		if (setting.equals("FOV")) {

@@ -1,4 +1,6 @@
 mesh: smallbag,
 texture: smallbag,
 normalized: true,
-scale: 0.2
+scale: {
+	uniform: 0.2
+}

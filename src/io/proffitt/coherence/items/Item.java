@@ -8,6 +8,7 @@ import io.proffitt.coherence.resource.ItemSchematic;
 import io.proffitt.coherence.resource.ResourceHandler;
 import io.proffitt.coherence.resource.Shader;
 import io.proffitt.coherence.world.Entity;
+import io.proffitt.coherence.world.component.Model;
 
 public class Item extends Entity {
 	static Transform inventoryTransform;
@@ -26,14 +27,14 @@ public class Item extends Entity {
 		this.transform.getScale().x = 1;
 		this.transform.getScale().y = 1;
 		this.transform.getScale().z = 1;
-		model = schema.getModel();
+		components.put(Model.class, schema.getModel());
 	}
 	public void update(double delta) {
 		super.update(delta);
 		//TODO: anything else?
 	}
 	public void draw(int x, int y) {
-		if (model != null) {
+		if (components.containsKey(Model.class)) {
 			//TODO!
 			inventoryTransform.getPosition().x = x + (Inventory.ITEM_SIZE_PIX / 2);
 			inventoryTransform.getPosition().y = y + (Inventory.ITEM_SIZE_PIX / 2);
@@ -43,7 +44,7 @@ public class Item extends Entity {
 			inventoryTransform.getRotation().y = (float) (t / 5);
 			inventoryTransform.getRotation().z = (float) (t / 13);
 			Shader.setEntityMat(inventoryTransform.getAsMatrix());
-			model.draw();
+			((Model) components.get(Model.class)).draw();
 		}
 	}
 	public Transform getTransfrom() {

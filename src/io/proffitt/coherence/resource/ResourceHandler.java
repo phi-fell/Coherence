@@ -19,7 +19,7 @@ import io.proffitt.coherence.world.Level;
 import io.proffitt.coherence.world.component.Model;
 
 public class ResourceHandler {
-	private static ResourceHandler	rh;
+	private static ResourceHandler rh;
 	public static ResourceHandler get() {
 		if (rh == null) {
 			rh = new ResourceHandler();
@@ -52,30 +52,23 @@ public class ResourceHandler {
 	public void cleanup() {
 		//this.saveConfig("settings");//save settings
 		this.saveConfig("keybindings");//save bound keys
-		for (String s : items.keySet()) {
-			properties.remove(s);// props don't need cleanup
-		}
-		for (String s : items.keySet()) {
-			items.remove(s);// items don't need cleanup
-		}
-		for (String s : configs.keySet()) {
-			configs.remove(s);// configs don't need cleanup
-		}
+		properties = new HashMap<String, CMLFile>();
+		items = new HashMap<String, ItemSchematic>();
+		configs = new HashMap<String, Configuration>();
+		textures = new HashMap<String, Texture>();
 		for (String s : textures.keySet()) {
-			textures.remove(s).destroy();
+			textures.get(s).destroy();
 		}
-		for (String s : fonts.keySet()) {
-			fonts.remove(s);// fonts don't need cleanup
-		}
+		fonts = new HashMap<String, Font>();
+		shaders = new HashMap<String, Shader>();
 		for (String s : shaders.keySet()) {
-			shaders.remove(s).destroy();
+			shaders.get(s).destroy();
 		}
+		meshes = new HashMap<String, Mesh>();
 		for (String s : meshes.keySet()) {
-			meshes.remove(s).destroy();
+			meshes.get(s).destroy();
 		}
-		for (String s : models.keySet()) {
-			models.remove(s);
-		}
+		models = new HashMap<String, Model>();
 	}
 	public CMLFile getProperty(String name) {
 		if (!properties.containsKey(name)) {
@@ -225,7 +218,7 @@ public class ResourceHandler {
 		return models.get(name);
 	}
 	private Model loadModel(String name) {
-		return new Model(this.loadResourceAsCML("res/model/" + name + ".mdl"));
+		return new Model(this.loadResourceAsCML("res/model/" + name + ".modl"));
 	}
 	private CMLFile loadResourceAsCML(String path) {
 		return new CMLFile(loadResourceAsString(path));

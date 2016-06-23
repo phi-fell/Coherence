@@ -1,4 +1,3 @@
 name: Gold Coin,
 model: penny,
-texture: penny,
 stack: 5

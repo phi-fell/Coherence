@@ -125,8 +125,9 @@ public class CMLObject {
 			} else {
 				return null;
 			}
+		} else {
+			return objects.get(obj);
 		}
-		return objects.get(obj);
 	}
 	public Collection<CMLObject> getSubs() {
 		return objects.values();

@@ -26,20 +26,20 @@ public class Quaternion {
 		y = (w * q.y) - (x * q.z) + (y * q.w) + (z * q.x);
 		z = (w * q.z) + (x * q.y) - (y * q.x) + (z * q.w);
 	}
-	public float SqMag() {
+	public float sqMag() {
 		return (w * w) + (x * x) + (y * y) + (z * z);
 	}
-	public float Mag() {
-		return (float) Math.sqrt(SqMag());
+	public float mag() {
+		return (float) Math.sqrt(sqMag());
 	}
 	public void normalize() {
-		float m = Mag();
+		float m = mag();
 		w /= m;
 		x /= m;
 		y /= m;
 		z /= m;
 	}
-	public Quaternion conjugate() {
+	public Quaternion getConjugate() {
 		return new Quaternion(w, -x, -y, -z);
 	}
 }
